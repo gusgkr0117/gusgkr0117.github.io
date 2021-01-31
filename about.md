@@ -26,5 +26,5 @@ titles:
 key: page-about
 ---
 
-* Email : gusgkr0117@naver.com
+* Email : gusgkr0117@korea.ac.kr
 * Topic : Mathematics, Cryptography, Computer Science
