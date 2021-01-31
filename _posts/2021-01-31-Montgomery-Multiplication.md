@@ -5,6 +5,7 @@ use_math: true
 ---
 
 * Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.
+* $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, ... etc)
 
 ### 빠른 모듈러 곱의 철학
 
@@ -113,8 +114,8 @@ function MultiPrecisionREDC is
         S[i] ← T[i + r]
     end for
 
-    if S ≥ N then
-        return S − N
+    if S ≥ p then
+        return S − p
     else
         return S
     end if
@@ -124,3 +125,61 @@ end function
 ### Multi-precision multiplication algorithm
 
 앞서 설명한 reduction을 이용해 실제 Montgomery 곱셈을 진행한다면 곱셈과 reduction을 하나로 합쳐야한다. 이 둘은 사실 따로 수행할 필요 없이 하나의 함수 안에 약간의 최적화로 수행할 수 있다.
+
+```
+B = 2^8 or 2^16 or 2^32
+function MultiPrecisionREDC is
+    Input: Integer p with gcd(B, p) = 1, stored as an array of m words,
+           Integer R = B^r,     --thus, r = log_B(R)
+           Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B),
+           Integer A in the range 0 ≤ A < p, stored as an array of m words.
+           Integer B in the range 0 ≤ B < p, stored as an array of m words.
+
+    Output: Integer S in [0, p − 1] such that ABR^(−1) ≡ S (mod p), stored as an array of m words.
+
+    --initialize array T
+    for 0 ≤ i < r + m do
+    	T[i] = 0
+    end for
+
+    Set T[r + m] = 0  (extra carry word)
+
+    for 0 ≤ i < r do
+        --loop1- Make T divisible by Bi+1
+
+        c ← 0
+        n ← (T[i] + A[0] ⋅ B[i]) ⋅ p′ mod B
+        for 0 ≤ j < m do
+            --loop2- Add n ⋅ p to T
+
+            x ← T[i + j] + n ⋅ p[j] + c
+            T[i + j] ← x mod B
+            c ← ⌊x / B⌋
+        end for
+        T[i + m] ← T[i + m] + c
+
+        c ← 0
+        for 0 ≤ j < m do
+            --loop3- Add A ⋅ B[i] to T
+
+            x ← T[i + j] + A[j] ⋅ B[i] + c
+            T[i + j] ← x mod B
+            c ← ⌊x / B⌋
+        end for
+        T[i + m] ← T[i + m] + c
+
+        --assert- A ⋅ B[i] + n ⋅ p는 B^(m+1)을 넘지 않으므로 더 이상의 캐리가 발생하지 않는다.
+
+    end for
+
+    for 0 ≤ i ≤ m do
+        S[i] ← T[i + r]
+    end for
+
+    if S ≥ p then
+        return S − p
+    else
+        return S
+    end if
+end function
+```

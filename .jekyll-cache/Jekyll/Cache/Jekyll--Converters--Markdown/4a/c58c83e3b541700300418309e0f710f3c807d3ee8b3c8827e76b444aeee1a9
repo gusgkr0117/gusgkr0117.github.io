@@ -1,5 +1,0 @@
-I"l<p>Montgomery Multiplication은 Modular Multiplication을 효율적으로 수행하는 알고리즘이다.</p>
-
-<p>소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다.
-단순한 방법으로 $a \cdot b$를 수행하고 이 값이 $p$보다 작아질 때까지 $p$를 빼주면 된다.</p>
-:ET

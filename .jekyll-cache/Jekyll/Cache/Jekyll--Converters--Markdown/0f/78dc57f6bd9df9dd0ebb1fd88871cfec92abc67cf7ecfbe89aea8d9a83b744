@@ -1,5 +1,6 @@
-I"�<ul>
+I"G(<ul>
   <li>Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.</li>
+  <li>$\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)</li>
 </ul>
 
 <h3 id="빠른-모듈러-곱의-철학">빠른 모듈러 곱의 철학</h3>
@@ -70,7 +71,10 @@ end function
 
 <h3 id="multi-precision-reduction-algorithm">Multi-precision reduction algorithm</h3>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function MultiPrecisionREDC is
+<p>아래 알고리즘은 $k$-right shift를 마지막에 한 번에 수행하는 방식이다. 실제로 right shift를 수행하지 않고, 출력값을 복사할 때, $k$-bit 밀려서 복사하는 방식으로 수행한다. 따라서 연산량이 전혀 들지 않는다</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>B = 2^8 or 2^16 or 2^32
+function MultiPrecisionREDC is
     Input: Integer p with gcd(B, p) = 1, stored as an array of m words,
            Integer R = B^r,     --thus, r = log_B(R)
            Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B),
@@ -100,12 +104,12 @@ end function
         end for
     end for
 
-    for 0 ≤ i ≤ p do
+    for 0 ≤ i ≤ m do
         S[i] ← T[i + r]
     end for
 
-    if S ≥ N then
-        return S − N
+    if S ≥ p then
+        return S − p
     else
         return S
     end if
@@ -113,4 +117,63 @@ end function
 </code></pre></div></div>
 
 <h3 id="multi-precision-multiplication-algorithm">Multi-precision multiplication algorithm</h3>
+
+<p>앞서 설명한 reduction을 이용해 실제 Montgomery 곱셈을 진행한다면 곱셈과 reduction을 하나로 합쳐야한다. 이 둘은 사실 따로 수행할 필요 없이 하나의 함수 안에 약간의 최적화로 수행할 수 있다.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>B = 2^8 or 2^16 or 2^32
+function MultiPrecisionREDC is
+    Input: Integer p with gcd(B, p) = 1, stored as an array of m words,
+           Integer R = B^r,     --thus, r = log_B(R)
+           Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B),
+           Integer A in the range 0 ≤ A &lt; p, stored as an array of m words.
+           Integer B in the range 0 ≤ B &lt; p, stored as an array of m words.
+
+    Output: Integer S in [0, p − 1] such that ABR^(−1) ≡ S (mod p), stored as an array of m words.
+
+    --initialize array T
+    for 0 ≤ i &lt; r + m do
+    	T[i] = 0
+    end for
+
+    Set T[r + m] = 0  (extra carry word)
+
+    for 0 ≤ i &lt; r do
+        --loop1- Make T divisible by Bi+1
+
+        c ← 0
+        n ← (T[i] + A[0] ⋅ B[i]) ⋅ p′ mod B
+        for 0 ≤ j &lt; m do
+            --loop2- Add n ⋅ p to T
+
+            x ← T[i + j] + n ⋅ p[j] + c
+            T[i + j] ← x mod B
+            c ← ⌊x / B⌋
+        end for
+        T[i + m] ← T[i + m] + c
+
+        c ← 0
+        for 0 ≤ j &lt; m do
+            --loop3- Add A ⋅ B[i] to T
+
+            x ← T[i + j] + A[j] ⋅ B[i] + c
+            T[i + j] ← x mod B
+            c ← ⌊x / B⌋
+        end for
+        T[i + m] ← T[i + m] + c
+
+        --assert- A ⋅ B[i] + n ⋅ p는 B^(m+1)을 넘지 않으므로 더 이상의 캐리가 발생하지 않는다.
+
+    end for
+
+    for 0 ≤ i ≤ m do
+        S[i] ← T[i + r]
+    end for
+
+    if S ≥ p then
+        return S − p
+    else
+        return S
+    end if
+end function
+</code></pre></div></div>
 :ET
