@@ -4,7 +4,7 @@ tag: Quantum_Algorithm
 use_math: true
 ---
 
-* 해당 글은 (Quantum Security Analysis of CSIDH)[https://eprint.iacr.org/2018/537.pdf]논문을 정리한 것이다.
+* 해당 글은 [Quantum Security Analysis of CSIDH](https://eprint.iacr.org/2018/537.pdf)논문을 정리한 것이다.
 * 3개의 대표적인 양자 알고리즘이 존재한다.
 * kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.
 * 입력으로 주어진 함수의 정의역 G가 commutative해야지 subexponential time 안에 문제를 해결할 수 있다.
@@ -13,7 +13,7 @@ use_math: true
 
  Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, shift 값 $s$를 찾는 문제이다.
 
- 이 문제는 classical한 관점에서 봤을 때, collision을 찾는 문제와 같다. $n=|G|$라고 할 때, 걸리는 시간은 $\sqrt{n}$이 된다. 하지만 quantum 알고리즘으로는 subexponential하게 해결할 수 있다.
+ 이 문제는 classical한 관점에서 봤을 때, collision을 찾는 문제와 같다. $n=\|G\|$라고 할 때, 걸리는 시간은 $\sqrt{n}$이 된다. 하지만 quantum 알고리즘으로는 subexponential하게 해결할 수 있다.
 
 ### kuperberg 알고리즘의 철학(labeled state)
 
@@ -64,7 +64,7 @@ $\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi({l_1 + l_2}{N})\ket{
 
 위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장큰 $k$ 값을 말한다.
 
-$P_i = {\ket{\psi_x} | val_2(x) = i}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\bra{\psi_{2^i}}}$를 얻을 수 있다.
+$P_i = {\ket{\psi_x} \| val_2(x) = i}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\bra{\psi_{2^i}}}$를 얻을 수 있다.
 
 ```
 for 0 ≤ i ≤ n do 
@@ -105,7 +105,7 @@ Group $G$의 크기를 $N$이라고 했을 때, 아래의 quantum state에 QFT�
 
 $\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$
 
-여기서 $s \in \mathbb{Z_N}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 N이 power of 2가 아닐 경우엔 $\mathbb{Z_N}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 (kitaev)[https://arxiv.org/pdf/quant-ph/9511026.pdf]와 (Mosca and Zalka)[https://arxiv.org/pdf/quant-ph/0301093.pdf] 논문을 참조하자.
+여기서 $s \in \mathbb{Z_N}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 N이 power of 2가 아닐 경우엔 $\mathbb{Z_N}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 [kitaev](https://arxiv.org/pdf/quant-ph/9511026.pdf)와 [Mosca and Zalka](https://arxiv.org/pdf/quant-ph/0301093.pdf) 논문을 참조하자.
 
 해당 포스트에서는 $N$-QFT를 이용해도 우리가 앞서 얻은 label들
 
@@ -115,15 +115,11 @@ ${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}
 
 $\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$
 
-이를 측정했을 때, label $t$를 얻을 확률은 
-
-$\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$
-
-이 된다.
+이를 측정했을 때, label $t$를 얻을 확률은 $\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$이 된다.
 
 $\theta = \frac{s}{N}+\frac{t}{2^n}$라고 하면, $\theta = 0$인 $t$가 존재하면, 해당 $t$가 label로 측정될 확률은 1이되지만, N이 power of 2가 아닌 경우, 그런 $k$가 존재하지 않는다면, $\theta \in [0, \frac{1}{2^{n+1}}]$인 경우, 확률값 $p(\theta) = \frac{1}{2^{2n}}(\frac{1-\chi(2^n\theta)}{1-\chi(\theta)})^2$는 단조 감소함을 알 수 있으며, $\theta = \frac{1}{2^{n+1}}$일 때, $p(\frac{1}{2^{n+1}}) \approx \frac{1}{2^{2n}}\frac{1/2}{(\pi\theta)^2} = \frac{2}{\pi^2}$값을 갖는다.
 
-따라서 $\left| \frac{s}{N} + \frac{t}{2^n} \right| \leq \frac{1}{2^{n+1}}$를 만족하는 $t$를 찾을 확률이 적어도 $\frac{2}{\pi^2}$가 된다. 이러한 $t$ 값을 찾으면, $n > \log_2(N)$일 때, 연분수를 이용해 정확한 $s$ 값을 찾을 수 있다.
+따라서 $\| \frac{s}{N} + \frac{t}{2^n} \| \leq \frac{1}{2^{n+1}}$를 만족하는 $t$를 찾을 확률이 적어도 $\frac{2}{\pi^2}$가 된다. 이러한 $t$ 값을 찾으면, $n > \log_2(N)$일 때, 연분수를 이용해 정확한 $s$ 값을 찾을 수 있다.
 
 ### Regev's algorithm with polynomial quantum space
 
