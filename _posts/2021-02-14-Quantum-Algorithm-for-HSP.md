@@ -19,28 +19,26 @@ use_math: true
 
 함수 $f$와 $g$가 주어졌을 때, uniform superposition state를 $f$, $g$ oracle에 입력해서 우리가 가장 간단히 얻을 수 있는 quantum state는 아래와 같다.
 
-$\newcommand{\ket}[1]{\left| #1 \right>}$
-$\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$
+<center>$\newcommand{\ket}[1]{\left| #1 \right>}$
+$\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$</center>
 
 두번째 레지스터는 $f$ 또는 $g$ 중에서 어떤 함수의 출력값인지 0 또는 1로 구분하기 위해 넣은 ancilla 값이다. 위와 같은 quantum state에서 세번째 레지스터를 측정해서 얻은 label이 $v$라고 할 때, $f(x_0 + s) = g(x_0) = v$를 만족하는 $x_0$에 대해서 아래의 quantum state를 얻을 수 있다.
 
-$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$
+<center>$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$</center>
 
 여기서 두번째 레지스터에 Quantum Fourier Transform을 적용하면 아래의 quantum state를 얻는다.
 
-$\ket{\psi_2} = \frac{1}{2N}\sum_{k=0}^{k=N-1} \ket{k}(\ket{0}+e^{2\pi ski/N}\ket{1})$
+<center>$\ket{\psi_2} = \frac{1}{2N}\sum_{k=0}^{k=N-1} \ket{k}(\ket{0}+e^{2\pi ski/N}\ket{1})$</center>
 
 여기서 다시 첫번째 레지스터를 측정하면 아래의 labeled quantum state를 얻을 수 있다.
 
-$\ket{\psi_l} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(l/N)\ket{1})$
-
-where $\chi(x) = e^{2\pi sxi}$
+<center>$\ket{\psi_l} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(l/N)\ket{1})$ where $\chi(x) = e^{2\pi sxi}$ </center>
 
 labeled quantum state $\ket{\psi_l}$을 얻을 확률은 정확히 $\frac{1}{N}$이며, 한 개의 labeled quantum state를 얻기 위해서 $f$와 $g$ quantum oracle 각각에 대해 한번씩의 query가 필요하다.(총 두번의 query)
 
 kuperberg 알고리즘은 이러한 labeled quantum state $\ket{\psi_l}$을 얻는 행위를 반복해서 충분히 많은 개수의 labeled quantum state를 모아놓고, 이들을 조합해서 아래의 labeled quantum state를 만드는 것이 목표이다.
 
-${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$
+<center>${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$</center>
 
 이와 같은 labeled quantum state를 얻으면, Quantum Fourier Transform을 역으로 적용해 shift 값 $s$를 얻을 수 있다.
 
@@ -48,15 +46,15 @@ ${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}
 
 labeled quantum state $\ket{\psi_{l_1}}$과 $\ket{\psi_{l_2}}$가 주어졌을 때, 이 둘을 단순히 붙여놓으면 아래와 같은 quantum state를 얻을 수 있다.
 
-$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1}{N})\ket{10} + \chi(l_2)\ket{01} + \chi(\frac{l_1 + l_2}{N})\ket{11})$
+<center>$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1}{N})\ket{10} + \chi(l_2)\ket{01} + \chi(\frac{l_1 + l_2}{N})\ket{11})$</center>
 
 여기서 첫번째와 두번째 qubit에 CNOT을 적용하면 아래와 같은 quantum state를 얻을 수 있다.
 
-$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1 + l_2}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1}{N})\ket{11})$
+<center>$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1 + l_2}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1}{N})\ket{11})$</center>
 
 여기서 두번째 qubit을 측정하면 $\frac{1}{2}$확률로 label 0을 얻고, 아래와 같은 quantum state를 얻을 수 있다.
 
-$\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi({l_1 + l_2}{N})\ket{1})$
+<center>$\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi({l_1 + l_2}{N})\ket{1})$</center>
 
 이와 같은 방식으로 두개의 labeled quantum state를 이용해 combination된 새로운 labeled quantum state를 얻을 수 있다.
 
@@ -64,7 +62,7 @@ $\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi({l_1 + l_2}{N})\ket{
 
 위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장큰 $k$ 값을 말한다.
 
-$P_i = \{\ket{\psi_x} \| val_2(x) = i\}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\bra{\psi_{2^i}}}$를 얻을 수 있다.
+$P_i = \\{ \ket{\psi_x} \| val_2(x) = i \right \\}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\ket{\psi_{2^i}}}$를 얻을 수 있다.
 
 ```
 for 0 ≤ i ≤ n do 
@@ -93,9 +91,7 @@ return Failure
 
 $2^k + 1$개의 $n$-bit label이 uniform distribution으로부터 주어졌다고 가정하자. 그러면 비둘기 집의 원리에 의해 이중에서 $l_1 + l_2$의 2-valuation이 $k$ 이상이 되는 $l_1$, $l_2$가 적어도 1개 존재하며, 이 둘을 combination해서 2-valuation이 $k$ 이상이 되는 label 한개를 만들 수 있다. 따라서 만약에 $r \cdot 2^k$만큼의 $n$-bit label이 주어지면, 적어도 $\frac{(r-1)}{2} \cdot 2^k > \frac{r}{4} \cdot 2^k$만큼의 2-valuation이 $k$이상인 label을 얻을 수 있다.
 
-그러면 가장 처음에 대략 $4^{\rceil \frac{n}{k} \lceil}2^k$만큼의 label을 뽑아놓으면 마지막에 2-valuation이 $n-1$인 label이 적어도 1개 나온다는 것을 알 수 있다. $k = \sqrt{n}$으로 설정하면, 필요한 label의 개수는 총 $2^{3\sqrt{n}}$으로 subexponential하다.
-
-label의 개수는 곧 oracle query의 개수이므로 subexponential query만으로 문제를 해결 할 수 있음을 알 수 있다.
+그러면 가장 처음에 대략 $4^{\lceil \frac{n}{k} \rceil}2^k$만큼의 label을 뽑아놓으면 마지막에 2-valuation이 $n-1$인 label이 적어도 1개 나온다는 것을 알 수 있다. $k = \sqrt{n}$으로 설정하면, 필요한 label의 개수는 총 $2^{3\sqrt{n}}$으로 subexponential하다. label의 개수는 곧 oracle query의 개수이므로 subexponential query만으로 문제를 해결 할 수 있음을 알 수 있다.
 
 다만, 이를 위해서 마찬가지로 subexponential한 quantum memory가 필요하다는 것도 알 수 있다.
 
@@ -103,17 +99,17 @@ label의 개수는 곧 oracle query의 개수이므로 subexponential query만�
 
 Group $G$의 크기를 $N$이라고 했을 때, 아래의 quantum state에 QFT를 적용한다.
 
-$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$
+<center>$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$</center>
 
 여기서 $s \in \mathbb{Z_N}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 N이 power of 2가 아닐 경우엔 $\mathbb{Z_N}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 [kitaev](https://arxiv.org/pdf/quant-ph/9511026.pdf)와 [Mosca and Zalka](https://arxiv.org/pdf/quant-ph/0301093.pdf) 논문을 참조하자.
 
 해당 포스트에서는 $N$-QFT를 이용해도 우리가 앞서 얻은 label들
 
-${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$
+<center>${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$</center>
 
 을 통해서 얼마나 정확히 $s$값을 구해낼 수 있는가를 분석해볼 것이다. label을 생성할 때에는 $N$-QFT를 이용했지만, shift 값 $s$를 복구할 때에는 위 label들을 사용해야하기 때문에 $2^n$-QFT를 사용할 수 밖에 없다. 그러면 아래와 같은 quantum state를 얻을 수 있다.
 
-$\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$
+<center>$\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$</center>
 
 이를 측정했을 때, label $t$를 얻을 확률은 $\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$이 된다.
 
