@@ -2,6 +2,7 @@
 title: Quantum algorithm for Hidden Shift Problem
 tag: Quantum_Algorithm
 use_math: true
+comments: true
 ---
 
 * 해당 글은 [Quantum Security Analysis of CSIDH](https://eprint.iacr.org/2018/537.pdf)논문을 정리한 것이다.
