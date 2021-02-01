@@ -19,7 +19,7 @@ use_math: true
 
 함수 $f$와 $g$가 주어졌을 때, uniform superposition state를 $f$, $g$ oracle에 입력해서 우리가 가장 간단히 얻을 수 있는 quantum state는 아래와 같다.
 
-$\require{physics}$
+$\newcommand{\ket}[1]{\left| #1 \right>}$
 $\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$
 
 두번째 레지스터는 $f$ 또는 $g$ 중에서 어떤 함수의 출력값인지 0 또는 1로 구분하기 위해 넣은 ancilla 값이다. 위와 같은 quantum state에서 세번째 레지스터를 측정해서 얻은 label이 $v$라고 할 때, $f(x_0 + s) = g(x_0) = v$를 만족하는 $x_0$에 대해서 아래의 quantum state를 얻을 수 있다.
@@ -64,7 +64,7 @@ $\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi({l_1 + l_2}{N})\ket{
 
 위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장큰 $k$ 값을 말한다.
 
-$P_i = {\ket{\psi_x} \| val_2(x) = i}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\bra{\psi_{2^i}}}$를 얻을 수 있다.
+$P_i = \{\ket{\psi_x} \| val_2(x) = i\}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\bra{\psi_{2^i}}}$를 얻을 수 있다.
 
 ```
 for 0 ≤ i ≤ n do 
