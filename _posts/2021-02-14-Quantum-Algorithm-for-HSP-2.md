@@ -1,5 +1,5 @@
 ---
-title: Quantum algorithm for Hidden Shift Problem 2
+title: Quantum algorithm for Hidden Shift Problem \#2
 tag: Quantum_Algorithm
 use_math: true
 ---
@@ -11,7 +11,7 @@ use_math: true
 $\newcommand{\ket}[1]{\left| #1 \right>}$
 $\newcommand{\bra}[1]{\left< #1 \right|}$
 $\newcommand{\norm}[1]{\left| #1 \right|}$
-$\newcommand{\inner}[1]{\left< #1 \right>}$
+$\newcommand{\inner}[1]{< #1 >}$
 $\newcommand{\ceil}[1]{\lceil #1 \rceil}$
 $\newcommand{\floor}[1]{\lfloor #1 \rfloor}$
 
@@ -31,11 +31,11 @@ Regev의 combination 연산은 $l+4$ 개의 labeled state를 입력으로 받아
 
 이를 모두 tensor product하면 아래와 같은 quantum state를 얻을 수 있다.
 
-<center>$\ket{\psi_0} = \sum_{\vec{b} \in \\{0,1\\}^{l+4}} \chi(\frac{\inner{\vec{b}, \vec{y}}}{N})\ket{\vec{b}}$</center>
+<center>$\ket{\psi_0} = \sum_{\vec{b} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{b}, \vec{y}}}{N})\ket{\vec{b}}$</center>
 
 여기서 첫번째 레지스터에 $\ket{\vec{b}}\ket{0} \rightarrow \ket{\vec{b}}\ket{\inner{\vec{b}, \vec{y}} \mod 2^l}$연산을 적용하면, 아래와 같은 quantum state를 얻을 수 있다.
 
-<center>$\ket{\psi_1} = \sum_{\vec{b} \in \\{0,1\\}^{l+4}} \chi(\frac{\inner{\vec{b}, \vec{y}}}{N})\ket{\vec{b}}\ket{\inner{\vec{b}, \vec{y}} \mod 2^l}$</center>
+<center>$\ket{\psi_1} = \sum_{\vec{b} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{b}, \vec{y}}}{N})\ket{\vec{b}}\ket{\inner{\vec{b}, \vec{y}} \mod 2^l}$</center>
 
 여기서 두번째 레지스터를 측정하면 label $V$를 얻고, 아래와 같은 quantum state를 얻는다.
 
@@ -57,7 +57,7 @@ $n = \ceil{\log N}$이라고 할 때, $l = O(\sqrt{n \log n})$으로 잡으면, 
 
 논문에서는 이 문제를 최적화된 classical 알고리즘을 적용해 $\tilde{O}(2^{0.291 \log_2(N)})$으로 해결함으로써 CSIDH-512가 NIST 기준에 맞지 않게됨을 보이고있다. **<span sytle="color:blue">이 의미는 결국 Classical한 측면에서 Hidden Shift Problem을 Subset Sum Problem으로 quantum reduction시켰다는 것이다.</span>** Subset Sum에 대한 최적화된 해결방법이 있으므로 이를 통해 Hidden Shift Problem를 우회적으로 짧은 시간 안에 해결하게 된다.
 
-CSIDH-512의 경우에 Class Group의 크기가 대략 $N \approx \sqrt{p} = 2^256$이며, $l = 256$에 대한 Regev algorithm을 적용하면 $2^19$만큼의 quantum query가 필요하며, $2^86$만큼의 classical time과 memory가 필요하다는 결론이 나온다.
+CSIDH-512의 경우에 Class Group의 크기가 대략 $N \approx \sqrt{p} = 2^{256}$이며, $l = 256$에 대한 Regev algorithm을 적용하면 $2^{19}$만큼의 quantum query가 필요하며, $2^{86}$만큼의 classical time과 memory가 필요하다는 결론이 나온다.
 
 ### Kuperberg's second algorithm(Collimation Sieve)
 
