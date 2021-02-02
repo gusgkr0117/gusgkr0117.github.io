@@ -3,6 +3,7 @@ title: Montgomery Multiplication
 subtitle: Montomery Multiplication 이해하기
 tags: Mathematics
 use_math: true
+key: post_20210131
 ---
 
 * Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.
