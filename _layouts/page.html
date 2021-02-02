@@ -152,6 +152,9 @@ layout: base
                     {%- if page.subtitle -%}
                       <p class="overlay__excerpt">{{ page.subtitle }}</p>
                     {%- endif -%}
+                    <a href="http://hits.dwyl.com/{{ site.url | remove_first: 'https://' | remove_first: 'http://' }}{{ page.url }}" target="_blank">
+                      <img src="http://hits.dwyl.com/{{ site.url | remove_first: 'https://' | remove_first: 'http://' }}{{ page.url }}.svg" />
+                    </a>
                     {%- if page.article_header.actions -%}
                       <ul class="menu">
                         {%- for _action in page.article_header.actions -%}
