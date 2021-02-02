@@ -1,5 +1,6 @@
 ---
 title: Montgomery Multiplication
+subtitle: Montomery Multiplication 이해하기
 tags: Mathematics
 use_math: true
 ---
@@ -7,7 +8,7 @@ use_math: true
 * Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.
 * $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, ... etc)
 
-### 빠른 모듈러 곱의 철학
+## 빠른 모듈러 곱의 철학
 
 소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다.
 단순한 방법으로 $a \cdot b$를 수행하고 이 값이 $p$보다 작아질 때까지 $p$를 빼주면 된다.
@@ -17,7 +18,7 @@ Modular 곱셈에서는 modular $p$를 해주는 연산이 가장 오래걸린�
 
 그런데 이진수를 사용한다면, $p = 2^k$꼴인 $p$에 대해서는 modular 연산이 k개의 least significant bit를 남기고 지우는 행위와 같다는 것을 알 수 있다. 이는 AND 논리 연산으로 아주 간단히 구현할 수 있다. $p \& (2^k-1)$을 연산하면 되기 때문이다. 이러한 점에서 착안해 modular $p$연산을 modular $2^k$연산으로 변환하여 연산을 빠르게 수행하려는 것이 Montgomery Multiplication의 철학이다.
 
-### Montgomery reduction
+## Montgomery reduction
 
 $a \cdot b$의 값을 $[0,p-1]$사이로 reduction 시킨다는 것은 수의 길이를 줄인다는 의미이다. 수의 길이를 줄이는 가장 빠른 방법은 당연히 right shift 연산을 통해 lsb를 버리는 방법이다. 그렇다면 right shift를 통해서 reduction 시킬 수 있는 상황이 존재할까?
 
@@ -60,7 +61,7 @@ end function
 ```
 [wiki 참조](https://en.wikipedia.org/wiki/Montgomery_modular_multiplication)
 
-### Multi-precision reduction
+## Multi-precision reduction
 
 지금까지는 $R = 2^k$인 일반적인 경우를 생각했지만, 컴퓨터의 연산단위는 8-bit, 16-bit, 32-bit, 64-bit와 같이 고정되어 있다. 따라서 이에 맞게 연산을 해주는게 더 빠를 것이다. 대표적인 예로 8-bit인 경우, 8-bit 크기의 레지스터에서 곱셈 또는 덧셈 연산을 하면 자동적으로 $2^8$에 대한 모듈러 곱셈, 덧셈을 연산하게 된다.
 

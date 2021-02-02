@@ -1,5 +1,6 @@
 ---
-title: Quantum algorithm for Hidden Shift Problem \#2
+title: Quantum algorithm for Hidden Shift Problem#2
+subtitle: Regev의 HSP 알고리즘과 Collimation Sieve 이해하기
 tag: Quantum_Algorithm
 use_math: true
 ---
@@ -11,11 +12,11 @@ use_math: true
 $\newcommand{\ket}[1]{\left| #1 \right>}$
 $\newcommand{\bra}[1]{\left< #1 \right|}$
 $\newcommand{\norm}[1]{\left| #1 \right|}$
-$\newcommand{\inner}[1]{< #1 >}$
+$\newcommand{\inner}[1]{\left< #1 \right>}$
 $\newcommand{\ceil}[1]{\lceil #1 \rceil}$
 $\newcommand{\floor}[1]{\lfloor #1 \rfloor}$
 
-### Regev's algorithm with polynomial quantum space
+## Regev's algorithm with polynomial quantum space
 
 Kuperberg가 처음 제안했던 알고리즘은 subexponential만큼의 quantum space를 필요로 한다는 단점이 있다. Kuperberg의 combination 방법은 $\frac{1}{2}$ 확률로 실패하기 때문에 $k$개의 labeled state를 결합한다면, 성공 확률은 $\frac{1}{2^{k-1}}$로 줄어든다. 따라서 두개씩만 골라서 2-valuation을 높일 수 있어야하기 때문에 저장공간을 많이 필요로 한다.
 
@@ -27,39 +28,39 @@ Regev의 combination 연산은 $l+4$ 개의 labeled state를 입력으로 받아
 
 아래와 같은 $l+4$ 개의 labeled state가 주어졌다고 가정하자.
 
-<center>$\ket{0} + \chi(\frac{l_j}{N})\ket{1}, j=1,...,l+4$</center>
+<center>$\ket{0} + \chi(\frac{y_j}{N})\ket{1}, j=1,...,l+4$</center>
 
 이를 모두 tensor product하면 아래와 같은 quantum state를 얻을 수 있다.
 
-<center>$\ket{\psi_0} = \sum_{\vec{b} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{b}, \vec{y}}}{N})\ket{\vec{b}}$</center>
+<center>$\ket{\psi_0} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$<br> where $\vec{y} = (y_1, y_2, ..., y_{l+4})$</center>
 
-여기서 첫번째 레지스터에 $\ket{\vec{b}}\ket{0} \rightarrow \ket{\vec{b}}\ket{\inner{\vec{b}, \vec{y}} \mod 2^l}$연산을 적용하면, 아래와 같은 quantum state를 얻을 수 있다.
+여기서 첫번째 레지스터에 $\ket{\vec{v}}\ket{0} \rightarrow \ket{\vec{v}}\ket{(\inner{\vec{v}, \vec{y}} \mod 2^l)}$연산을 적용하면, 아래와 같은 quantum state를 얻을 수 있다.
 
-<center>$\ket{\psi_1} = \sum_{\vec{b} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{b}, \vec{y}}}{N})\ket{\vec{b}}\ket{\inner{\vec{b}, \vec{y}} \mod 2^l}$</center>
+<center>$\ket{\psi_1} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}\ket{\inner{\vec{v}, \vec{y}} \mod 2^l}$</center>
 
 여기서 두번째 레지스터를 측정하면 label $V$를 얻고, 아래와 같은 quantum state를 얻는다.
 
-<center>$\ket{\psi_2} = \sum_{\inner{\vec{b}, \vec{y}} \equiv V \mod 2^l} \chi(\frac{\inner{\vec{b}, \vec{y}}}{N})\ket{\vec{b}}$<br> where $\vec{y} = (y_1, y_2, ..., y_{l+4})$</center>
+<center>$\ket{\psi_2} = \sum_{\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$</center>
 
-$\inner{\vec{b}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{b}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{b} \in \\{0,1\\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 4$이다.
+$\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{v}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{v} \in \\{0,1\\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 4$이다.
 
- 이 solution들을 $\vec{b}^1, ... , \vec{b}^m \in \\{0,1\\}^{l+4}$라고 하자. 그러면 $\vec{b}^1, \vec{b}^2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{b}^1, ... , \vec{b}^m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{4} = \frac{1}{2}$이며, 아래와 같은 quantum state를 얻는다.
+ 이 solution들을 $\vec{v}_1, ... , \vec{v}_m \in \\{0,1\\}^{l+4}$라고 하자. 그러면 $\vec{v}_1, \vec{v}_2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{v}_1, ... , \vec{v}_m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{4} = \frac{1}{2}$이며, 아래와 같은 quantum state를 얻는다.
 
- <center>$\ket{0} + \chi(\frac{\inner{(\vec{b}^2 - \vec{b}^1), \vec{y}}}{N})\ket{1}$</center>
+ <center>$\ket{0} + \chi(\frac{\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}}}{N})\ket{1}$</center>
 
-$\inner{(\vec{b}^2 - \vec{b}^1), \vec{y}} \equiv 0 \mod 2^l$이 보장되므로, 2-variation은 $l$ 이상인 새로운 labeled quantum state를 얻는다.
+$\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}} \equiv 0 \mod 2^l$이 보장되므로, 2-variation은 $l$ 이상인 새로운 labeled quantum state를 얻는다.
 
 ### Time Complexity of Regev's algorithm
 
-$n = \ceil{\log N}$이라고 할 때, $l = O(\sqrt{n \log n})$으로 잡으면, **<span sytle="color:blue">$k = O(\sqrt{n/\log n})$에 대해 $lk = O(n)$만큼의 저장공간만 필요로 한다는 것을 알 수 있다.</span>** 이 때, classical한 연산의 시간복잡도는 $O(2^l) = 2^{O(\sqrt{n \log n})}$이다. 또한, 필요한 labeled quantum state의 수(=필요한 query의 수)는 $l^k = 2^{O(\sqrt{n \log n})}$이다. Kuperberg의 query 수랑 비교했을 때 약간 더 많음을 알 수 있다.
+$n = \ceil{\log N}$이라고 할 때, $l = O(\sqrt{n \log n})$으로 잡으면, **<font color='red'>$k = O(\sqrt{n/\log n})$에 대해 $lk = O(n)$만큼의 저장공간만 필요로 한다는 것을 알 수 있다.</font>** 이 때, classical한 연산의 시간복잡도는 $O(2^l) = 2^{O(\sqrt{n \log n})}$이다. 또한, 필요한 labeled quantum state의 수(=필요한 query의 수)는 $l^k = 2^{O(\sqrt{n \log n})}$이다. Kuperberg의 query 수랑 비교했을 때 약간 더 많음을 알 수 있다.
 
 만약에 $l = n$으로 잡으면, $k = 1$이 되어, 필요한 query 개수는 $n$개가 된다. 이러면 polynomial query 안에 문제를 해결할 수 있게된다. 하지만 여기서 함정은 classical한 연산을 $O(2^n) = O(N)$만큼 해야한다는 점이다. 이는 단순히 Hidden Shift 문제를 classical하게 해결하는 것과 같다. 
 
-논문에서는 이 문제를 최적화된 classical 알고리즘을 적용해 $\tilde{O}(2^{0.291 \log_2(N)})$으로 해결함으로써 CSIDH-512가 NIST 기준에 맞지 않게됨을 보이고있다. **<span sytle="color:blue">이 의미는 결국 Classical한 측면에서 Hidden Shift Problem을 Subset Sum Problem으로 quantum reduction시켰다는 것이다.</span>** Subset Sum에 대한 최적화된 해결방법이 있으므로 이를 통해 Hidden Shift Problem를 우회적으로 짧은 시간 안에 해결하게 된다.
+논문에서는 이 문제를 최적화된 classical 알고리즘을 적용해 $\tilde{O}(2^{0.291 \log_2(N)})$으로 해결함으로써 CSIDH-512가 NIST 기준에 맞지 않게됨을 보이고있다. **<font color='red'>이 의미는 결국 Classical한 측면에서 Hidden Shift Problem을 Subset Sum Problem으로 quantum reduction시켰다는 것이다.</font>** Subset Sum에 대한 최적화된 해결방법이 있으므로 이를 통해 Hidden Shift Problem를 우회적으로 짧은 시간 안에 해결하게 된다.
 
 CSIDH-512의 경우에 Class Group의 크기가 대략 $N \approx \sqrt{p} = 2^{256}$이며, $l = 256$에 대한 Regev algorithm을 적용하면 $2^{19}$만큼의 quantum query가 필요하며, $2^{86}$만큼의 classical time과 memory가 필요하다는 결론이 나온다.
 
-### Kuperberg's second algorithm(Collimation Sieve)
+## Kuperberg's second algorithm(Collimation Sieve)
 
 * 이 알고리즘은 2010년도 [Another subexp quantum algorithm for DHSP](https://arxiv.org/pdf/1112.3333.pdf)를 참조
 * 이 알고리즘은 Collimation Sieve라고 불림

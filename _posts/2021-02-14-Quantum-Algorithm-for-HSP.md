@@ -1,5 +1,6 @@
 ---
 title: Quantum algorithm for Hidden Shift Problem
+subtitle: Kuperberg 알고리즘 이해하기
 tag: Quantum_Algorithm
 use_math: true
 comments: true

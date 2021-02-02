@@ -1,10 +1,206 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2021-01-31T22:27:11+09:00</updated><id>/feed.xml</id><title type="html">Manbo’s blog</title><subtitle>Hello, welcome to manbo's blog
-</subtitle><author><name>Hyeonhak</name></author><entry><title type="html">Montgomery Multiplication</title><link href="/2021/01/31/Montgomery-Multiplication.html" rel="alternate" type="text/html" title="Montgomery Multiplication" /><published>2021-01-31T00:00:00+09:00</published><updated>2021-01-31T00:00:00+09:00</updated><id>/2021/01/31/Montgomery-Multiplication</id><content type="html" xml:base="/2021/01/31/Montgomery-Multiplication.html">&lt;ul&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2021-02-02T21:19:34+09:00</updated><id>/feed.xml</id><title type="html">Manbo’s blog</title><subtitle>Hello, welcome to manbo's blog
+</subtitle><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><entry><title type="html">Quantum algorithm for Hidden Shift Problem#2</title><link href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html" rel="alternate" type="text/html" title="Quantum algorithm for Hidden Shift Problem#2" /><published>2021-02-15T00:00:00+09:00</published><updated>2021-02-15T00:00:00+09:00</updated><id>/2021/02/15/Quantum-Algorithm-for-HSP-2</id><content type="html" xml:base="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">&lt;ul&gt;
+  &lt;li&gt;해당 글은 &lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt;논문을 정리한 것이다.&lt;/li&gt;
+  &lt;li&gt;Regev의 알고리즘은 2008년도 &lt;a href=&quot;https://arxiv.org/pdf/quant-ph/0406151.pdf&quot;&gt;A Subexponential Time Algorithm for the DHSP with Polynomial Space&lt;/a&gt; 논문을 참조&lt;/li&gt;
+  &lt;li&gt;Quantum algorithm for HSP 2편&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;$\newcommand{\ket}[1]{\left| #1 \right&amp;gt;}$
+$\newcommand{\bra}[1]{\left&amp;lt; #1 \right|}$
+$\newcommand{\norm}[1]{\left| #1 \right|}$
+$\newcommand{\inner}[1]{\left&amp;lt; #1 \right&amp;gt;}$
+$\newcommand{\ceil}[1]{\lceil #1 \rceil}$
+$\newcommand{\floor}[1]{\lfloor #1 \rfloor}$&lt;/p&gt;
+
+&lt;h2 id=&quot;regevs-algorithm-with-polynomial-quantum-space&quot;&gt;Regev’s algorithm with polynomial quantum space&lt;/h2&gt;
+
+&lt;p&gt;Kuperberg가 처음 제안했던 알고리즘은 subexponential만큼의 quantum space를 필요로 한다는 단점이 있다. Kuperberg의 combination 방법은 $\frac{1}{2}$ 확률로 실패하기 때문에 $k$개의 labeled state를 결합한다면, 성공 확률은 $\frac{1}{2^{k-1}}$로 줄어든다. 따라서 두개씩만 골라서 2-valuation을 높일 수 있어야하기 때문에 저장공간을 많이 필요로 한다.&lt;/p&gt;
+
+&lt;p&gt;Regev는 이러한 단점을 보완하여 여러개의 labeled state를 결합할 수 있는 양자 알고리즘을 제안했다. 물론 Regev의 결합 방법도 실패 확률이 존재하지만, 이는 결합하려는 labeled state의 개수와는 상관 없이 constant 확률을 가지므로 quantum space를 절약할 수 있다.&lt;/p&gt;
+
+&lt;p&gt;Regev의 combination 연산은 $l+4$ 개의 labeled state를 입력으로 받아서 $l$ 개의 lsb가 0인 새로운 labeled state를 만든다.&lt;/p&gt;
+
+&lt;h3 id=&quot;combination-step&quot;&gt;Combination step&lt;/h3&gt;
+
+&lt;p&gt;아래와 같은 $l+4$ 개의 labeled state가 주어졌다고 가정하자.&lt;/p&gt;
+
+&lt;center&gt;$\ket{0} + \chi(\frac{y_j}{N})\ket{1}, j=1,...,l+4$&lt;/center&gt;
+
+&lt;p&gt;이를 모두 tensor product하면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_0} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$&lt;br /&gt; where $\vec{y} = (y_1, y_2, ..., y_{l+4})$&lt;/center&gt;
+
+&lt;p&gt;여기서 첫번째 레지스터에 $\ket{\vec{v}}\ket{0} \rightarrow \ket{\vec{v}}\ket{(\inner{\vec{v}, \vec{y}} \mod 2^l)}$연산을 적용하면, 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_1} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}\ket{\inner{\vec{v}, \vec{y}} \mod 2^l}$&lt;/center&gt;
+
+&lt;p&gt;여기서 두번째 레지스터를 측정하면 label $V$를 얻고, 아래와 같은 quantum state를 얻는다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_2} = \sum_{\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$&lt;/center&gt;
+
+&lt;p&gt;$\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{v}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{v} \in \{0,1\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 4$이다.&lt;/p&gt;
+
+&lt;p&gt;이 solution들을 $\vec{v}_1, … , \vec{v}_m \in \{0,1\}^{l+4}$라고 하자. 그러면 $\vec{v}_1, \vec{v}_2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{v}_1, … , \vec{v}_m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{4} = \frac{1}{2}$이며, 아래와 같은 quantum state를 얻는다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{0} + \chi(\frac{\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}}}{N})\ket{1}$&lt;/center&gt;
+
+&lt;p&gt;$\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}} \equiv 0 \mod 2^l$이 보장되므로, 2-variation은 $l$ 이상인 새로운 labeled quantum state를 얻는다.&lt;/p&gt;
+
+&lt;h3 id=&quot;time-complexity-of-regevs-algorithm&quot;&gt;Time Complexity of Regev’s algorithm&lt;/h3&gt;
+
+&lt;p&gt;$n = \ceil{\log N}$이라고 할 때, $l = O(\sqrt{n \log n})$으로 잡으면, &lt;strong&gt;&lt;font color=&quot;red&quot;&gt;$k = O(\sqrt{n/\log n})$에 대해 $lk = O(n)$만큼의 저장공간만 필요로 한다는 것을 알 수 있다.&lt;/font&gt;&lt;/strong&gt; 이 때, classical한 연산의 시간복잡도는 $O(2^l) = 2^{O(\sqrt{n \log n})}$이다. 또한, 필요한 labeled quantum state의 수(=필요한 query의 수)는 $l^k = 2^{O(\sqrt{n \log n})}$이다. Kuperberg의 query 수랑 비교했을 때 약간 더 많음을 알 수 있다.&lt;/p&gt;
+
+&lt;p&gt;만약에 $l = n$으로 잡으면, $k = 1$이 되어, 필요한 query 개수는 $n$개가 된다. 이러면 polynomial query 안에 문제를 해결할 수 있게된다. 하지만 여기서 함정은 classical한 연산을 $O(2^n) = O(N)$만큼 해야한다는 점이다. 이는 단순히 Hidden Shift 문제를 classical하게 해결하는 것과 같다.&lt;/p&gt;
+
+&lt;p&gt;논문에서는 이 문제를 최적화된 classical 알고리즘을 적용해 $\tilde{O}(2^{0.291 \log_2(N)})$으로 해결함으로써 CSIDH-512가 NIST 기준에 맞지 않게됨을 보이고있다. &lt;strong&gt;&lt;font color=&quot;red&quot;&gt;이 의미는 결국 Classical한 측면에서 Hidden Shift Problem을 Subset Sum Problem으로 quantum reduction시켰다는 것이다.&lt;/font&gt;&lt;/strong&gt; Subset Sum에 대한 최적화된 해결방법이 있으므로 이를 통해 Hidden Shift Problem를 우회적으로 짧은 시간 안에 해결하게 된다.&lt;/p&gt;
+
+&lt;p&gt;CSIDH-512의 경우에 Class Group의 크기가 대략 $N \approx \sqrt{p} = 2^{256}$이며, $l = 256$에 대한 Regev algorithm을 적용하면 $2^{19}$만큼의 quantum query가 필요하며, $2^{86}$만큼의 classical time과 memory가 필요하다는 결론이 나온다.&lt;/p&gt;
+
+&lt;h2 id=&quot;kuperbergs-second-algorithmcollimation-sieve&quot;&gt;Kuperberg’s second algorithm(Collimation Sieve)&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;이 알고리즘은 2010년도 &lt;a href=&quot;https://arxiv.org/pdf/1112.3333.pdf&quot;&gt;Another subexp quantum algorithm for DHSP&lt;/a&gt;를 참조&lt;/li&gt;
+  &lt;li&gt;이 알고리즘은 Collimation Sieve라고 불림&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Kuperberg의 두번째 알고리즘도 여러 개의 labeled quantum state를 한번에 combination하는 방법을 사용한다. 다만 방식이 조금 다르다. labeled quantum state의 list를 만들어 list끼리 combination 해서 lsb를 지우는 방법을 사용한다. 이 알고리즘도 combination 과정에서 classical algorithm이 사용된다. 여기서는 subset sum 문제를 풀지 않고, 두 개의 list에서 matching을 찾는 문제를 풀어야한다. 이 또한 exponential 수준의 classical time을 필요로한다.&lt;/p&gt;
+
+&lt;p&gt;Collimation Sieve나 Regev의 알고리즘이나 중요한 철학은 classical 자원을 어떻게 최대한으로 이용해서 quantum space 또는 quantum time을 줄일 것이냐 하는 것이다. Regev의 알고리즘은 quantum space를 polynomial하게 줄였다.&lt;/p&gt;
+
+&lt;p&gt;Kuperberg가 Collimation Sieve를 제시하면서 주장하는 것은 classical 자원을 활용해서 quantum time도 polynomial하게 줄일 수 있다는 것이다. 물론 quantum space도 여전히 polynomial하게 유지할 수 있다. 그런데 여기서 개인적인 의문점은 앞서 설명한 것처럼 Regev의 알고리즘도 classical한 자원을 exponential하게 활용해서 quantum time을 polynomial하게 줄일 수 있음을 보였다. 따라서 Collimation Sieve가 Regev의 알고리즘보다 어떤 점이 더 좋은건지 아직은 이해가 잘 가지 않는다..&lt;/p&gt;
+
+&lt;p&gt;Collimation Sieve는 아래와 같은 labeled list를 사용한다.&lt;/p&gt;
+
+&lt;h3 id=&quot;combination-step-of-collimation-sieve&quot;&gt;Combination Step of Collimation Sieve&lt;/h3&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다. Regev의 알고리즘은 2008년도 A Subexponential Time Algorithm for the DHSP with Polynomial Space 논문을 참조 Quantum algorithm for HSP 2편 $\newcommand{\ket}[1]{\left| #1 \right&amp;gt;}$ $\newcommand{\bra}[1]{\left&amp;lt; #1 \right|}$ $\newcommand{\norm}[1]{\left| #1 \right|}$ $\newcommand{\inner}[1]{\left&amp;lt; #1 \right&amp;gt;}$ $\newcommand{\ceil}[1]{\lceil #1 \rceil}$ $\newcommand{\floor}[1]{\lfloor #1 \rfloor}$ Regev’s algorithm with polynomial quantum space Kuperberg가 처음 제안했던 알고리즘은 subexponential만큼의 quantum space를 필요로 한다는 단점이 있다. Kuperberg의 combination 방법은 $\frac{1}{2}$ 확률로 실패하기 때문에 $k$개의 labeled state를 결합한다면, 성공 확률은 $\frac{1}{2^{k-1}}$로 줄어든다. 따라서 두개씩만 골라서 2-valuation을 높일 수 있어야하기 때문에 저장공간을 많이 필요로 한다. Regev는 이러한 단점을 보완하여 여러개의 labeled state를 결합할 수 있는 양자 알고리즘을 제안했다. 물론 Regev의 결합 방법도 실패 확률이 존재하지만, 이는 결합하려는 labeled state의 개수와는 상관 없이 constant 확률을 가지므로 quantum space를 절약할 수 있다. Regev의 combination 연산은 $l+4$ 개의 labeled state를 입력으로 받아서 $l$ 개의 lsb가 0인 새로운 labeled state를 만든다. Combination step 아래와 같은 $l+4$ 개의 labeled state가 주어졌다고 가정하자. $\ket{0} + \chi(\frac{y_j}{N})\ket{1}, j=1,...,l+4$ 이를 모두 tensor product하면 아래와 같은 quantum state를 얻을 수 있다. $\ket{\psi_0} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$ where $\vec{y} = (y_1, y_2, ..., y_{l+4})$ 여기서 첫번째 레지스터에 $\ket{\vec{v}}\ket{0} \rightarrow \ket{\vec{v}}\ket{(\inner{\vec{v}, \vec{y}} \mod 2^l)}$연산을 적용하면, 아래와 같은 quantum state를 얻을 수 있다. $\ket{\psi_1} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}\ket{\inner{\vec{v}, \vec{y}} \mod 2^l}$ 여기서 두번째 레지스터를 측정하면 label $V$를 얻고, 아래와 같은 quantum state를 얻는다. $\ket{\psi_2} = \sum_{\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$ $\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{v}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{v} \in \{0,1\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 4$이다. 이 solution들을 $\vec{v}_1, … , \vec{v}_m \in \{0,1\}^{l+4}$라고 하자. 그러면 $\vec{v}_1, \vec{v}_2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{v}_1, … , \vec{v}_m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{4} = \frac{1}{2}$이며, 아래와 같은 quantum state를 얻는다. $\ket{0} + \chi(\frac{\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}}}{N})\ket{1}$ $\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}} \equiv 0 \mod 2^l$이 보장되므로, 2-variation은 $l$ 이상인 새로운 labeled quantum state를 얻는다. Time Complexity of Regev’s algorithm $n = \ceil{\log N}$이라고 할 때, $l = O(\sqrt{n \log n})$으로 잡으면, $k = O(\sqrt{n/\log n})$에 대해 $lk = O(n)$만큼의 저장공간만 필요로 한다는 것을 알 수 있다. 이 때, classical한 연산의 시간복잡도는 $O(2^l) = 2^{O(\sqrt{n \log n})}$이다. 또한, 필요한 labeled quantum state의 수(=필요한 query의 수)는 $l^k = 2^{O(\sqrt{n \log n})}$이다. Kuperberg의 query 수랑 비교했을 때 약간 더 많음을 알 수 있다. 만약에 $l = n$으로 잡으면, $k = 1$이 되어, 필요한 query 개수는 $n$개가 된다. 이러면 polynomial query 안에 문제를 해결할 수 있게된다. 하지만 여기서 함정은 classical한 연산을 $O(2^n) = O(N)$만큼 해야한다는 점이다. 이는 단순히 Hidden Shift 문제를 classical하게 해결하는 것과 같다. 논문에서는 이 문제를 최적화된 classical 알고리즘을 적용해 $\tilde{O}(2^{0.291 \log_2(N)})$으로 해결함으로써 CSIDH-512가 NIST 기준에 맞지 않게됨을 보이고있다. 이 의미는 결국 Classical한 측면에서 Hidden Shift Problem을 Subset Sum Problem으로 quantum reduction시켰다는 것이다. Subset Sum에 대한 최적화된 해결방법이 있으므로 이를 통해 Hidden Shift Problem를 우회적으로 짧은 시간 안에 해결하게 된다. CSIDH-512의 경우에 Class Group의 크기가 대략 $N \approx \sqrt{p} = 2^{256}$이며, $l = 256$에 대한 Regev algorithm을 적용하면 $2^{19}$만큼의 quantum query가 필요하며, $2^{86}$만큼의 classical time과 memory가 필요하다는 결론이 나온다. Kuperberg’s second algorithm(Collimation Sieve) 이 알고리즘은 2010년도 Another subexp quantum algorithm for DHSP를 참조 이 알고리즘은 Collimation Sieve라고 불림 Kuperberg의 두번째 알고리즘도 여러 개의 labeled quantum state를 한번에 combination하는 방법을 사용한다. 다만 방식이 조금 다르다. labeled quantum state의 list를 만들어 list끼리 combination 해서 lsb를 지우는 방법을 사용한다. 이 알고리즘도 combination 과정에서 classical algorithm이 사용된다. 여기서는 subset sum 문제를 풀지 않고, 두 개의 list에서 matching을 찾는 문제를 풀어야한다. 이 또한 exponential 수준의 classical time을 필요로한다. Collimation Sieve나 Regev의 알고리즘이나 중요한 철학은 classical 자원을 어떻게 최대한으로 이용해서 quantum space 또는 quantum time을 줄일 것이냐 하는 것이다. Regev의 알고리즘은 quantum space를 polynomial하게 줄였다. Kuperberg가 Collimation Sieve를 제시하면서 주장하는 것은 classical 자원을 활용해서 quantum time도 polynomial하게 줄일 수 있다는 것이다. 물론 quantum space도 여전히 polynomial하게 유지할 수 있다. 그런데 여기서 개인적인 의문점은 앞서 설명한 것처럼 Regev의 알고리즘도 classical한 자원을 exponential하게 활용해서 quantum time을 polynomial하게 줄일 수 있음을 보였다. 따라서 Collimation Sieve가 Regev의 알고리즘보다 어떤 점이 더 좋은건지 아직은 이해가 잘 가지 않는다.. Collimation Sieve는 아래와 같은 labeled list를 사용한다. Combination Step of Collimation Sieve</summary></entry><entry><title type="html">Quantum algorithm for Hidden Shift Problem</title><link href="/2021/02/14/Quantum-Algorithm-for-HSP.html" rel="alternate" type="text/html" title="Quantum algorithm for Hidden Shift Problem" /><published>2021-02-14T00:00:00+09:00</published><updated>2021-02-14T00:00:00+09:00</updated><id>/2021/02/14/Quantum-Algorithm-for-HSP</id><content type="html" xml:base="/2021/02/14/Quantum-Algorithm-for-HSP.html">&lt;ul&gt;
+  &lt;li&gt;해당 글은 &lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt;논문을 정리한 것이다.&lt;/li&gt;
+  &lt;li&gt;3개의 대표적인 양자 알고리즘이 존재한다.&lt;/li&gt;
+  &lt;li&gt;kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.&lt;/li&gt;
+  &lt;li&gt;입력으로 주어진 함수의 정의역 G가 commutative해야지 subexponential time 안에 문제를 해결할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;hidden-shift-problem&quot;&gt;Hidden Shift Problem&lt;/h3&gt;
+
+&lt;p&gt;Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, shift 값 $s$를 찾는 문제이다.&lt;/p&gt;
+
+&lt;p&gt;이 문제는 classical한 관점에서 봤을 때, collision을 찾는 문제와 같다. $n=|G|$라고 할 때, 걸리는 시간은 $\sqrt{n}$이 된다. 하지만 quantum 알고리즘으로는 subexponential하게 해결할 수 있다.&lt;/p&gt;
+
+&lt;h3 id=&quot;kuperberg-알고리즘의-철학labeled-state&quot;&gt;kuperberg 알고리즘의 철학(labeled state)&lt;/h3&gt;
+
+&lt;p&gt;함수 $f$와 $g$가 주어졌을 때, uniform superposition state를 $f$, $g$ oracle에 입력해서 우리가 가장 간단히 얻을 수 있는 quantum state는 아래와 같다.&lt;/p&gt;
+
+&lt;center&gt;$\newcommand{\ket}[1]{\left| #1 \right&amp;gt;}$
+$\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$&lt;/center&gt;
+
+&lt;p&gt;두번째 레지스터는 $f$ 또는 $g$ 중에서 어떤 함수의 출력값인지 0 또는 1로 구분하기 위해 넣은 ancilla 값이다. 위와 같은 quantum state에서 세번째 레지스터를 측정해서 얻은 label이 $v$라고 할 때, $f(x_0 + s) = g(x_0) = v$를 만족하는 $x_0$에 대해서 아래의 quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$&lt;/center&gt;
+
+&lt;p&gt;여기서 두번째 레지스터에 Quantum Fourier Transform을 적용하면 아래의 quantum state를 얻는다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_2} = \frac{1}{\sqrt{2N}}\sum_{k=0}^{N-1} \ket{k}(\ket{0}+e^{2\pi ski/N}\ket{1})$&lt;/center&gt;
+
+&lt;p&gt;여기서 다시 첫번째 레지스터를 측정하면 아래의 labeled quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_l} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l}{N})\ket{1})$ where $\chi(x) = e^{2\pi sxi}$ &lt;/center&gt;
+
+&lt;p&gt;labeled quantum state $\ket{\psi_l}$을 얻을 확률은 정확히 $\frac{1}{N}$이며, 한 개의 labeled quantum state를 얻기 위해서 $f$와 $g$ quantum oracle 각각에 대해 한번씩의 query가 필요하다.(총 두번의 query)&lt;/p&gt;
+
+&lt;p&gt;kuperberg 알고리즘은 이러한 labeled quantum state $\ket{\psi_l}$을 얻는 행위를 반복해서 충분히 많은 개수의 labeled quantum state를 모아놓고, 이들을 조합해서 아래의 labeled quantum state를 만드는 것이 목표이다.&lt;/p&gt;
+
+&lt;center&gt;${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$&lt;/center&gt;
+
+&lt;p&gt;이와 같은 labeled quantum state를 얻으면, Quantum Fourier Transform을 역으로 적용해 shift 값 $s$를 얻을 수 있다.&lt;/p&gt;
+
+&lt;h3 id=&quot;combination-step&quot;&gt;Combination Step&lt;/h3&gt;
+
+&lt;p&gt;labeled quantum state $\ket{\psi_{l_1}}$과 $\ket{\psi_{l_2}}$가 주어졌을 때, 이 둘을 단순히 붙여놓으면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1 + l_2}{N})\ket{11})$&lt;/center&gt;
+
+&lt;p&gt;여기서 첫번째와 두번째 qubit에 CNOT을 적용하면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1 + l_2}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1}{N})\ket{11})$&lt;/center&gt;
+
+&lt;p&gt;여기서 두번째 qubit을 측정하면 $\frac{1}{2}$확률로 label 0을 얻고, 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l_1 + l_2}{N})\ket{1})$&lt;/center&gt;
+
+&lt;p&gt;이와 같은 방식으로 두개의 labeled quantum state를 이용해 combination된 새로운 labeled quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;h3 id=&quot;kuperberg-algorithm&quot;&gt;kuperberg algorithm&lt;/h3&gt;
+
+&lt;p&gt;위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장 큰 $k$ 값을 말한다.&lt;/p&gt;
+
+&lt;p&gt;$P_i = \{ \ket{\psi_x} | val_2(x) = i \}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\ket{\psi_{2^i}}}$들을 얻을 수 있다.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;for 0 ≤ i ≤ n do 
+	pop a element e from P_i, put (e,i) in R.
+	for (e,j) in R do:
+		if val_2(e - 2^j) = i then
+			pop A from P_i which maximize val_2(a + e -2^j)
+			e = e + a
+		end if
+	end for
+
+	if {(2^i, i) | 0 ≤ i ≤ n} in R then
+		Apply QFT on the qubits, measure a t
+		s ⟵ ⌈-Nt/2^(n+1)⌋ mod N
+		return s
+	end if
+
+	while |P_i| ≥ 2 do
+		pop two elements (a,b) of P_i which maximizes val_2(a+b)
+		c = a+b
+		Insert c in the corresponding P_(val_2(c))
+	end while
+end for
+return Failure
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;$2^k + 1$개의 $n$-bit label이 uniform distribution으로부터 주어졌다고 가정하자. 그러면 비둘기 집의 원리에 의해 이중에서 $l_1 + l_2$의 2-valuation이 $k$ 이상이 되는 $l_1$, $l_2$가 적어도 1개 존재하며, 이 둘을 combination해서 2-valuation이 $k$ 이상이 되는 label 한개를 만들 수 있다. 따라서 만약에 $r \cdot 2^k$만큼의 $n$-bit label이 주어지면, 적어도 $\frac{(r-1)}{2} \cdot 2^k &amp;gt; \frac{r}{4} \cdot 2^k$만큼의 2-valuation이 $k$이상인 label을 얻을 수 있다.&lt;/p&gt;
+
+&lt;p&gt;그러면 가장 처음에 대략 $4^{\lceil \frac{n}{k} \rceil}2^k$만큼의 label을 뽑아놓으면 마지막에 2-valuation이 $n-1$인 label이 1개 이상 나온다는 것을 알 수 있다. $k = \sqrt{n}$으로 설정하면, 필요한 label의 개수는 총 $2^{3\sqrt{n}}$으로 subexponential하다. label의 개수는 곧 oracle query의 개수이므로 subexponential query만으로 문제를 해결 할 수 있음을 알 수 있다.&lt;/p&gt;
+
+&lt;p&gt;다만, 이를 위해서는 subexponential한 quantum memory가 필요하다는 것도 알 수 있다. 이는 상당한 자원을 필요로 한다.&lt;/p&gt;
+
+&lt;h3 id=&quot;approximate-qft&quot;&gt;Approximate QFT&lt;/h3&gt;
+
+&lt;p&gt;Group $G$의 크기를 $N$이라고 했을 때, 아래의 quantum state에 QFT를 적용한다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$&lt;/center&gt;
+
+&lt;p&gt;여기서 $s \in \mathbb{Z}/N\mathbb{Z}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 $N$이 power of 2가 아닐 경우엔 $\mathbb{Z}/N\mathbb{Z}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 &lt;a href=&quot;https://arxiv.org/pdf/quant-ph/9511026.pdf&quot;&gt;kitaev&lt;/a&gt;와 &lt;a href=&quot;https://arxiv.org/pdf/quant-ph/0301093.pdf&quot;&gt;Mosca and Zalka&lt;/a&gt; 논문을 참조하자.&lt;/p&gt;
+
+&lt;p&gt;해당 포스트에서는 $N$-QFT를 이용해도 우리가 앞서 얻은 label들&lt;/p&gt;
+
+&lt;center&gt;${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$&lt;/center&gt;
+
+&lt;p&gt;을 통해서 얼마나 정확히 $s$값을 구해낼 수 있는가를 분석해볼 것이다. label을 생성할 때에는 $N$-QFT를 이용했지만, shift 값 $s$를 복구할 때에는 위 label들을 사용해야하기 때문에 $2^n$-QFT를 사용할 수 밖에 없다. 그러면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+
+&lt;center&gt;$\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$&lt;/center&gt;
+
+&lt;p&gt;이를 측정했을 때, label $t$를 얻을 확률은 $\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$이 된다.&lt;/p&gt;
+
+&lt;p&gt;$\theta = \frac{s}{N}+\frac{t}{2^n}$라고 하면, $\theta = 0$인 $t$가 존재하면, 해당 $t$가 label로 측정될 확률은 1이되지만, N이 power of 2가 아닌 경우, 그런 $k$가 존재하지 않는다. $\theta \in [0, \frac{1}{2^{n+1}}]$인 경우, 확률값 $p(\theta) = \frac{1}{2^{2n}}(\frac{1-\chi(2^n\theta)}{1-\chi(\theta)})^2$는 단조 감소함을 알 수 있으며, $\theta = \frac{1}{2^{n+1}}$일 때, $p(\frac{1}{2^{n+1}}) \approx \frac{1}{2^{2n}}\frac{1/2}{(\pi\theta)^2} = \frac{2}{\pi^2}$값을 갖는다.&lt;/p&gt;
+
+&lt;p&gt;따라서 $| \frac{s}{N} + \frac{t}{2^n} | \leq \frac{1}{2^{n+1}}$를 만족하는 $t$를 찾을 확률이 적어도 $\frac{2}{\pi^2}$가 된다. 이러한 $t$ 값을 찾으면, $n &amp;gt; \log_2(N)$일 때, 연분수를 이용해 정확한 $s$ 값을 찾을 수 있다.&lt;/p&gt;
+
+&lt;h3 id=&quot;regevs-algorithm-with-polynomial-quantum-space&quot;&gt;Regev’s algorithm with polynomial quantum space&lt;/h3&gt;
+
+&lt;p&gt;내용이 길어지는 관계로 다음 포스팅에..&lt;/p&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다. 3개의 대표적인 양자 알고리즘이 존재한다. kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다. 입력으로 주어진 함수의 정의역 G가 commutative해야지 subexponential time 안에 문제를 해결할 수 있다. Hidden Shift Problem Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, shift 값 $s$를 찾는 문제이다. 이 문제는 classical한 관점에서 봤을 때, collision을 찾는 문제와 같다. $n=|G|$라고 할 때, 걸리는 시간은 $\sqrt{n}$이 된다. 하지만 quantum 알고리즘으로는 subexponential하게 해결할 수 있다. kuperberg 알고리즘의 철학(labeled state) 함수 $f$와 $g$가 주어졌을 때, uniform superposition state를 $f$, $g$ oracle에 입력해서 우리가 가장 간단히 얻을 수 있는 quantum state는 아래와 같다. $\newcommand{\ket}[1]{\left| #1 \right&amp;gt;}$ $\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$ 두번째 레지스터는 $f$ 또는 $g$ 중에서 어떤 함수의 출력값인지 0 또는 1로 구분하기 위해 넣은 ancilla 값이다. 위와 같은 quantum state에서 세번째 레지스터를 측정해서 얻은 label이 $v$라고 할 때, $f(x_0 + s) = g(x_0) = v$를 만족하는 $x_0$에 대해서 아래의 quantum state를 얻을 수 있다. $\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$ 여기서 두번째 레지스터에 Quantum Fourier Transform을 적용하면 아래의 quantum state를 얻는다. $\ket{\psi_2} = \frac{1}{\sqrt{2N}}\sum_{k=0}^{N-1} \ket{k}(\ket{0}+e^{2\pi ski/N}\ket{1})$ 여기서 다시 첫번째 레지스터를 측정하면 아래의 labeled quantum state를 얻을 수 있다. $\ket{\psi_l} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l}{N})\ket{1})$ where $\chi(x) = e^{2\pi sxi}$ labeled quantum state $\ket{\psi_l}$을 얻을 확률은 정확히 $\frac{1}{N}$이며, 한 개의 labeled quantum state를 얻기 위해서 $f$와 $g$ quantum oracle 각각에 대해 한번씩의 query가 필요하다.(총 두번의 query) kuperberg 알고리즘은 이러한 labeled quantum state $\ket{\psi_l}$을 얻는 행위를 반복해서 충분히 많은 개수의 labeled quantum state를 모아놓고, 이들을 조합해서 아래의 labeled quantum state를 만드는 것이 목표이다. ${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$ 이와 같은 labeled quantum state를 얻으면, Quantum Fourier Transform을 역으로 적용해 shift 값 $s$를 얻을 수 있다. Combination Step labeled quantum state $\ket{\psi_{l_1}}$과 $\ket{\psi_{l_2}}$가 주어졌을 때, 이 둘을 단순히 붙여놓으면 아래와 같은 quantum state를 얻을 수 있다. $\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1 + l_2}{N})\ket{11})$ 여기서 첫번째와 두번째 qubit에 CNOT을 적용하면 아래와 같은 quantum state를 얻을 수 있다. $\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1 + l_2}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1}{N})\ket{11})$ 여기서 두번째 qubit을 측정하면 $\frac{1}{2}$확률로 label 0을 얻고, 아래와 같은 quantum state를 얻을 수 있다. $\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l_1 + l_2}{N})\ket{1})$ 이와 같은 방식으로 두개의 labeled quantum state를 이용해 combination된 새로운 labeled quantum state를 얻을 수 있다. kuperberg algorithm 위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장 큰 $k$ 값을 말한다. $P_i = \{ \ket{\psi_x} | val_2(x) = i \}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\ket{\psi_{2^i}}}$들을 얻을 수 있다. for 0 ≤ i ≤ n do pop a element e from P_i, put (e,i) in R. for (e,j) in R do: if val_2(e - 2^j) = i then pop A from P_i which maximize val_2(a + e -2^j) e = e + a end if end for if {(2^i, i) | 0 ≤ i ≤ n} in R then Apply QFT on the qubits, measure a t s ⟵ ⌈-Nt/2^(n+1)⌋ mod N return s end if while |P_i| ≥ 2 do pop two elements (a,b) of P_i which maximizes val_2(a+b) c = a+b Insert c in the corresponding P_(val_2(c)) end while end for return Failure $2^k + 1$개의 $n$-bit label이 uniform distribution으로부터 주어졌다고 가정하자. 그러면 비둘기 집의 원리에 의해 이중에서 $l_1 + l_2$의 2-valuation이 $k$ 이상이 되는 $l_1$, $l_2$가 적어도 1개 존재하며, 이 둘을 combination해서 2-valuation이 $k$ 이상이 되는 label 한개를 만들 수 있다. 따라서 만약에 $r \cdot 2^k$만큼의 $n$-bit label이 주어지면, 적어도 $\frac{(r-1)}{2} \cdot 2^k &amp;gt; \frac{r}{4} \cdot 2^k$만큼의 2-valuation이 $k$이상인 label을 얻을 수 있다. 그러면 가장 처음에 대략 $4^{\lceil \frac{n}{k} \rceil}2^k$만큼의 label을 뽑아놓으면 마지막에 2-valuation이 $n-1$인 label이 1개 이상 나온다는 것을 알 수 있다. $k = \sqrt{n}$으로 설정하면, 필요한 label의 개수는 총 $2^{3\sqrt{n}}$으로 subexponential하다. label의 개수는 곧 oracle query의 개수이므로 subexponential query만으로 문제를 해결 할 수 있음을 알 수 있다. 다만, 이를 위해서는 subexponential한 quantum memory가 필요하다는 것도 알 수 있다. 이는 상당한 자원을 필요로 한다. Approximate QFT Group $G$의 크기를 $N$이라고 했을 때, 아래의 quantum state에 QFT를 적용한다. $\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$ 여기서 $s \in \mathbb{Z}/N\mathbb{Z}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 $N$이 power of 2가 아닐 경우엔 $\mathbb{Z}/N\mathbb{Z}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 kitaev와 Mosca and Zalka 논문을 참조하자. 해당 포스트에서는 $N$-QFT를 이용해도 우리가 앞서 얻은 label들 ${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$ 을 통해서 얼마나 정확히 $s$값을 구해낼 수 있는가를 분석해볼 것이다. label을 생성할 때에는 $N$-QFT를 이용했지만, shift 값 $s$를 복구할 때에는 위 label들을 사용해야하기 때문에 $2^n$-QFT를 사용할 수 밖에 없다. 그러면 아래와 같은 quantum state를 얻을 수 있다. $\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$ 이를 측정했을 때, label $t$를 얻을 확률은 $\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$이 된다. $\theta = \frac{s}{N}+\frac{t}{2^n}$라고 하면, $\theta = 0$인 $t$가 존재하면, 해당 $t$가 label로 측정될 확률은 1이되지만, N이 power of 2가 아닌 경우, 그런 $k$가 존재하지 않는다. $\theta \in [0, \frac{1}{2^{n+1}}]$인 경우, 확률값 $p(\theta) = \frac{1}{2^{2n}}(\frac{1-\chi(2^n\theta)}{1-\chi(\theta)})^2$는 단조 감소함을 알 수 있으며, $\theta = \frac{1}{2^{n+1}}$일 때, $p(\frac{1}{2^{n+1}}) \approx \frac{1}{2^{2n}}\frac{1/2}{(\pi\theta)^2} = \frac{2}{\pi^2}$값을 갖는다. 따라서 $| \frac{s}{N} + \frac{t}{2^n} | \leq \frac{1}{2^{n+1}}$를 만족하는 $t$를 찾을 확률이 적어도 $\frac{2}{\pi^2}$가 된다. 이러한 $t$ 값을 찾으면, $n &amp;gt; \log_2(N)$일 때, 연분수를 이용해 정확한 $s$ 값을 찾을 수 있다. Regev’s algorithm with polynomial quantum space 내용이 길어지는 관계로 다음 포스팅에..</summary></entry><entry><title type="html">Elliptic Curve and Isogeny</title><link href="/2021/02/07/Elliptic-Curve-and-Isogeny.html" rel="alternate" type="text/html" title="Elliptic Curve and Isogeny" /><published>2021-02-07T00:00:00+09:00</published><updated>2021-02-07T00:00:00+09:00</updated><id>/2021/02/07/Elliptic-Curve-and-Isogeny</id><content type="html" xml:base="/2021/02/07/Elliptic-Curve-and-Isogeny.html">&lt;ul&gt;
+  &lt;li&gt;Isogeny는 Elliptic Curve 간의 group homomorphism을 말한다.&lt;/li&gt;
+  &lt;li&gt;$\mathbb{C}$ 위에서 정의된 Elliptic Curve들은 모두 isogenous할까?&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;$\bar{\mathbb{F}}_p$ 위에서 정의된 Elliptic Curve들은 $\mathbb{C}$위에서 정의된 Elliptic Curve들과 어떻게 다를까?&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Velu’s formula를 이용해 Isogeny를 연산할 수 있다.&lt;/li&gt;
+  &lt;li&gt;kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html">Isogeny는 Elliptic Curve 간의 group homomorphism을 말한다. $\mathbb{C}$ 위에서 정의된 Elliptic Curve들은 모두 isogenous할까? $\bar{\mathbb{F}}_p$ 위에서 정의된 Elliptic Curve들은 $\mathbb{C}$위에서 정의된 Elliptic Curve들과 어떻게 다를까? Velu’s formula를 이용해 Isogeny를 연산할 수 있다. kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.</summary></entry><entry><title type="html">Montgomery Multiplication</title><link href="/2021/01/31/Montgomery-Multiplication.html" rel="alternate" type="text/html" title="Montgomery Multiplication" /><published>2021-01-31T00:00:00+09:00</published><updated>2021-01-31T00:00:00+09:00</updated><id>/2021/01/31/Montgomery-Multiplication</id><content type="html" xml:base="/2021/01/31/Montgomery-Multiplication.html">&lt;ul&gt;
   &lt;li&gt;Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.&lt;/li&gt;
   &lt;li&gt;$\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&quot;빠른-모듈러-곱의-철학&quot;&gt;빠른 모듈러 곱의 철학&lt;/h3&gt;
+&lt;h2 id=&quot;빠른-모듈러-곱의-철학&quot;&gt;빠른 모듈러 곱의 철학&lt;/h2&gt;
 
 &lt;p&gt;소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다.
 단순한 방법으로 $a \cdot b$를 수행하고 이 값이 $p$보다 작아질 때까지 $p$를 빼주면 된다.
@@ -14,7 +210,7 @@
 
 &lt;p&gt;그런데 이진수를 사용한다면, $p = 2^k$꼴인 $p$에 대해서는 modular 연산이 k개의 least significant bit를 남기고 지우는 행위와 같다는 것을 알 수 있다. 이는 AND 논리 연산으로 아주 간단히 구현할 수 있다. $p \&amp;amp; (2^k-1)$을 연산하면 되기 때문이다. 이러한 점에서 착안해 modular $p$연산을 modular $2^k$연산으로 변환하여 연산을 빠르게 수행하려는 것이 Montgomery Multiplication의 철학이다.&lt;/p&gt;
 
-&lt;h3 id=&quot;montgomery-reduction&quot;&gt;Montgomery reduction&lt;/h3&gt;
+&lt;h2 id=&quot;montgomery-reduction&quot;&gt;Montgomery reduction&lt;/h2&gt;
 
 &lt;p&gt;$a \cdot b$의 값을 $[0,p-1]$사이로 reduction 시킨다는 것은 수의 길이를 줄인다는 의미이다. 수의 길이를 줄이는 가장 빠른 방법은 당연히 right shift 연산을 통해 lsb를 버리는 방법이다. 그렇다면 right shift를 통해서 reduction 시킬 수 있는 상황이 존재할까?&lt;/p&gt;
 
@@ -56,7 +252,7 @@ end function
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Montgomery_modular_multiplication&quot;&gt;wiki 참조&lt;/a&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;multi-precision-reduction&quot;&gt;Multi-precision reduction&lt;/h3&gt;
+&lt;h2 id=&quot;multi-precision-reduction&quot;&gt;Multi-precision reduction&lt;/h2&gt;
 
 &lt;p&gt;지금까지는 $R = 2^k$인 일반적인 경우를 생각했지만, 컴퓨터의 연산단위는 8-bit, 16-bit, 32-bit, 64-bit와 같이 고정되어 있다. 따라서 이에 맞게 연산을 해주는게 더 빠를 것이다. 대표적인 예로 8-bit인 경우, 8-bit 크기의 레지스터에서 곱셈 또는 덧셈 연산을 하면 자동적으로 $2^8$에 대한 모듈러 곱셈, 덧셈을 연산하게 된다.&lt;/p&gt;
 
@@ -176,4 +372,4 @@ function MultiPrecisionREDC is
         return S
     end if
 end function
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Hyeonhak</name></author><category term="Mathematics" /><summary type="html">Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다. $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc) 빠른 모듈러 곱의 철학 소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다. 단순한 방법으로 $a \cdot b$를 수행하고 이 값이 $p$보다 작아질 때까지 $p$를 빼주면 된다. 조금 더 개선한 방법으로는 $0 \leq a \cdot b - k \cdot p &amp;lt; p$를 만족하는 k를 $[0,p)$ 구간에서 binary search 해주는 방법이 있겠다. 이는 대략 $O(\log p)$의 시간복잡도를 가진다. Modular 곱셈에서는 modular $p$를 해주는 연산이 가장 오래걸린다. modular 연산에 걸리는 시간을 효율적으로 줄이는게 Modular Multiplication 연산을 빠르게 수행할 수 있는 방법이다. 그런데 이진수를 사용한다면, $p = 2^k$꼴인 $p$에 대해서는 modular 연산이 k개의 least significant bit를 남기고 지우는 행위와 같다는 것을 알 수 있다. 이는 AND 논리 연산으로 아주 간단히 구현할 수 있다. $p \&amp;amp; (2^k-1)$을 연산하면 되기 때문이다. 이러한 점에서 착안해 modular $p$연산을 modular $2^k$연산으로 변환하여 연산을 빠르게 수행하려는 것이 Montgomery Multiplication의 철학이다. Montgomery reduction $a \cdot b$의 값을 $[0,p-1]$사이로 reduction 시킨다는 것은 수의 길이를 줄인다는 의미이다. 수의 길이를 줄이는 가장 빠른 방법은 당연히 right shift 연산을 통해 lsb를 버리는 방법이다. 그렇다면 right shift를 통해서 reduction 시킬 수 있는 상황이 존재할까? right shift는 $2^k$로 나누는 연산이므로 $2^k$로 나누어서 $a \cdot b$를 얻을 수 있어야한다. 여기서 Montgomery form의 아이디어가 발생한다. 모듈러 곱 연산을 할 때마다 $2^k$로 나누는 연산을 해야만 하도록 만들기 위해서 우리는 $a$와 $b$로부터 $a \cdot b$를 얻는 것 대신에 $a \cdot 2^k$와 $b \cdot 2^k$로부터 $a \cdot b \cdot 2^k$를 얻도록 만들 것이다. 이러면 자연스럽게 $ a2^k \cdot b2^k$를 연산해준 다음 $2^k$를 다시 나누어줘야 한다. 이렇게 되면 이왕 $2^k$로 나눠주어야 하는 김에 right shift 연산으로 길이도 $\log p$로 줄여서 자연스럽게 $ab2^k$ 값이 $[0,p-1]$ 안에 들어오도록 만들 수 있다. 그래도 아직 충분하지 않다. 우리는 $T = (a2^k \mod p) \times (b2^k \mod p)$를 $R = 2^k$로 나누는 연산을 수행할 때, right shift 연산을 사용하고 싶은건데 $T$ 값은 밑에서 $k$ 비트 만큼이 모두 0이라는 보장이 없기 때문이다. $p$값을 적절히 더해줘서 $k$만큼의 lsb를 0으로 만들어주면 그제서야 right shift를 사용할 수 있다. $p$를 $n$번 더해줘야 $T$ 값을 우리가 원하는 형태로 만들 수 있다고 하면, $T + np \equiv 0 \mod R$ 식을 만족하는 $n$을 찾아야한다. 식을 다시쓰면, $n \equiv T \times (-1 \times p^{-1}) \mod R$ 이 된다. $p$는 고정되어 있으므로, $p’ = ((-1 \times p^{-1}) \mod R)$은 미리 계산해서 저장해두면, $Tp’ \mod R$만 계산하면 된다. 이 모듈러 곱은 AND 연산으로 간단히 수행될 것이다. $\lfloor (T + np)/R \rfloor$를 계산하면 크기 범위는 $[0, \lfloor (p-1)^2/R \rfloor + (p-1)]$이 될 것이다. $k = \lceil \log p \rceil$라고 하면, $R = 2^k \geq p-1$이므로, $\lfloor ((p-1)^2/R) \rfloor \leq (p-1)$가 된다. 정리하면, 아래와 같은 결론을 내릴 수 있다. $k \geq \lceil \log p \rceil$이면, $\lfloor (T + np)/R \rfloor$는 $[0, 2(p-1)]$ 범위 안에 들어온다. $k = \lceil \log p \rceil$일 때, $T \in [0, (p-1)^2]$을 입력 받아서 미리 계산해둔 $p’ = ((-1 \times p^{-1}) \mod R)$를 이용해서 $n = (T \times p’ \mod R)$을 계산하고, $T + np$를 $k$-right shift 해주면 $T$에 대한 montgomery reduction이 된다. montgomery reduction을 통해 modular reduction을 수행한다면 곱셈 한번과 덧셈 한번만큼의 연산만 필요하기 때문에 앞서 생각한 binary search보다는 훨씬 많은 연산을 줄인다는 것을 알 수 있다. 이를 pseudo code로 표현하면 아래와 같다. Montgomery reduction algorithm k = ceil(log p) function REDC is input: Integers R=2^k and p with gcd(R, p) = 1, Integer p′ in [0, R − 1] such that NN′ ≡ −1 mod R, Integer T in the range [0, Rp − 1]. output: Integer S in the range [0, p − 1] such that S ≡ TR^(-1) mod p n ← ((T mod R)p′) mod R t ← (T + np) / R if t ≥ p then return t − p else return t end if end function wiki 참조 Multi-precision reduction 지금까지는 $R = 2^k$인 일반적인 경우를 생각했지만, 컴퓨터의 연산단위는 8-bit, 16-bit, 32-bit, 64-bit와 같이 고정되어 있다. 따라서 이에 맞게 연산을 해주는게 더 빠를 것이다. 대표적인 예로 8-bit인 경우, 8-bit 크기의 레지스터에서 곱셈 또는 덧셈 연산을 하면 자동적으로 $2^8$에 대한 모듈러 곱셈, 덧셈을 연산하게 된다. 그런데 앞에서 $k \geq \lceil \log p \rceil$ 조건이 있어야한다고 언급했는데 어떻게 $k$를 8, 16, 32, 64와 같은 값으로 줄일 수 있을까? 결국 우리가 구하고자 하는 값은 $\lfloor (T + np)/R \rfloor$이므로 레지스터 크기가 8일 때, $k = 8*l \geq \lceil \log p \rceil$꼴인 $k$를 선택해서 $2^8$로 나눠주는 연산을 $l$번 수행하면 된다. 아래와 같은 루틴을 수행한다. 1) $T+np \equiv 0 \mod 2^8$이 되는 $n \in [0, 2^8-1]$을 찾는다. 2) $T+np$에 8-right shift를 취한다. 3) 1), 2)를 $l-1$번 더 반복한다. 자세한 알고리즘은 아래와 같다. Multi-precision reduction algorithm 아래 알고리즘은 $k$-right shift를 마지막에 한 번에 수행하는 방식이다. 실제로 right shift를 수행하지 않고, 출력값을 복사할 때, $k$-bit 밀려서 복사하는 방식으로 수행한다. 따라서 연산량이 전혀 들지 않는다 B = 2^8 or 2^16 or 2^32 function MultiPrecisionREDC is Input: Integer p with gcd(B, p) = 1, stored as an array of m words, Integer R = B^r, --thus, r = log_B(R) Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B), Integer T in the range 0 ≤ T &amp;lt; Rp, stored as an array of r + m words. Output: Integer S in [0, p − 1] such that TR^(−1) ≡ S (mod p), stored as an array of m words. Set T[r + m] = 0 (extra carry word) for 0 ≤ i &amp;lt; r do --loop1- Make T divisible by Bi+1 c ← 0 n ← T[i] ⋅ p′ mod B for 0 ≤ j &amp;lt; m do --loop2- Add the low word of n ⋅ p[j] and the carry from earlier, and find the new carry x ← T[i + j] + n ⋅ p[j] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for for m ≤ j ≤ r + m − i do --loop3- Continue carrying x ← T[i + j] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for end for for 0 ≤ i ≤ m do S[i] ← T[i + r] end for if S ≥ p then return S − p else return S end if end function Multi-precision multiplication algorithm 앞서 설명한 reduction을 이용해 실제 Montgomery 곱셈을 진행한다면 곱셈과 reduction을 하나로 합쳐야한다. 이 둘은 사실 따로 수행할 필요 없이 하나의 함수 안에 약간의 최적화로 수행할 수 있다. B = 2^8 or 2^16 or 2^32 function MultiPrecisionREDC is Input: Integer p with gcd(B, p) = 1, stored as an array of m words, Integer R = B^r, --thus, r = log_B(R) Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B), Integer A in the range 0 ≤ A &amp;lt; p, stored as an array of m words. Integer B in the range 0 ≤ B &amp;lt; p, stored as an array of m words. Output: Integer S in [0, p − 1] such that ABR^(−1) ≡ S (mod p), stored as an array of m words. --initialize array T for 0 ≤ i &amp;lt; r + m do T[i] = 0 end for Set T[r + m] = 0 (extra carry word) for 0 ≤ i &amp;lt; r do --loop1- Make T divisible by Bi+1 c ← 0 n ← (T[i] + A[0] ⋅ B[i]) ⋅ p′ mod B for 0 ≤ j &amp;lt; m do --loop2- Add n ⋅ p to T x ← T[i + j] + n ⋅ p[j] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for T[i + m] ← T[i + m] + c c ← 0 for 0 ≤ j &amp;lt; m do --loop3- Add A ⋅ B[i] to T x ← T[i + j] + A[j] ⋅ B[i] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for T[i + m] ← T[i + m] + c --assert- A ⋅ B[i] + n ⋅ p는 B^(m+1)을 넘지 않으므로 더 이상의 캐리가 발생하지 않는다. end for for 0 ≤ i ≤ m do S[i] ← T[i + r] end for if S ≥ p then return S − p else return S end if end function</summary></entry><entry><title type="html">Welcome</title><link href="/2021/01/30/welcome.html" rel="alternate" type="text/html" title="Welcome" /><published>2021-01-30T00:00:00+09:00</published><updated>2021-01-30T00:00:00+09:00</updated><id>/2021/01/30/welcome</id><content type="html" xml:base="/2021/01/30/welcome.html">&lt;p&gt;안녕하세요. 주로 수학, 암호관련 포스팅을 하겠습니다.&lt;/p&gt;</content><author><name>Hyeonhak</name></author><category term="Daily" /><summary type="html">안녕하세요. 주로 수학, 암호관련 포스팅을 하겠습니다.</summary></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html">Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다. $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc) 빠른 모듈러 곱의 철학 소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다. 단순한 방법으로 $a \cdot b$를 수행하고 이 값이 $p$보다 작아질 때까지 $p$를 빼주면 된다. 조금 더 개선한 방법으로는 $0 \leq a \cdot b - k \cdot p &amp;lt; p$를 만족하는 k를 $[0,p)$ 구간에서 binary search 해주는 방법이 있겠다. 이는 대략 $O(\log p)$의 시간복잡도를 가진다. Modular 곱셈에서는 modular $p$를 해주는 연산이 가장 오래걸린다. modular 연산에 걸리는 시간을 효율적으로 줄이는게 Modular Multiplication 연산을 빠르게 수행할 수 있는 방법이다. 그런데 이진수를 사용한다면, $p = 2^k$꼴인 $p$에 대해서는 modular 연산이 k개의 least significant bit를 남기고 지우는 행위와 같다는 것을 알 수 있다. 이는 AND 논리 연산으로 아주 간단히 구현할 수 있다. $p \&amp;amp; (2^k-1)$을 연산하면 되기 때문이다. 이러한 점에서 착안해 modular $p$연산을 modular $2^k$연산으로 변환하여 연산을 빠르게 수행하려는 것이 Montgomery Multiplication의 철학이다. Montgomery reduction $a \cdot b$의 값을 $[0,p-1]$사이로 reduction 시킨다는 것은 수의 길이를 줄인다는 의미이다. 수의 길이를 줄이는 가장 빠른 방법은 당연히 right shift 연산을 통해 lsb를 버리는 방법이다. 그렇다면 right shift를 통해서 reduction 시킬 수 있는 상황이 존재할까? right shift는 $2^k$로 나누는 연산이므로 $2^k$로 나누어서 $a \cdot b$를 얻을 수 있어야한다. 여기서 Montgomery form의 아이디어가 발생한다. 모듈러 곱 연산을 할 때마다 $2^k$로 나누는 연산을 해야만 하도록 만들기 위해서 우리는 $a$와 $b$로부터 $a \cdot b$를 얻는 것 대신에 $a \cdot 2^k$와 $b \cdot 2^k$로부터 $a \cdot b \cdot 2^k$를 얻도록 만들 것이다. 이러면 자연스럽게 $ a2^k \cdot b2^k$를 연산해준 다음 $2^k$를 다시 나누어줘야 한다. 이렇게 되면 이왕 $2^k$로 나눠주어야 하는 김에 right shift 연산으로 길이도 $\log p$로 줄여서 자연스럽게 $ab2^k$ 값이 $[0,p-1]$ 안에 들어오도록 만들 수 있다. 그래도 아직 충분하지 않다. 우리는 $T = (a2^k \mod p) \times (b2^k \mod p)$를 $R = 2^k$로 나누는 연산을 수행할 때, right shift 연산을 사용하고 싶은건데 $T$ 값은 밑에서 $k$ 비트 만큼이 모두 0이라는 보장이 없기 때문이다. $p$값을 적절히 더해줘서 $k$만큼의 lsb를 0으로 만들어주면 그제서야 right shift를 사용할 수 있다. $p$를 $n$번 더해줘야 $T$ 값을 우리가 원하는 형태로 만들 수 있다고 하면, $T + np \equiv 0 \mod R$ 식을 만족하는 $n$을 찾아야한다. 식을 다시쓰면, $n \equiv T \times (-1 \times p^{-1}) \mod R$ 이 된다. $p$는 고정되어 있으므로, $p’ = ((-1 \times p^{-1}) \mod R)$은 미리 계산해서 저장해두면, $Tp’ \mod R$만 계산하면 된다. 이 모듈러 곱은 AND 연산으로 간단히 수행될 것이다. $\lfloor (T + np)/R \rfloor$를 계산하면 크기 범위는 $[0, \lfloor (p-1)^2/R \rfloor + (p-1)]$이 될 것이다. $k = \lceil \log p \rceil$라고 하면, $R = 2^k \geq p-1$이므로, $\lfloor ((p-1)^2/R) \rfloor \leq (p-1)$가 된다. 정리하면, 아래와 같은 결론을 내릴 수 있다. $k \geq \lceil \log p \rceil$이면, $\lfloor (T + np)/R \rfloor$는 $[0, 2(p-1)]$ 범위 안에 들어온다. $k = \lceil \log p \rceil$일 때, $T \in [0, (p-1)^2]$을 입력 받아서 미리 계산해둔 $p’ = ((-1 \times p^{-1}) \mod R)$를 이용해서 $n = (T \times p’ \mod R)$을 계산하고, $T + np$를 $k$-right shift 해주면 $T$에 대한 montgomery reduction이 된다. montgomery reduction을 통해 modular reduction을 수행한다면 곱셈 한번과 덧셈 한번만큼의 연산만 필요하기 때문에 앞서 생각한 binary search보다는 훨씬 많은 연산을 줄인다는 것을 알 수 있다. 이를 pseudo code로 표현하면 아래와 같다. Montgomery reduction algorithm k = ceil(log p) function REDC is input: Integers R=2^k and p with gcd(R, p) = 1, Integer p′ in [0, R − 1] such that NN′ ≡ −1 mod R, Integer T in the range [0, Rp − 1]. output: Integer S in the range [0, p − 1] such that S ≡ TR^(-1) mod p n ← ((T mod R)p′) mod R t ← (T + np) / R if t ≥ p then return t − p else return t end if end function wiki 참조 Multi-precision reduction 지금까지는 $R = 2^k$인 일반적인 경우를 생각했지만, 컴퓨터의 연산단위는 8-bit, 16-bit, 32-bit, 64-bit와 같이 고정되어 있다. 따라서 이에 맞게 연산을 해주는게 더 빠를 것이다. 대표적인 예로 8-bit인 경우, 8-bit 크기의 레지스터에서 곱셈 또는 덧셈 연산을 하면 자동적으로 $2^8$에 대한 모듈러 곱셈, 덧셈을 연산하게 된다. 그런데 앞에서 $k \geq \lceil \log p \rceil$ 조건이 있어야한다고 언급했는데 어떻게 $k$를 8, 16, 32, 64와 같은 값으로 줄일 수 있을까? 결국 우리가 구하고자 하는 값은 $\lfloor (T + np)/R \rfloor$이므로 레지스터 크기가 8일 때, $k = 8*l \geq \lceil \log p \rceil$꼴인 $k$를 선택해서 $2^8$로 나눠주는 연산을 $l$번 수행하면 된다. 아래와 같은 루틴을 수행한다. 1) $T+np \equiv 0 \mod 2^8$이 되는 $n \in [0, 2^8-1]$을 찾는다. 2) $T+np$에 8-right shift를 취한다. 3) 1), 2)를 $l-1$번 더 반복한다. 자세한 알고리즘은 아래와 같다. Multi-precision reduction algorithm 아래 알고리즘은 $k$-right shift를 마지막에 한 번에 수행하는 방식이다. 실제로 right shift를 수행하지 않고, 출력값을 복사할 때, $k$-bit 밀려서 복사하는 방식으로 수행한다. 따라서 연산량이 전혀 들지 않는다 B = 2^8 or 2^16 or 2^32 function MultiPrecisionREDC is Input: Integer p with gcd(B, p) = 1, stored as an array of m words, Integer R = B^r, --thus, r = log_B(R) Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B), Integer T in the range 0 ≤ T &amp;lt; Rp, stored as an array of r + m words. Output: Integer S in [0, p − 1] such that TR^(−1) ≡ S (mod p), stored as an array of m words. Set T[r + m] = 0 (extra carry word) for 0 ≤ i &amp;lt; r do --loop1- Make T divisible by Bi+1 c ← 0 n ← T[i] ⋅ p′ mod B for 0 ≤ j &amp;lt; m do --loop2- Add the low word of n ⋅ p[j] and the carry from earlier, and find the new carry x ← T[i + j] + n ⋅ p[j] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for for m ≤ j ≤ r + m − i do --loop3- Continue carrying x ← T[i + j] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for end for for 0 ≤ i ≤ m do S[i] ← T[i + r] end for if S ≥ p then return S − p else return S end if end function Multi-precision multiplication algorithm 앞서 설명한 reduction을 이용해 실제 Montgomery 곱셈을 진행한다면 곱셈과 reduction을 하나로 합쳐야한다. 이 둘은 사실 따로 수행할 필요 없이 하나의 함수 안에 약간의 최적화로 수행할 수 있다. B = 2^8 or 2^16 or 2^32 function MultiPrecisionREDC is Input: Integer p with gcd(B, p) = 1, stored as an array of m words, Integer R = B^r, --thus, r = log_B(R) Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B), Integer A in the range 0 ≤ A &amp;lt; p, stored as an array of m words. Integer B in the range 0 ≤ B &amp;lt; p, stored as an array of m words. Output: Integer S in [0, p − 1] such that ABR^(−1) ≡ S (mod p), stored as an array of m words. --initialize array T for 0 ≤ i &amp;lt; r + m do T[i] = 0 end for Set T[r + m] = 0 (extra carry word) for 0 ≤ i &amp;lt; r do --loop1- Make T divisible by Bi+1 c ← 0 n ← (T[i] + A[0] ⋅ B[i]) ⋅ p′ mod B for 0 ≤ j &amp;lt; m do --loop2- Add n ⋅ p to T x ← T[i + j] + n ⋅ p[j] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for T[i + m] ← T[i + m] + c c ← 0 for 0 ≤ j &amp;lt; m do --loop3- Add A ⋅ B[i] to T x ← T[i + j] + A[j] ⋅ B[i] + c T[i + j] ← x mod B c ← ⌊x / B⌋ end for T[i + m] ← T[i + m] + c --assert- A ⋅ B[i] + n ⋅ p는 B^(m+1)을 넘지 않으므로 더 이상의 캐리가 발생하지 않는다. end for for 0 ≤ i ≤ m do S[i] ← T[i + r] end for if S ≥ p then return S − p else return S end if end function</summary></entry></feed>

@@ -369,7 +369,53 @@ fill="#000000" stroke="none">
               <div class="col-main cell cell--auto"><!-- start custom main top snippet -->
 
 <!-- end custom main top snippet -->
-<article itemscope itemtype="http://schema.org/WebPage"><header style="display:none;"><h1>Home</h1></header><meta itemprop="headline" content="Home"><meta itemprop="author" content="Hyeonhak"/><div class="js-article-content"><div class="layout--articles"><div class="article-list items items--divided"><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
+<article itemscope itemtype="http://schema.org/WebPage"><header style="display:none;"><h1>Home</h1></header><meta itemprop="headline" content="Home"><meta itemprop="author" content="manbo"/><div class="js-article-content"><div class="layout--articles"><div class="article-list items items--divided"><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
+          <header><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html"><h2 itemprop="headline" class="item__header">Quantum algorithm for Hidden Shift Problem#2</h2></a></header>
+          <div class="item__description"><div class="article__content" itemprop="description articleBody">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다.
+  Regev의 알고리즘은 2008년도 A Subexponential Time Algorithm for the DHSP with Polynomial Space 논문을 참조
+  Quantum algorithm for HSP 2편
+
+
+$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
+$\newcommand{\bra}[1]{\left&lt; #1 \right|}$
+$\newcommand{\norm}[1]{\left| #1 \right|}$
+$\newcommand{\inner}[1]{\left&lt...</div><p><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
+              <a class="button button--secondary button--pill button--sm"
+                href="/archive.html?tag=Quantum_Algorithm">Quantum_Algorithm</a>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 15, 2021</span>
+            </li></ul></div><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-15T00:00:00+09:00">
+    <meta itemprop="keywords" content="Quantum_Algorithm"></div>
+      </article><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
+          <header><a href="/2021/02/14/Quantum-Algorithm-for-HSP.html"><h2 itemprop="headline" class="item__header">Quantum algorithm for Hidden Shift Problem</h2></a></header>
+          <div class="item__description"><div class="article__content" itemprop="description articleBody">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다.
+  3개의 대표적인 양자 알고리즘이 존재한다.
+  kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.
+  입력으로 주어진 함수의 정의역 G가 commutative해야지 subexponential time 안에 문제를 해결할 수 있다.
+
+
+Hidden Shift Problem
+
+Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, sh...</div><p><a href="/2021/02/14/Quantum-Algorithm-for-HSP.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
+              <a class="button button--secondary button--pill button--sm"
+                href="/archive.html?tag=Quantum_Algorithm">Quantum_Algorithm</a>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 14, 2021</span>
+            </li></ul></div><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-14T00:00:00+09:00">
+    <meta itemprop="keywords" content="Quantum_Algorithm"></div>
+      </article><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
+          <header><a href="/2021/02/07/Elliptic-Curve-and-Isogeny.html"><h2 itemprop="headline" class="item__header">Elliptic Curve and Isogeny</h2></a></header>
+          <div class="item__description"><div class="article__content" itemprop="description articleBody">Isogeny는 Elliptic Curve 간의 group homomorphism을 말한다.
+  $\mathbb{C}$ 위에서 정의된 Elliptic Curve들은 모두 isogenous할까?
+  
+    $\bar{\mathbb{F}}_p$ 위에서 정의된 Elliptic Curve들은 $\mathbb{C}$위에서 정의된 Elliptic Curve들과 어떻게 다를까?
+  
+  Velu’s formula를 이용해 Isogeny를 연산할 수 있다.
+  kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.</div><p><a href="/2021/02/07/Elliptic-Curve-and-Isogeny.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
+              <a class="button button--secondary button--pill button--sm"
+                href="/archive.html?tag=Mathematics">Mathematics</a>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 07, 2021</span>
+            </li></ul></div><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-07T00:00:00+09:00">
+    <meta itemprop="keywords" content="Mathematics"></div>
+      </article><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
           <header><a href="/2021/01/31/Montgomery-Multiplication.html"><h2 itemprop="headline" class="item__header">Montgomery Multiplication</h2></a></header>
           <div class="item__description"><div class="article__content" itemprop="description articleBody">Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.
   $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)
@@ -383,16 +429,8 @@ fill="#000000" stroke="none">
               <a class="button button--secondary button--pill button--sm"
                 href="/archive.html?tag=Mathematics">Mathematics</a>
             </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Jan 31, 2021</span>
-            </li></ul></div><meta itemprop="author" content="Hyeonhak"/><meta itemprop="datePublished" content="2021-01-31T00:00:00+09:00">
+            </li></ul></div><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-01-31T00:00:00+09:00">
     <meta itemprop="keywords" content="Mathematics"></div>
-      </article><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
-          <header><a href="/2021/01/30/welcome.html"><h2 itemprop="headline" class="item__header">Welcome</h2></a></header>
-          <div class="item__description"><div class="article__content" itemprop="description articleBody">안녕하세요. 주로 수학, 암호관련 포스팅을 하겠습니다.</div><p><a href="/2021/01/30/welcome.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
-              <a class="button button--secondary button--pill button--sm"
-                href="/archive.html?tag=Daily">Daily</a>
-            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Jan 30, 2021</span>
-            </li></ul></div><meta itemprop="author" content="Hyeonhak"/><meta itemprop="datePublished" content="2021-01-30T00:00:00+09:00">
-    <meta itemprop="keywords" content="Daily"></div>
       </article></div>
 </div><div class="layout--home"></div>
 <script>/*(function () {
@@ -409,14 +447,22 @@ fill="#000000" stroke="none">
             </div></div></div><div class="page__footer d-print-none">
 <footer class="footer py-4 js-page-footer">
   <div class="main"><div itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Hyeonhak"><meta itemprop="url" content="/"><meta itemprop="description" content="Researcher"><div class="footer__author-links"><div class="author-links">
-  <ul class="menu menu--nowrap menu--inline"></ul>
+      <meta itemprop="name" content="manbo"><meta itemprop="url" content="http://gusgkr0117.github.io"><meta itemprop="description" content="Researcher"><div class="footer__author-links"><div class="author-links">
+  <ul class="menu menu--nowrap menu--inline"><link itemprop="url" href="http://gusgkr0117.github.io"><li title="Send me an Email.">
+      <a class="button button--circle mail-button" itemprop="email" href="mailto:gusgkr0117@korea.ac.kr" target="_blank">
+        <i class="fas fa-envelope"></i>
+      </a><li title="Follow me on Github.">
+        <a class="button button--circle github-button" itemprop="sameAs" href="https://github.com/gusgkr0117" target="_blank">
+          <div class="icon"><svg fill="#000000" width="24px" height="24px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <path class="svgpath" data-index="path_0" fill="#272636" d="M0 525.2c0 223.6 143.3 413.7 343 483.5 26.9 6.8 22.8-12.4 22.8-25.4l0-88.7c-155.3 18.2-161.5-84.6-172-101.7-21.1-36-70.8-45.2-56-62.3 35.4-18.2 71.4 4.6 113.1 66.3 30.2 44.7 89.1 37.2 119 29.7 6.5-26.9 20.5-50.9 39.7-69.6C248.8 728.2 181.7 630 181.7 513.2c0-56.6 18.7-108.7 55.3-150.7-23.3-69.3 2.2-128.5 5.6-137.3 66.5-6 135.5 47.6 140.9 51.8 37.8-10.2 80.9-15.6 129.1-15.6 48.5 0 91.8 5.6 129.8 15.9 12.9-9.8 77-55.8 138.8-50.2 3.3 8.8 28.2 66.7 6.3 135 37.1 42.1 56 94.6 56 151.4 0 117-67.5 215.3-228.8 243.7 26.9 26.6 43.6 63.4 43.6 104.2l0 128.8c0.9 10.3 0 20.5 17.2 20.5C878.1 942.4 1024 750.9 1024 525.3c0-282.9-229.3-512-512-512C229.1 13.2 0 242.3 0 525.2L0 525.2z" />
+</svg>
+</div>
+        </a>
+      </li></ul>
 </div>
 </div>
     </div><div class="site-info mt-2">
-      <div>© Manbo's blog 2021,
-        Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="http://jekyllrb.com/">Jekyll</a> & <a
-        title="TeXt is a super customizable Jekyll theme." href="https://github.com/kitian616/jekyll-TeXt-theme">TeXt Theme</a>.
+      <div>© Manbo's blog 2021
       </div>
     </div>
   </div>
