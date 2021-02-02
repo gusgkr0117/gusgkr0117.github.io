@@ -215,7 +215,6 @@ defaults:
       layout: article
       sharing: true
       license: true
-      key: anything
       mode: immersive # 백그라운드 이미지 위에 헤더와 타이틀 올리기
       header:
         theme: dark # dark는 헤더의 배경을 어둡게 하고 글씨를 밝게함. light는 반대
