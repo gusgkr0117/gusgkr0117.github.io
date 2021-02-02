@@ -223,7 +223,7 @@ defaults:
         type: overlay # 포스트 내부에서 헤더 오버레이 적용여부
         theme: dark
         background_image: # 포스트 헤더 배경이미지 경로 및 그라데이션 설정
-          src: https://user-images.githubusercontent.com/59393359/74720914-e4b7e980-5279-11ea-9532-c262caf64f00.jpg
+          src: /assets/c262caf64f00.jpg
           gradient: 'linear-gradient(rgba(0, 0, 0, .3), rgba(0, 0, 0, .0))'
       aside:
         toc: true
