@@ -1,5 +1,5 @@
 ---
-title: Quantum algorithm for Hidden Shift Problem #2
+title: Quantum algorithm for Hidden Shift Problem 2
 tag: Quantum_Algorithm
 use_math: true
 ---
