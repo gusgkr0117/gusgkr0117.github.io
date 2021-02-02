@@ -215,7 +215,6 @@ defaults:
       layout: article
       sharing: true
       license: true
-      mode: immersive
       key: anything
       aside:
         toc: true
