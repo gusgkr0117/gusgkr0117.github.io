@@ -3,6 +3,7 @@ title: Quantum algorithm for Hidden Shift Problem#2
 subtitle: Regev의 HSP 알고리즘과 Collimation Sieve 이해하기
 tag: Quantum_Algorithm
 use_math: true
+key: post_20210215
 ---
 
 * 해당 글은 [Quantum Security Analysis of CSIDH](https://eprint.iacr.org/2018/537.pdf)논문을 정리한 것이다.
