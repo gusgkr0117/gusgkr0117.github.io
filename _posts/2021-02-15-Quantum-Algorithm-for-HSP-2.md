@@ -43,9 +43,9 @@ $\newcommand{\floor}[1]{\lfloor #1 \rfloor}$
 
 <center>$\ket{\psi_2} = \sum_{\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$</center>
 
-$\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{v}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{v} \in \\{0,1\\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 4$이다.
+$\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{v}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{v} \in \\{0,1\\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 2^4$이다.
 
- 이 solution들을 $\vec{v}_1, ... , \vec{v}_m \in \\{0,1\\}^{l+4}$라고 하자. 그러면 $\vec{v}_1, \vec{v}_2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{v}_1, ... , \vec{v}_m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{4} = \frac{1}{2}$이며, 아래와 같은 quantum state를 얻는다.
+ 이 solution들을 $\vec{v}_1, ... , \vec{v}_m \in \\{0,1\\}^{l+4}$라고 하자. 그러면 $\vec{v}_1, \vec{v}_2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{v}_1, ... , \vec{v}_m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{2^4} = \frac{1}{8}$이며, 아래와 같은 quantum state를 얻는다.
 
  <center>$\ket{0} + \chi(\frac{\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}}}{N})\ket{1}$</center>
 
@@ -95,9 +95,9 @@ $\ket{\psi_1} \propto \sum_{i=0}^{M-1} \chi(\frac{v_i}{N})\ket{i}$</center>
 
 <center>$\ket{\psi_{1}} \propto \sum_{0 \leq i,j < M-1} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$</center>
 
-여기서 Regev 알고리즘과 비슷하게 $\ket{i}\ket{j}\ket{0} \rightarrow \ket{i}\ket{j}\ket{\floor{(u_i + v_j)/{2^{(h-r)}})}}$ 연산을 적용하고 세번째 레지스터를 측정해서 label $V$와 아래와 같은 quantum state를 얻는다.
+여기서 Regev 알고리즘과 비슷하게 $\ket{i}\ket{j}\ket{0} \rightarrow \ket{i}\ket{j}\ket{\floor{(u_i + v_j)/{2^{(h-r)}}}}$ 연산을 적용하고 세번째 레지스터를 측정해서 label $V$와 아래와 같은 quantum state를 얻는다.
 
-<center>$\ket{\psi_{2}} \propto \sum_{\floor{(u_i + v_j)/{2^{(h-r)}})} = V} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$</center>
+<center>$\ket{\psi_{2}} \propto \sum_{\floor{(u_i + v_j)/{2^{(h-r)}}} = V} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$</center>
 
 여기서 classical하게 $\floor{(u_i + v_j)/{2^r})} = V$를 만족하는 모든 $(u_i, v_j)$쌍을 찾는다. 이 과정은 $O(M)$만큼 걸린다. 찾은 쌍들의 개수가 총 $M'$개라고 할 때, 찾아놓은 모든 $(u_i, v_j)$ 값들을 이용해 $\ket{0}, ..., \ket{M'-1}$로 basis를 변화시켜주면 아래와 같은 새로운 list state를 얻을 수 있다.
 

@@ -9,7 +9,7 @@ key: post_20210214
 * 해당 글은 [Quantum Security Analysis of CSIDH](https://eprint.iacr.org/2018/537.pdf)논문을 정리한 것이다.
 * 3개의 대표적인 양자 알고리즘이 존재한다.
 * kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.
-* 입력으로 주어진 함수의 정의역 G가 commutative해야지 subexponential time 안에 문제를 해결할 수 있다.
+* 입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)
 
 ### Hidden Shift Problem
 
