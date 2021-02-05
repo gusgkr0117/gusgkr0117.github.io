@@ -45,7 +45,7 @@ Hilbert space $\mathbb{C}^{N}$에서 생각해보면, diffusion operator는 Hilb
 
 Diffusion operator는 $U_s = 2\ket{s}\bra{s} - I_n$인데 이를 어떻게 quantum circuit으로 구현할 수 있을까?
 
-$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\textdagger}$를 만족하므로 사실 우리는 $\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, ..., \ket{2^n -1})$로 생각해보자.
+$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\dagger}$를 만족하므로 사실 우리는 $\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, ..., \ket{2^n -1})$로 생각해보자.
 
 $\ket{0^n}$의 값을 제외한 나머지 basis들에 대해 phase를 $\pi$만큼 shift 시켜주는 것이다. global phase를 $-1$ 곱해주면 이는 $\ket{0^n}$만 $\pi$만큼 phase shift 시키고, 나머지는 가만히 냅두는 것과 같다. $C^{n-1}$-NOT gate를 이용하면 아래 그림과 같이 circuit을 구성하면 된다.
 
@@ -95,7 +95,7 @@ diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이
 
 <center>$x = \frac{1}{e^{i(\gamma - \beta)} -e^{-i\beta} -e^{i\gamma} + 1} = \frac{1}{(1-e^{i\gamma})(1-e^{-i\beta})}$</center>
 
-$\newcommand{\norm}[1]{\left| #1 \right|}$
+$\newcommand{\norm}[1]{\left\| #1 \right\|}$
 
 $x$는 0이상 1이하 실수이므로, 이를 만족하기 위해서는 $\gamma = \beta$이어야 한다. 이런 경우, $x = \norm{\frac{1}{(1-e^{i\gamma})}}^2 \geq \frac{1}{4}$이다. 따라서 $f(x)=1$을 만족하는 해의 개수가 최소 ${2^n -2}$개는 되어야 한 번의 query로 해를 찾을 수 있다. 이 때, $\beta = \gamma = \cos^{-1}(1-\frac{1}{2x})$이다.
 
@@ -105,8 +105,8 @@ $x$는 0이상 1이하 실수이므로, 이를 만족하기 위해서는 $\gamma
 
 여기서 눈여겨 볼 점은 한 번의 query로 Grover algorithm을 수행하기 위해서는 phase shift gate를 구현해야한다는 것이다. 이는 [Quantum Security Analysis of CSIDH](https://eprint.iacr.org/2018/537.pdf)논문 22페이지에 아래와 같이 언급되어 있다.
 
- > For a phase shift gate synthesized from Clifford+T gates, we estimate from [28](https://arxiv.org/pdf/1206.5236.pdf) that it can be approximated up to an error of $2^{-50}$ using around $2^{14}$ T-gates, which is negligible compared to the cost of the exponentiation in the test function
+ > For a phase shift gate synthesized from Clifford+T gates, we estimate from [[28](https://arxiv.org/pdf/1206.5236.pdf)] that it can be approximated up to an error of $2^{-50}$ using around $2^{14}$ T-gates, which is negligible compared to the cost of the exponentiation in the test function
 
- _[28](https://arxiv.org/pdf/1206.5236.pdf)논문은 읽어보는게 좋을 것 같다!_
+ _[[28](https://arxiv.org/pdf/1206.5236.pdf)]논문은 읽어보는게 좋을 것 같다!_
 
  논문에서처럼 phase shift gate는 한 번 수행할 때마다 $2^{-50}$으로 매우 작은 실패 확률을 가지고 있고, Grover algorithm with a single query에서는 phase shift gate를 polynomial 횟수(대략 $n$번)만 사용하므로 에러는 무시할만한 수준으로 보인다.
