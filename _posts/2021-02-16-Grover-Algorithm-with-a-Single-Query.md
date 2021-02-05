@@ -11,7 +11,7 @@ key: post_20210216
 
 ## 기존 Grover Algorithm
 
-임의의 함수 $f:\mathbb{Z}\_n  \rightarrow \\{0,1\\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^(n/2))$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.
+임의의 함수 $f:\mathbb{Z}\_n  \rightarrow \\{0,1\\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^{(n/2)})$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.
 
 $\newcommand{\ket}[1]{\left| #1 \right>}$
 <center>$O_{f}^{0}\ket{x}\ket{0} = \ket{x}\ket{f(x)}$</center>
@@ -28,12 +28,12 @@ $\newcommand{\ket}[1]{\left| #1 \right>}$
 
 물론 superposition이 아니라면 phase shift는 무시되겠지만, Grover algorithm에서는 다음과 같이 uniform superposition state를 oracle에 입력으로 넣는다. global phase는 무시한채 식을 쓰면,
 
-<center>$O_f(\sum_{x=0}^{2^n} \ket{x}) = \sum_{x=0}^{2^n} (-1)^{f(x)}\ket{x}$</center>
+<center>$O_f(\sum_{x=0}^{2^n-1} \ket{x}) = \sum_{x=0}^{2^n-1} (-1)^{f(x)}\ket{x}$</center>
 
 이렇게 얻은 quantum state는 실제로 $f(w)=1$을 만족하는 $w \in \\{0,1\\}^n$ 한 개만 phase가 -1인 superposition state이다. 이 과정을 reflection 단계라고 부른다. 다음은 여기에 diffusion operator라는 것을 적용할 것이다. diffusion operator $U_s$는 아래와 같이 주어진다.
 
 $\newcommand{\bra}[1]{\left< #1 \right|}$
-<center>$U_s = 2\ket{s}\bra{s} - I_n$ where $\ket{s} = \frac{1}{\sqrt{2^n}}(\sum_{i=0}^{2^n} \ket{i})$</center>
+<center>$U_s = 2\ket{s}\bra{s} - I_n$ where $\ket{s} = \frac{1}{\sqrt{2^n}}(\sum_{i=0}^{2^n-1} \ket{i})$</center>
 
 Hilbert space $\mathbb{C}^{N}$에서 생각해보면, diffusion operator는 Hilbert space 위의 벡터 $\ket{s}$에 대한 대칭이동을 의미한다. 또한 oracle operator $O_f$를 적용하는 것은 $\ket{w}$로 생성되는 벡터 공간에 수직인 공간에 대한 대칭 이동을 의미한다. 따라서 이를 $\ket{w}$와 $\ket{s}$에 의해 생성되는 2차원 평면 상에서 그림을 그리면 아래와 같이 동작한다.
 
@@ -79,7 +79,7 @@ diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이
 
 이 부분을 보완하기 위해 $M$ 값을 바꾸는 방법을 사용할 것이다. oracle $O_f$ 대신에 phase $\gamma$만큼 변화시키는 $\gamma$-phase oracle을 이용하면 $M$ 값이 변화한다. $\gamma$-phase oracle을 적용하면 얻을 수 있는 quantum state는 아래와 같다.
 
-<center>$U_{\gamma}\ket{\psi} = \sum_{x=0}^{2^n} (e^{i\gamma})^{f(x)}\ket{x}$</center>
+<center>$U_{\gamma}\ket{\psi} = \sum_{x=0}^{2^n-1} (e^{i\gamma})^{f(x)}\ket{x}$</center>
 
 여기서 $M$ 값은 $\frac{2^n -1 + e^{i\gamma}}{2^n}$이다. 이러면 $l = \frac{2^n -1 +e^{i\gamma}}{1-e^{i\gamma}}$이 되어야 한 번의 query로 해를 구할 수 있다. 그러면 $\beta$-phase diffusion transform을 사용한다고 했을 때, $e^{i\beta} = -\frac{1-e^{i\gamma}}{2^n -1 +e^{i\gamma}}$를 만족해야한다. 근데 이 식도 자세히 보면, 좌변의 norm은 1인데 비해, 우변의 norm은 $n$이 커질수록 exponential하게 작아짐을 알 수 있다. 이러면 $n$ 값이 조금만 커도 해당 식을 만족하는 $0 \leq \beta, \gamma < 2\pi$가 존재하지 않는다.
 
