@@ -85,7 +85,7 @@ diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이
 
 여기서 $f(x)=1$인 해의 개수가 오직 한 개라는 조건의 한계점을 느낄 수 있다. 만약 해의 개수가 $r$개라면, 식이 어떻게 변화할지 생각해보자. $M$은 아래와 같이 바뀐다.
 
-<center>$M = \frac{2^n - r + r \cdot e^{i\gamma}}{2^n}</center>
+<center>$M = \frac{2^n - r + r \cdot e^{i\gamma}}{2^n}$</center>
 
 그러면 한 번의 query로 해를 찾을 수 있는 $\beta$값은 아래 식으로 구할 수 있다.
 
@@ -97,7 +97,7 @@ diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이
 
 $\newcommand{\norm}[1]{\left| #1 \right|}$
 
-$x$는 0이상 1이하 실수이므로, 이를 만족하기 위해서는 $\gamma = \beta$이어야 한다. 이런 경우, $x = \norm{\frac{1}{(1-e^{i\gamma})}}^2 \geq \frac{1}{4}$이다. 따라서 $f(x)=1$을 만족하는 해의 개수가 최소 ${2^n -2}$개는 되어야 한번의 query로 해를 찾을 수 있다. 이 때, $\beta = \gamma = \cos^{-1}(1-\frac{1}{2x})$이다.
+$x$는 0이상 1이하 실수이므로, 이를 만족하기 위해서는 $\gamma = \beta$이어야 한다. 이런 경우, $x = \norm{\frac{1}{(1-e^{i\gamma})}}^2 \geq \frac{1}{4}$이다. 따라서 $f(x)=1$을 만족하는 해의 개수가 최소 ${2^n -2}$개는 되어야 한 번의 query로 해를 찾을 수 있다. 이 때, $\beta = \gamma = \cos^{-1}(1-\frac{1}{2x})$이다.
 
 ### 알고리즘의 적용
 
