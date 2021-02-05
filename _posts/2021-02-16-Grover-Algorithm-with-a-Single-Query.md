@@ -52,7 +52,7 @@ Hilbert space $\mathbb{C}^{N}$에서 생각해보면, diffusion operator는 Hilb
 
 Diffusion operator는 $U_s = 2\ket{s}\bra{s} - I_n$인데 이를 어떻게 quantum circuit으로 구현할 수 있을까?
 
-$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\dagger}$를 만족하므로 사실 우리는 $\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, ..., \ket{2^n -1})$로 생각해보자.
+$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\dagger}$를 만족하므로 사실 우리는 $2\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, ..., \ket{2^n -1})$로 생각해보자.
 
 $\ket{0^n}$의 값을 제외한 나머지 basis들에 대해 phase를 $\pi$만큼 shift 시켜주는 것이다. global phase를 $-1$ 곱해주면 이는 $\ket{0^n}$만 $\pi$만큼 phase shift 시키고, 나머지는 가만히 냅두는 것과 같다. $C^{n-1}$-NOT gate를 이용하면 아래 그림과 같이 circuit을 구성하면 된다.
 
