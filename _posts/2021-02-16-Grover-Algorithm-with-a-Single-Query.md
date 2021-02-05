@@ -7,11 +7,11 @@ key: post_20210216
 ---
 
 * 해당 글은 1997년도 논문 [Quantum Database Searching by a Single Query](https://arxiv.org/pdf/quant-ph/9708005.pdf)를 정리한 것이다.
-* 주어진 함수 $f:\mathbb{Z}_n \rightarrow \\{0,1\\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.
+* 주어진 함수 $f:\mathbb{Z}\_n \rightarrow \\{0,1\\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.
 
 ## 기존 Grover Algorithm
 
-임의의 함수 $f:\mathbb{Z}_n  \rightarrow \\{0,1\\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^(n/2))$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.
+임의의 함수 $f:\mathbb{Z}\_n  \rightarrow \\{0,1\\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^(n/2))$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.
 
 $\newcommand{\ket}[1]{\left| #1 \right>}$
 <center>$O_{f}^{0}\ket{x}\ket{0} = \ket{x}\ket{f(x)}$</center>
