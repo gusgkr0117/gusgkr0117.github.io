@@ -99,7 +99,7 @@ $\ket{\psi_1} \propto \sum_{i=0}^{M-1} \chi(\frac{v_i}{N})\ket{i}$</center>
 
 <center>$\ket{\psi_{2}} \propto \sum_{\floor{(u_i + v_j)/{2^{(h-r)}}} = V} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$</center>
 
-여기서 classical하게 $\floor{(u_i + v_j)/{2^r})} = V$를 만족하는 모든 $(u_i, v_j)$쌍을 찾는다. 이 과정은 $O(M)$만큼 걸린다. 찾은 쌍들의 개수가 총 $M'$개라고 할 때, 찾아놓은 모든 $(u_i, v_j)$ 값들을 이용해 $\ket{0}, ..., \ket{M'-1}$로 basis를 변화시켜주면 아래와 같은 새로운 list state를 얻을 수 있다.
+여기서 classical하게 $\floor{(u_i + v_j)/{2^r}} = V$를 만족하는 모든 $(u_i, v_j)$쌍을 찾는다. 이 과정은 $O(M)$만큼 걸린다. 찾은 쌍들의 개수가 총 $M'$개라고 할 때, 찾아놓은 모든 $(u_i, v_j)$ 값들을 이용해 $\ket{0}, ..., \ket{M'-1}$로 basis를 변화시켜주면 아래와 같은 새로운 list state를 얻을 수 있다.
 
 <center>$\ket{\psi_{new}} \propto \sum_{i=0}^{M'-1} \chi(\frac{w_i}{N})\ket{i}$ where $\floor{w_i/{2^{(h-r)}}} = V$</center>
 
@@ -115,7 +115,10 @@ $r$을 크게하고 싶어서 욕심을 부리다보면 출력 사이즈 $M'$가
 
 앞서 설명한 2-list merging을 사용해서 원하는 labeled state를 얻으려면 binary tree 구조로 combination을 수행해야한다. binary tree의 depth에 따라서 전체 time complexity, memory complexity 등이 결정될 것이다. 우리가 원하는 것은 height이 1인 list state이므로 time complexity $2^t$, quantum memory complexity $2^m$, quantum query $2^q$에 대한 아래와 같은 그래프를 그릴 수 있다.
 
-<center><img src="/assets/20210215_1.png" width="400" height="300"></center>
+<center>
+<img src="/assets/20210215/20210215_1.png" width="40%">
+<figcaption> 출처 : <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a></figcaption>
+</center>
 
 그래프에서 tree level이 0일 때 초기 list state의 사이즈 $2^{l_0}$를 $m$으로 최대한 키울 수 없는 이유는 tree level 0에서는 leaf node의 개수가 총 $2^q$개인데, 2-list merging은 $O(2^{l_0})$만큼의 시간복잡도를 가지므로 level 0에서만 총 $O(2^{l_0 \cdot q})$만큼의 시간복잡도를 소모하기 때문이다. 앞서 시간복잡도는 $2^t$라는 설정이 있었으므로 $l_0 = t-q$가 최대 사이즈가 된다.
 

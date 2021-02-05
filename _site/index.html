@@ -370,16 +370,29 @@ fill="#000000" stroke="none">
 
 <!-- end custom main top snippet -->
 <article itemscope itemtype="http://schema.org/WebPage"><header style="display:none;"><h1>Home</h1></header><meta itemprop="headline" content="Home"><meta itemprop="author" content="manbo"/><div class="js-article-content"><div class="layout--articles"><div class="article-list items items--divided"><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
+          <header><a href="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html"><h2 itemprop="headline" class="item__header">Grover Algorithm with a Single Query</h2></a></header>
+          <div class="item__description"><div class="article__content" itemprop="description articleBody">해당 글은 1997년도 논문 Quantum Database Searching by a Single Query를 정리한 것이다.
+  주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.
+
+
+기존 Grover Algorithm
+
+임의의 함수 $f:\mathbb{Z}_n  \rightarrow \{0,1\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^{(n/2)})$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 ...</div><p><a href="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
+              <a class="button button--secondary button--pill button--sm"
+                href="/archive.html?tag=Quantum_Algorithm">Quantum_Algorithm</a>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 16, 2021</span>
+            </li></ul></div><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-16T00:00:00+09:00">
+    <meta itemprop="keywords" content="Quantum_Algorithm"></div>
+      </article><article class="item" itemscope itemtype="http://schema.org/BlogPosting"><div class="item__content">
           <header><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html"><h2 itemprop="headline" class="item__header">Quantum algorithm for Hidden Shift Problem#2</h2></a></header>
           <div class="item__description"><div class="article__content" itemprop="description articleBody">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다.
   Regev의 알고리즘은 2008년도 A Subexponential Time Algorithm for the DHSP with Polynomial Space 논문을 참조
   Quantum algorithm for HSP 2편
 
 
-$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
-$\newcommand{\bra}[1]{\left&lt; #1 \right|}$
-$\newcommand{\norm}[1]{\left| #1 \right|}$
-$\newcommand{\inner}[1]{\left&lt...</div><p><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
+Regev’s algorithm with polynomial quantum space
+
+Kuperberg가 처음 제안했던 알고리즘은 subexponential만큼의 quantum space를 필요로 한다는 단점이 있다. Kuperberg의 combination 방법은 $\frac{1}{2}$ 확...</div><p><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
               <a class="button button--secondary button--pill button--sm"
                 href="/archive.html?tag=Quantum_Algorithm">Quantum_Algorithm</a>
             </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 15, 2021</span>
@@ -390,12 +403,12 @@ $\newcommand{\inner}[1]{\left&lt...</div><p><a href="/2021/02/15/Quantum-Algorit
           <div class="item__description"><div class="article__content" itemprop="description articleBody">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다.
   3개의 대표적인 양자 알고리즘이 존재한다.
   kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.
-  입력으로 주어진 함수의 정의역 G가 commutative해야지 subexponential time 안에 문제를 해결할 수 있다.
+  입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)
 
 
 Hidden Shift Problem
 
-Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, sh...</div><p><a href="/2021/02/14/Quantum-Algorithm-for-HSP.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
+Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) ...</div><p><a href="/2021/02/14/Quantum-Algorithm-for-HSP.html">Read more</a></p></div><div class="article__info clearfix"><ul class="left-col menu"><li>
               <a class="button button--secondary button--pill button--sm"
                 href="/archive.html?tag=Quantum_Algorithm">Quantum_Algorithm</a>
             </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 14, 2021</span>

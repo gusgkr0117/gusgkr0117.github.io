@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en">
   <head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Quantum algorithm for Hidden Shift Problem - Manbo's blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Grover Algorithm with a Single Query - Manbo's blog</title>
 
-<meta name="description" content="해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다.  3개의 대표적인 양자 알고리즘이 존재한다.  kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.  입력으로 주어진 함수의 정의역 G가 commutative ...">
-<link rel="canonical" href="/2021/02/14/Quantum-Algorithm-for-HSP.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
+<meta name="description" content="해당 글은 1997년도 논문 Quantum Database Searching by a Single Query를 정리한 것이다.  주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로...">
+<link rel="canonical" href="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
 
 <meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/browserconfig.xml">
 
@@ -385,13 +385,13 @@ const randNum = Math.floor(Math.random() * bgList.length);
 bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__content"><div class ="main"><div class="article__info clearfix"><ul class="left-col menu"><li>
               <a class="button button--secondary button--pill button--sm"
                 href="/archive.html?tag=Quantum_Algorithm">Quantum_Algorithm</a>
-            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 14, 2021</span>
-            </li></ul></div><div class="article__header"><header><h1>Quantum algorithm for Hidden Shift Problem</h1></header><span class="split-space">&nbsp;</span>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 16, 2021</span>
+            </li></ul></div><div class="article__header"><header><h1>Grover Algorithm with a Single Query</h1></header><span class="split-space">&nbsp;</span>
           <a class="edit-on-github"
             title="Edit on Github"
-            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2021-02-14-Quantum-Algorithm-for-HSP.md">
-            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">Kuperberg 알고리즘 이해하기</p><a href="http://hits.dwyl.com//2021/02/14/Quantum-Algorithm-for-HSP.html" target="_blank">
-                      <img src="http://hits.dwyl.com//2021/02/14/Quantum-Algorithm-for-HSP.html.svg" />
+            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2021-02-16-Grover-Algorithm-with-a-Single-Query.md">
+            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">Arbitrary phase를 이용한 Grover algorithm 이해하기</p><a href="http://hits.dwyl.com//2021/02/16/Grover-Algorithm-with-a-Single-Query.html" target="_blank">
+                      <img src="http://hits.dwyl.com//2021/02/16/Grover-Algorithm-with-a-Single-Query.html.svg" />
                     </a></div></div>
               </div>
             </div><div class ="main"><div class="grid grid--reverse">
@@ -402,128 +402,141 @@ bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__
               <div class="col-main cell cell--auto"><!-- start custom main top snippet -->
 
 <!-- end custom main top snippet -->
-<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Quantum algorithm for Hidden Shift Problem"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-14T00:00:00+09:00">
+<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Grover Algorithm with a Single Query"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-16T00:00:00+09:00">
     <meta itemprop="keywords" content="Quantum_Algorithm"><div class="js-article-content"><div class="layout--article"><!-- start custom article top snippet -->
 
 <!-- end custom article top snippet -->
 <div class="article__content" itemprop="articleBody"><ul>
-  <li>해당 글은 <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a>논문을 정리한 것이다.</li>
-  <li>3개의 대표적인 양자 알고리즘이 존재한다.</li>
-  <li>kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.</li>
-  <li>입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)</li>
+  <li>해당 글은 1997년도 논문 <a href="https://arxiv.org/pdf/quant-ph/9708005.pdf">Quantum Database Searching by a Single Query</a>를 정리한 것이다.</li>
+  <li>주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.</li>
 </ul>
 
-<h3 id="hidden-shift-problem">Hidden Shift Problem</h3>
+<h2 id="기존-grover-algorithm">기존 Grover Algorithm</h2>
 
-<p>Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, shift 값 $s$를 찾는 문제이다.</p>
+<p>임의의 함수 $f:\mathbb{Z}_n  \rightarrow \{0,1\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^{(n/2)})$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.</p>
 
-<p>이 문제는 classical한 관점에서 봤을 때, collision을 찾는 문제와 같다. $n=|G|$라고 할 때, 걸리는 시간은 $\sqrt{n}$이 된다. 하지만 quantum 알고리즘으로는 subexponential하게 해결할 수 있다.</p>
+<center>
+$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
+$O_{f}^{0}\ket{x}\ket{0} = \ket{x}\ket{f(x)}$</center>
 
-<h3 id="kuperberg-알고리즘의-철학labeled-state">kuperberg 알고리즘의 철학(labeled state)</h3>
+<p>얻어진 quantum state에 두번째 레지스터로 control되는 controlled-phase $\pi$ shift gate를 $x$ 레지스터를 이루는 각각의 qubit에 적용하면 아래와 같은 새로운 Oracle $O_{f}^{1}$를 얻을 수 있다.</p>
 
-<p>함수 $f$와 $g$가 주어졌을 때, uniform superposition state를 $f$, $g$ oracle에 입력해서 우리가 가장 간단히 얻을 수 있는 quantum state는 아래와 같다.</p>
+<center>$O_{f}^{1}\ket{x}\ket{0} = (-1)^{f(x)}\ket{x}\ket{f(x)}$</center>
 
-<center>$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
-$\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$</center>
+<p>여기서 black box Oracle을 한 번 더 적용해서 두번째 레지스터를 초기화시켜주면 아래와 같은 원하는 Oracle $O_f$가 된다.</p>
 
-<p>두번째 레지스터는 $f$ 또는 $g$ 중에서 어떤 함수의 출력값인지 0 또는 1로 구분하기 위해 넣은 ancilla 값이다. 위와 같은 quantum state에서 세번째 레지스터를 측정해서 얻은 label이 $v$라고 할 때, $f(x_0 + s) = g(x_0) = v$를 만족하는 $x_0$에 대해서 아래의 quantum state를 얻을 수 있다.</p>
+<center>$O_f\ket{x} = (-1)^{f(x)}\ket{x}$</center>
 
-<center>$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$</center>
+<blockquote>
+  <p>이와 같은 방식으로 얻어낸 phase 변환 oracle은 엄밀히 따지면 함수 $f$에 대한 oracle에 두번씩 query를 날리게 되는 것은 아닌지 궁금하다. 두번째 레지스터를 초기화해주려면 $f$를 무조건 두 번 수행해주어야 하는 것 아닌가? 아니면 최적화 할 수 있는 방법이 있는 걸까?</p>
+</blockquote>
 
-<p>여기서 두번째 레지스터에 Quantum Fourier Transform을 적용하면 아래의 quantum state를 얻는다.</p>
+<p>물론 superposition이 아니라면 phase shift는 무시되겠지만, Grover algorithm에서는 다음과 같이 uniform superposition state를 oracle에 입력으로 넣는다. global phase는 무시한채 식을 쓰면,</p>
 
-<center>$\ket{\psi_2} = \frac{1}{\sqrt{2N}}\sum_{k=0}^{N-1} \ket{k}(\ket{0}+e^{2\pi ski/N}\ket{1})$</center>
+<center>$O_f(\sum_{x=0}^{2^n-1} \ket{x}) = \sum_{x=0}^{2^n-1} (-1)^{f(x)}\ket{x}$</center>
 
-<p>여기서 다시 첫번째 레지스터를 측정하면 아래의 labeled quantum state를 얻을 수 있다.</p>
+<p>이렇게 얻은 quantum state는 실제로 $f(w)=1$을 만족하는 $w \in \{0,1\}^n$ 한 개만 phase가 -1인 superposition state이다. 이 과정을 reflection 단계라고 부른다. 다음은 여기에 diffusion operator라는 것을 적용할 것이다. diffusion operator $U_s$는 아래와 같이 주어진다.</p>
 
-<center>$\ket{\psi_l} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l}{N})\ket{1})$ where $\chi(x) = e^{2\pi sxi}$ </center>
+<center>
+$\newcommand{\bra}[1]{\left&lt; #1 \right|}$
+$U_s = 2\ket{s}\bra{s} - I_n$ where $\ket{s} = \frac{1}{\sqrt{2^n}}(\sum_{i=0}^{2^n-1} \ket{i})$</center>
 
-<p>labeled quantum state $\ket{\psi_l}$을 얻을 확률은 정확히 $\frac{1}{N}$이며, 한 개의 labeled quantum state를 얻기 위해서 $f$와 $g$ quantum oracle 각각에 대해 한번씩의 query가 필요하다.(총 두번의 query)</p>
+<p>Hilbert space $\mathbb{C}^{N}$에서 생각해보면, diffusion operator는 Hilbert space 위의 벡터 $\ket{s}$에 대한 대칭이동을 의미한다. 또한 oracle operator $O_f$를 적용하는 것은 $\ket{w}$로 생성되는 벡터 공간에 수직인 공간에 대한 대칭 이동을 의미한다. 따라서 이를 $\ket{w}$와 $\ket{s}$에 의해 생성되는 2차원 평면 상에서 그림을 그리면 아래와 같이 동작한다.</p>
 
-<p>kuperberg 알고리즘은 이러한 labeled quantum state $\ket{\psi_l}$을 얻는 행위를 반복해서 충분히 많은 개수의 labeled quantum state를 모아놓고, 이들을 조합해서 아래의 labeled quantum state를 만드는 것이 목표이다.</p>
+<center>
+<figure>
+<img src="/assets/20210216/20210216_1.png" width="40%" />
+<figcaption> 출처 : <a href="https://en.wikipedia.org/wiki/Grover%27s_algorithm">위키피디아 - "Grover's algorithm"</a></figcaption>
+</figure>
+</center>
 
-<center>${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$</center>
+<p>위 그림과 같이 $\ket{v}$에 $O_f$와 $U_s$를 차례대로 적용하면, 반시계 방향으로 $\theta$ 만큼 1회 회전한다는 것을 알 수 있다. recursive하게 이를 $r$번 적용하면 총 $r\theta$ 만큼 회전하게 되어 우리가 원하는 $\ket{w}$ 벡터에 최대한 가까운 값을 얻기 위해서는 $\sin^2((r+\frac{1}{2})\theta)$ 값이 최대가 되는 $r$을 선택한다. $\sin(\frac{\theta}{2}) = \frac{1}{\sqrt{N}}$을 만족하므로, $r \approx \pi \sqrt{N}/4$ 일 때, $\ket{w}$에 가장 가깝다. 이로써 subexponential time 안에 해를 찾을 수 있음을 알 수 있다. 에러의 최대 크기는 $\ket{w}$와 $\theta$ 만큼 차이 날 때 인데, 이 때 $\ket{w}$에 projection한 크기는 대략 $\sqrt{\frac{N-2}{N}}$이므로 원하는 답이 나오지 않을 확률은 대략 $\frac{2}{N}$ 정도 됨을 알 수 있다. 이는 $\log N$에 대해 exponential하게 작아지는 값이므로 높은 확률로 해를 구할 수 있다.</p>
 
-<p>이와 같은 labeled quantum state를 얻으면, Quantum Fourier Transform을 역으로 적용해 shift 값 $s$를 얻을 수 있다.</p>
+<h3 id="diffusion-operator">Diffusion operator</h3>
 
-<h3 id="combination-step">Combination Step</h3>
+<p>Diffusion operator는 $U_s = 2\ket{s}\bra{s} - I_n$인데 이를 어떻게 quantum circuit으로 구현할 수 있을까?</p>
 
-<p>labeled quantum state $\ket{\psi_{l_1}}$과 $\ket{\psi_{l_2}}$가 주어졌을 때, 이 둘을 단순히 붙여놓으면 아래와 같은 quantum state를 얻을 수 있다.</p>
+<p>$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\dagger}$를 만족하므로 사실 우리는 $\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, …, \ket{2^n -1})$로 생각해보자.</p>
 
-<center>$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1 + l_2}{N})\ket{11})$</center>
+<p>$\ket{0^n}$의 값을 제외한 나머지 basis들에 대해 phase를 $\pi$만큼 shift 시켜주는 것이다. global phase를 $-1$ 곱해주면 이는 $\ket{0^n}$만 $\pi$만큼 phase shift 시키고, 나머지는 가만히 냅두는 것과 같다. $C^{n-1}$-NOT gate를 이용하면 아래 그림과 같이 circuit을 구성하면 된다.</p>
 
-<p>여기서 첫번째와 두번째 qubit에 CNOT을 적용하면 아래와 같은 quantum state를 얻을 수 있다.</p>
+<center>
+<figure>
+<img src="/assets/20210216/20210216_2.png" width="40%" />
+<figcaption>4-qubit에서 Diffusion operator 구현</figcaption>
+</figure>
+</center>
 
-<center>$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1 + l_2}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1}{N})\ket{11})$</center>
+<h2 id="grover-algorithm-with-an-arbitrary-phase">Grover algorithm with an arbitrary phase</h2>
 
-<p>여기서 두번째 qubit을 측정하면 $\frac{1}{2}$확률로 label 0을 얻고, 아래와 같은 quantum state를 얻을 수 있다.</p>
+<p>앞서 설명한 Grover algorithm은 $U_s = 2\ket{s}\bra{s} - I_n$와 같은 diffusion operator를 사용한다. 위에서는 이를 평면 위에서 벡터의 회전으로 해석했지만, 이번에는 외분점 개념으로 생각해보자. 어렸을 때, 선분의 외분점 공식을 배운적이 있을 것이다. 실수 선분 위에 서로 다른 두 점 $a, b$가 주어졌을 때, 다음 그림과 같은 외분점 $c$ 구하려면 $c = \frac{mb - na}{m-n}$ 식을 이용해 구할 수 있다.</p>
 
-<center>$\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l_1 + l_2}{N})\ket{1})$</center>
+<center>
+<img src="/assets/20210216/20210216_3.png" width="40%" />
+</center>
 
-<p>이와 같은 방식으로 두개의 labeled quantum state를 이용해 combination된 새로운 labeled quantum state를 얻을 수 있다.</p>
+<p>diffusion operator도 자세히 보면 외분점을 구하는 공식과 같다. quantum state $\ket{\psi} \propto \sum_{k=0}^{2^n -1}x_k\ket{k}$에 대해 diffusion operator를 적용해보면, 아래 공식을 만족한다.</p>
 
-<h3 id="kuperberg-algorithm">kuperberg algorithm</h3>
+<center>$U_s\ket{\psi} = 2\ket{s}\bra{s}\ket{\psi} - \ket{\psi}$</center>
 
-<p>위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장 큰 $k$ 값을 말한다.</p>
+<p>여기서 basis $\ket{k}$의 크기를 구하면 아래와 같다.</p>
 
-<p>$P_i = \{ \ket{\psi_x} | val_2(x) = i \}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\ket{\psi_{2^i}}}$들을 얻을 수 있다.</p>
+<center>$\bra{k}U_s\ket{\psi} = 2\bra{k}\ket{s}\bra{s}\ket{\psi} - \bra{k}\ket{\psi} = \frac{2}{N}(\sum_{i=0}^{2^n -1} x_i) - x_k$</center>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for 0 ≤ i ≤ n do 
-	pop a element e from P_i, put (e,i) in R.
-	for (e,j) in R do:
-		if val_2(e - 2^j) = i then
-			pop A from P_i which maximize val_2(a + e -2^j)
-			e = e + a
-		end if
-	end for
+<p>$M = \frac{1}{N}(\sum_{i=0}^{2^n -1} x_i)$라고 하면, 식은 아래와 같다.</p>
 
-	if {(2^i, i) | 0 ≤ i ≤ n} in R then
-		Apply QFT on the qubits, measure a t
-		s ⟵ ⌈-Nt/2^(n+1)⌋ mod N
-		return s
-	end if
+<center>$2 \cdot M - x_k$</center>
 
-	while |P_i| ≥ 2 do
-		pop two elements (a,b) of P_i which maximizes val_2(a+b)
-		c = a+b
-		Insert c in the corresponding P_(val_2(c))
-	end while
-end for
-return Failure
-</code></pre></div></div>
+<p>이는 점 $M$과 $x_k$가 주어졌을 때, $2:1$ 외분점을 뜻한다. $x_k$가 1일 때와 -1 일 때 $M$에 대한 외분점이 달라지기 때문에 원하는 basis에 대한 amplitude를 키울 수 있게되는 것이다. 여기서 잠시 생각해보면, 외분점을 잘 조절해서 $x_k = 1$ 일 때, $(l+1) \cdot M - l \cdot 1 \approx 0$이 되도록 할 수 있지 않을까? 이러면 $O(\sqrt{N})$번 iteration을 돌릴 필요 없이 단 한 번의 oracle query만으로 해를 구할 수 있게 된다. 위 식을 만족하기 위해서는 $l = \frac{M}{1-M}$을 만족해야 한다. 가장 처음 iteration에서 $x_w = -1$이고 나머지는 다 1이므로 사실 $M = \frac{2^n -2}{2^n}$이다. 그러면 $l = 2^{n-1} -1$이다.</p>
 
-<p>$2^k + 1$개의 $n$-bit label이 uniform distribution으로부터 주어졌다고 가정하자. 그러면 비둘기 집의 원리에 의해 이중에서 $l_1 + l_2$의 2-valuation이 $k$ 이상이 되는 $l_1$, $l_2$가 적어도 1개 존재하며, 이 둘을 combination해서 2-valuation이 $k$ 이상이 되는 label 한개를 만들 수 있다. 따라서 만약에 $r \cdot 2^k$만큼의 $n$-bit label이 주어지면, 적어도 $\frac{(r-1)}{2} \cdot 2^k &gt; \frac{r}{4} \cdot 2^k$만큼의 2-valuation이 $k$이상인 label을 얻을 수 있다.</p>
+<p>diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이라도 변경해볼 수 있을지 생각해보자. 기존의 diffusion circuit에서 아래와 같은 circuit으로 변경하면 비율을 $m:n = (1-e^{i\beta}) : 1$로 줄일 수 있다.</p>
 
-<p>그러면 가장 처음에 대략 $4^{\lceil \frac{n}{k} \rceil}2^k$만큼의 label을 뽑아놓으면 마지막에 2-valuation이 $n-1$인 label이 1개 이상 나온다는 것을 알 수 있다. $k = \sqrt{n}$으로 설정하면, 필요한 label의 개수는 총 $2^{3\sqrt{n}}$으로 subexponential하다. label의 개수는 곧 oracle query의 개수이므로 subexponential query만으로 문제를 해결 할 수 있음을 알 수 있다.</p>
+<center>
+<figure>
+<img src="/assets/20210216/20210216_4.png" width="40%" />
+<figcaption>4-qubit에서 $\beta$-phase diffusion transform 구현</figcaption>
+</figure>
+</center>
 
-<p>다만, 이를 위해서는 subexponential한 quantum memory가 필요하다는 것도 알 수 있다. 이는 상당한 자원을 필요로 한다.</p>
+<p>이를 논문에서는 $\beta$-phase diffusion transform이라고 한다. 하지만 $e^{i\beta} = -\frac{1}{l}$이 되려면, $M = \frac{2^n -2}{2^n}$에 대해서는 한 번의 query로 해를 찾을 수 있는 $\beta$가 존재하지 않는다.</p>
 
-<h3 id="approximate-qft">Approximate QFT</h3>
+<p>이 부분을 보완하기 위해 $M$ 값을 바꾸는 방법을 사용할 것이다. oracle $O_f$ 대신에 phase $\gamma$만큼 변화시키는 $\gamma$-phase oracle을 이용하면 $M$ 값이 변화한다. $\gamma$-phase oracle을 적용하면 얻을 수 있는 quantum state는 아래와 같다.</p>
 
-<p>Group $G$의 크기를 $N$이라고 했을 때, 아래의 quantum state에 QFT를 적용한다.</p>
+<center>$U_{\gamma}\ket{\psi} = \sum_{x=0}^{2^n-1} (e^{i\gamma})^{f(x)}\ket{x}$</center>
 
-<center>$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$</center>
+<p>여기서 $M$ 값은 $\frac{2^n -1 + e^{i\gamma}}{2^n}$이다. 이러면 $l = \frac{2^n -1 +e^{i\gamma}}{1-e^{i\gamma}}$이 되어야 한 번의 query로 해를 구할 수 있다. 그러면 $\beta$-phase diffusion transform을 사용한다고 했을 때, $e^{i\beta} = -\frac{1-e^{i\gamma}}{2^n -1 +e^{i\gamma}}$를 만족해야한다. 근데 이 식도 자세히 보면, 좌변의 norm은 1인데 비해, 우변의 norm은 $n$이 커질수록 exponential하게 작아짐을 알 수 있다. 이러면 $n$ 값이 조금만 커도 해당 식을 만족하는 $0 \leq \beta, \gamma &lt; 2\pi$가 존재하지 않는다.</p>
 
-<p>여기서 $s \in \mathbb{Z}/N\mathbb{Z}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 $N$이 power of 2가 아닐 경우엔 $\mathbb{Z}/N\mathbb{Z}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 <a href="https://arxiv.org/pdf/quant-ph/9511026.pdf">kitaev</a>와 <a href="https://arxiv.org/pdf/quant-ph/0301093.pdf">Mosca and Zalka</a> 논문을 참조하자.</p>
+<p>여기서 $f(x)=1$인 해의 개수가 오직 한 개라는 조건의 한계점을 느낄 수 있다. 만약 해의 개수가 $r$개라면, 식이 어떻게 변화할지 생각해보자. $M$은 아래와 같이 바뀐다.</p>
 
-<p>해당 포스트에서는 $N$-QFT를 이용해도 우리가 앞서 얻은 label들</p>
+<center>$M = \frac{2^n - r + r \cdot e^{i\gamma}}{2^n}$</center>
 
-<center>${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$</center>
+<p>그러면 한 번의 query로 해를 찾을 수 있는 $\beta$값은 아래 식으로 구할 수 있다.</p>
 
-<p>을 통해서 얼마나 정확히 $s$값을 구해낼 수 있는가를 분석해볼 것이다. label을 생성할 때에는 $N$-QFT를 이용했지만, shift 값 $s$를 복구할 때에는 위 label들을 사용해야하기 때문에 $2^n$-QFT를 사용할 수 밖에 없다. 그러면 아래와 같은 quantum state를 얻을 수 있다.</p>
+<center>$e^{i\beta} = -\frac{r - r \cdot e^{i\gamma}}{2^n -r + r \cdot e^{i\gamma}} = -\frac{1 - e^{i\gamma}}{\frac{2^n}{r} -1 + e^{i\gamma}}$</center>
 
-<center>$\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$</center>
+<p>식을 다시 $f(x)=1$을 만족하는 해의 비율인 $x = \frac{r}{2^n}$ 값에 대해 정리하면 아래와 같다.</p>
 
-<p>이를 측정했을 때, label $t$를 얻을 확률은 $\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$이 된다.</p>
+<center>$x = \frac{1}{e^{i(\gamma - \beta)} -e^{-i\beta} -e^{i\gamma} + 1} = \frac{1}{(1-e^{i\gamma})(1-e^{-i\beta})}$</center>
 
-<p>$\theta = \frac{s}{N}+\frac{t}{2^n}$라고 하면, $\theta = 0$인 $t$가 존재하면, 해당 $t$가 label로 측정될 확률은 1이되지만, N이 power of 2가 아닌 경우, 그런 $k$가 존재하지 않는다. $\theta \in [0, \frac{1}{2^{n+1}}]$인 경우, 확률값 $p(\theta) = \frac{1}{2^{2n}}(\frac{1-\chi(2^n\theta)}{1-\chi(\theta)})^2$는 단조 감소함을 알 수 있으며, $\theta = \frac{1}{2^{n+1}}$일 때, $p(\frac{1}{2^{n+1}}) \approx \frac{1}{2^{2n}}\frac{1/2}{(\pi\theta)^2} = \frac{2}{\pi^2}$값을 갖는다.</p>
+<p>$\newcommand{\norm}[1]{\left| #1 \right|}$
+$x$는 0 이상 1 이하 실수이므로, 이를 만족하기 위해서는 $\gamma = \beta$이어야 한다. 이런 경우, $x = \norm{\frac{1}{(1-e^{i\gamma})}}^2 \geq \frac{1}{4}$이다. 따라서 $f(x)=1$을 만족하는 해의 개수가 최소 ${2^n -2}$개는 되어야 한 번의 query로 해를 찾을 수 있다. 이 때, $\beta = \gamma = \cos^{-1}(1-\frac{1}{2x})$이다.</p>
 
-<p>따라서 $| \frac{s}{N} + \frac{t}{2^n} | \leq \frac{1}{2^{n+1}}$를 만족하는 $t$를 찾을 확률이 적어도 $\frac{2}{\pi^2}$가 된다. 이러한 $t$ 값을 찾으면, $n &gt; \log_2(N)$일 때, 연분수를 이용해 정확한 $s$ 값을 찾을 수 있다.</p>
+<h3 id="알고리즘의-적용">알고리즘의 적용</h3>
 
-<h3 id="regevs-algorithm-with-polynomial-quantum-space">Regev’s algorithm with polynomial quantum space</h3>
+<p><a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a> 논문 21페이지로 잠시 돌아가면, CSIDH에 대한 oracle을 만들기 위해 Elliptic curve 위의 $l$-order point $P$를 구할 때, curve 위의 랜덤한 점 $P$를 uniform superposition state로 만들어 해당 점의 order가 $l$인 점 $P$를 구하는 Grover algorithm의 입력으로 넣어주는 상황을 생각해보자. 이 때, curve위의 임의의 점 중에서 order가 $l$인 점의 비율은 대략 $\frac{l-1}{l}$이다. 이는 어떤 $l$ 값에 대해서도 비율이 $1/4$를 넘으므로 한 번의 query로 Grover algorithm을 적용할 수 있는 상황이된다.</p>
 
-<p>내용이 길어지는 관계로 다음 포스팅에..</p>
-</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2021-02-14T00:00:00+09:00"><!-- start custom article footer snippet -->
+<p>여기서 눈여겨 볼 점은 한 번의 query로 Grover algorithm을 수행하기 위해서는 phase shift gate를 구현해야한다는 것이다. 이는 <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a> 논문 22페이지에 아래와 같이 언급되어 있다.</p>
+
+<blockquote>
+  <p>For a phase shift gate synthesized from Clifford+T gates, we estimate from [<a href="https://arxiv.org/pdf/1206.5236.pdf">28</a>] that it can be approximated up to an error of $2^{-50}$ using around $2^{14}$ T-gates, which is negligible compared to the cost of the exponentiation in the test function</p>
+</blockquote>
+
+<blockquote>
+  <p><em>논문 [<a href="https://arxiv.org/pdf/1206.5236.pdf">28</a>]은 읽어보는게 좋을 것 같다!</em></p>
+</blockquote>
+
+<p>논문에서처럼 phase shift gate는 한 번 수행할 때마다 $2^{-50}$으로 매우 작은 실패 확률을 가지고 있고, Grover algorithm with a single query에서는 phase shift gate를 polynomial 횟수(대략 $n$번)만 사용하므로 에러는 무시할만한 수준으로 보인다.</p>
+</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2021-02-16T00:00:00+09:00"><!-- start custom article footer snippet -->
 
 <!-- end custom article footer snippet -->
 <div class="article__subscribe"></div><div class="article__license"><div class="license">
@@ -533,7 +546,7 @@ return Failure
       </a>
     </p>
   </div></div></footer>
-<div class="article__section-navigator clearfix"><div class="previous"><span>PREVIOUS</span><a href="/2021/02/07/Elliptic-Curve-and-Isogeny.html">Elliptic Curve and Isogeny</a></div><div class="next"><span>NEXT</span><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">Quantum algorithm for Hidden Shift Problem#2</a></div></div></div>
+<div class="article__section-navigator clearfix"><div class="previous"><span>PREVIOUS</span><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">Quantum algorithm for Hidden Shift Problem#2</a></div></div></div>
 
 </div>
 
