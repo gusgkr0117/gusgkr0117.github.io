@@ -11,6 +11,8 @@ key: post_20210214
 * kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.
 * 입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)
 
+<!--more-->
+
 ### Hidden Shift Problem
 
  Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, shift 값 $s$를 찾는 문제이다.

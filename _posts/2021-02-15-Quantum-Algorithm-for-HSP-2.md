@@ -10,6 +10,8 @@ key: post_20210215
 * Regev의 알고리즘은 2008년도 [A Subexponential Time Algorithm for the DHSP with Polynomial Space](https://arxiv.org/pdf/quant-ph/0406151.pdf) 논문을 참조
 * Quantum algorithm for HSP 2편
 
+<!--more-->
+
 ## Regev's algorithm with polynomial quantum space
 
 Kuperberg가 처음 제안했던 알고리즘은 subexponential만큼의 quantum space를 필요로 한다는 단점이 있다. Kuperberg의 combination 방법은 $\frac{1}{2}$ 확률로 실패하기 때문에 $k$개의 labeled state를 결합한다면, 성공 확률은 $\frac{1}{2^{k-1}}$로 줄어든다. 따라서 두개씩만 골라서 2-valuation을 높일 수 있어야하기 때문에 저장공간을 많이 필요로 한다.

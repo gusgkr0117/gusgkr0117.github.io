@@ -17,7 +17,6 @@
 markdown: kramdown
 highlighter: rouge
 lsi: false
-excerpt_separator: "\n\n"
 incremental: false
 
 ## => Site Settings
@@ -28,13 +27,13 @@ url     : # the base hostname & protocol for your site e.g. https://www.someone.
 baseurl : # does not include hostname
 title   : Manbo's blog
 description: > # this means to ignore newlines until "Language & timezone"
-  Hello, welcome to manbo's blog
+  Hello, welcome to Manbo's blog
 
 
 ## => Language and Timezone
 ##############################
-lang: # the language of your site, default as "en"
-timezone: # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for the available values
+lang: "en"# the language of your site, default as "en"
+timezone: "Asia/Tokyo"# see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for the available values
 
 
 ## => Author and Social

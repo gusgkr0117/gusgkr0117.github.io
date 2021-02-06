@@ -9,6 +9,8 @@ key: post_20210131
 * Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.
 * $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, ... etc)
 
+<!--more-->
+
 ## 빠른 모듈러 곱의 철학
 
 소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다.

@@ -765,6 +765,12 @@ input:focus { outline: none; }
 
 .mermaidTooltip { display: none; }
 
+::-webkit-scrollbar { width: 6px; height: 3px; background-color: #fff8ff; }
+
+::-webkit-scrollbar-thumb { border-radius: 3px; background-color: #0366d6; }
+
+::-webkit-scrollbar-track:horizontal { background-color: #000000; }
+
 @media print { a, a:link, a:visited { text-decoration: underline; } .root[data-is-touch="false"] a:hover { text-decoration: underline; } .root[data-is-touch] a.active, .root[data-is-touch] a:active { text-decoration: underline; } img, tr, pre, blockquote { page-break-inside: avoid; } }
 
 .button, .swiper__button { display: inline-block; font-weight: 700; line-height: 1 !important; text-decoration: none !important; cursor: pointer; outline: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }

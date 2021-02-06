@@ -10,3 +10,5 @@ use_math: true
 
 * Velu's formula를 이용해 Isogeny를 연산할 수 있다.
 * kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.
+
+<!--more-->

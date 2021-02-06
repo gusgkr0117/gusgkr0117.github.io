@@ -3,7 +3,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Montgomery Multiplication - Manbo's blog</title>
 
-<meta name="description" content="Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.  $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)빠른 모듈러 곱의 철학소수 $p$가 주어졌을...">
+<meta name="description" content="Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.  $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)">
 <link rel="canonical" href="/2021/01/31/Montgomery-Multiplication.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
 
 <meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/browserconfig.xml">
@@ -356,7 +356,7 @@ fill="#000000" stroke="none">
 -12 4 -12 9 0 15 -175 94 -235 107 -52 10 -178 12 -220 3z"/>
 </g>
 </svg>
-<a title="Hello, welcome to manbo's blog
+<a title="Hello, welcome to Manbo's blog
 " href="/">Manbo's blog</a></div><button class="button button--secondary button--circle search-button js-search-toggle"><i class="fas fa-search"></i></button></div><nav class="navigation">
         <ul><li class="navigation__item"><a href="/archive.html">Archive</a></li><li class="navigation__item"><a href="/about.html">About</a></li><li><button class="button button--secondary button--circle search-button js-search-toggle"><i class="fas fa-search"></i></button></li></ul>
       </nav></div>
@@ -410,6 +410,8 @@ bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__
   <li>Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.</li>
   <li>$\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)</li>
 </ul>
+
+<!--more-->
 
 <h2 id="빠른-모듈러-곱의-철학">빠른 모듈러 곱의 철학</h2>
 
