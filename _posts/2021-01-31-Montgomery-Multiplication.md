@@ -187,3 +187,5 @@ function MultiPrecisionREDC is
     end if
 end function
 ```
+
+[visual studio c++ source code](https://github.com/gusgkr0117/Montgomery-Multiplication)
