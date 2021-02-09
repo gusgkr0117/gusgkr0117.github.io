@@ -77,7 +77,7 @@ projective algebraic set $V$가 주어졌을 때, 이를 affine space에서 바�
 
  > Elliptic Curve Cryptography에서 사용하는 그 point at infinity의 개념이 여기서 나온 것이다.
 
-affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\\{f_1, ..., f_m\\} \subset \bar{K}[X_1, ..., X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\\{{f_1}^{\*}, ...,{f_m}^{\*}\\} \subset \bar{K}[X_1, ..., X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V'$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V' \cap U_{n+1})$을 만족한다.
+affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\\{f_1, ..., f_m\\} \subset \bar{K}[X_1, ..., X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\\{ {f_1}^{\ast}, ...,{f_m}^{\ast} \\} \subset \bar{K}[X_1, ..., X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V'$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V' \cap U_{n+1})$을 만족한다.
 
 따라서 우리는 projective algebraic set $V \in \mathbb{P}^n$이 주어지면 이를 affine algebraic set으로 표현할 수 있고, 이는 곧 dehomogenization된 polynomial $\in \bar{K}[X_1, ...,X_n]$으로 표현할 수 있다!
 
