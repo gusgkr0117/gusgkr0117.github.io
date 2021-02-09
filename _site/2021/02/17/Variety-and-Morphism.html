@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en">
   <head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Grover Algorithm with a Single Query - Manbo's blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Variety and Morphism - Manbo's blog</title>
 
-<meta name="description" content="해당 글은 1997년도 논문 Quantum Database Searching by a Single Query를 정리한 것이다.  주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로...">
-<link rel="canonical" href="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
+<meta name="description" content="해당 글은 Silverman의 Arithmetic of Elliptic Curves의 Chapter 1을 정리한 것이다.        Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $...">
+<link rel="canonical" href="/2021/02/17/Variety-and-Morphism.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
 
 <meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/browserconfig.xml">
 
@@ -384,14 +384,14 @@ const randNum = Math.floor(Math.random() * bgList.length);
 
 bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__content"><div class ="main"><div class="article__info clearfix"><ul class="left-col menu"><li>
               <a class="button button--secondary button--pill button--sm"
-                href="/archive.html?tag=Quantum_Algorithm">Quantum_Algorithm</a>
-            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 16, 2021</span>
-            </li></ul></div><div class="article__header"><header><h1>Grover Algorithm with a Single Query</h1></header><span class="split-space">&nbsp;</span>
+                href="/archive.html?tag=Mathematics">Mathematics</a>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 17, 2021</span>
+            </li></ul></div><div class="article__header"><header><h1>Variety and Morphism</h1></header><span class="split-space">&nbsp;</span>
           <a class="edit-on-github"
             title="Edit on Github"
-            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2021-02-16-Grover-Algorithm-with-a-Single-Query.md">
-            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">Arbitrary phase를 이용한 Grover algorithm 이해하기</p><a href="http://hits.dwyl.com//2021/02/16/Grover-Algorithm-with-a-Single-Query.html" target="_blank">
-                      <img src="http://hits.dwyl.com//2021/02/16/Grover-Algorithm-with-a-Single-Query.html.svg" />
+            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2021-02-17-Variety-and-Morphism.md">
+            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">Variety와 Morphism 이해가기</p><a href="http://hits.dwyl.com//2021/02/17/Variety-and-Morphism.html" target="_blank">
+                      <img src="http://hits.dwyl.com//2021/02/17/Variety-and-Morphism.html.svg" />
                     </a></div></div>
               </div>
             </div><div class ="main"><div class="grid grid--reverse">
@@ -402,142 +402,125 @@ bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__
               <div class="col-main cell cell--auto"><!-- start custom main top snippet -->
 
 <!-- end custom main top snippet -->
-<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Grover Algorithm with a Single Query"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-16T00:00:00+09:00">
-    <meta itemprop="keywords" content="Quantum_Algorithm"><div class="js-article-content"><div class="layout--article"><!-- start custom article top snippet -->
+<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Variety and Morphism"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-17T00:00:00+09:00">
+    <meta itemprop="keywords" content="Mathematics"><div class="js-article-content"><div class="layout--article"><!-- start custom article top snippet -->
 
 <!-- end custom article top snippet -->
 <div class="article__content" itemprop="articleBody"><ul>
-  <li>해당 글은 1997년도 논문 <a href="https://arxiv.org/pdf/quant-ph/9708005.pdf">Quantum Database Searching by a Single Query</a>를 정리한 것이다.</li>
-  <li>주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.</li>
+  <li>
+    <p>해당 글은 Silverman의 <a href="https://www.springer.com/gp/book/9780387094939">Arithmetic of Elliptic Curves</a>의 Chapter 1을 정리한 것이다.</p>
+  </li>
+  <li>
+    <p>Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $x,y$가 아니라 $x_1, x_2, …, x_n$으로 많다면 정수해를 어떻게 찾을 수 있을까? 그리고 그들은 어떤 특징을 가질까?</p>
+  </li>
+  <li>
+    <p>다항식을 통해 얻을 수 있는 점들의 집합은 대수적으로 어떤 특성을 갖는지 분석하는 것이 대수기하학이다. 이것의 기본이 되는 기념이 algebraic set, variety라고 할 수 있다.</p>
+  </li>
+  <li>Notation
+    <ul>
+      <li>$K$ : field</li>
+      <li>$\bar{K}$ : algebraic closure of $K$</li>
+      <li>$G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$</li>
+    </ul>
+  </li>
+  <li>
+    <p>$K[X_1, X_2, … , X_n]$는 간단히 $K[X]$로 표기하도록 하겠다.</p>
+  </li>
+  <li>Affine Space
+    <ul>
+      <li>$\mathbb{A}^n = \{(y_1, y_2, …, y_n) : y_i \in \bar{K} \ \textrm{for} \ 1 \leq i \leq n\}$</li>
+      <li>$\mathbb{A}^n(K) = \{(y_1, y_2, …, y_n) : y_i \in K \ \textrm{for} \ 1 \leq i \leq n\}$</li>
+    </ul>
+  </li>
 </ul>
 
-<!--more-->
-<h2 id="기존-grover-algorithm">기존 Grover Algorithm</h2>
+<h2 id="algebraic-set">Algebraic set</h2>
 
-<p>임의의 함수 $f:\mathbb{Z}_n  \rightarrow \{0,1\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^{n/2})$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.</p>
+<p>$\bar{K}[X]$ 상의 ideal $I \subset \bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다.</p>
 
-<center>
-$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
-$O_{f}^{0}\ket{x}\ket{0} = \ket{x}\ket{f(x)}$</center>
+<center>$V_I = \{ P \in \mathbb{A}^n : f(P) = 0 \ \textrm{for} \ \forall f \in I \}$</center>
 
-<p>얻어진 quantum state에 두번째 레지스터로 control되는 controlled-phase $\pi$ shift gate를 $x$ 레지스터를 이루는 각각의 qubit에 적용하면 아래와 같은 새로운 Oracle $O_{f}^{1}$를 얻을 수 있다.</p>
+<p>algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$가 만일 $K[X]$에 들어있는 함수들로 generate 된다면, $V$는 $K$ 위에서 정의되었다고 하며 이를 $V/K$라고 표기한다. $V(K)$는 $V$에 속하는 점들 중에서 $K$ 위에서 정의된 점들을 말하며 아래와 같이 정의된다.</p>
 
-<center>$O_{f}^{1}\ket{x}\ket{0} = (-1)^{f(x)}\ket{x}\ket{f(x)}$</center>
+<center>$V(K) = V \cap \mathbb{A}^n(K)$</center>
 
-<p>여기서 black box Oracle을 한 번 더 적용해서 두번째 레지스터를 초기화시켜주면 아래와 같은 원하는 Oracle $O_f$가 된다.</p>
+<p>또한 $I(K) = I(V) \cap K[X] \subset \bar{K}[X]$로 정의한다. 정의에 따르면 $V/K$에 대해 아래와 같은 식을 도출 할 수 있다.</p>
 
-<center>$O_f\ket{x} = (-1)^{f(x)}\ket{x}$</center>
+<center>$I(V) = I(K)\bar{K}[X]$ &nbsp;&nbsp;if $V$ is defined over $K$</center>
 
-<blockquote>
-  <p>이와 같은 방식으로 얻어낸 phase 변환 oracle은 엄밀히 따지면 함수 $f$에 대한 oracle에 두번씩 query를 날리게 되는 것은 아닌지 궁금하다. 두번째 레지스터를 초기화해주려면 $f$를 무조건 두 번 수행해주어야 하는 것 아닌가? 아니면 최적화 할 수 있는 방법이 있는 걸까?</p>
-</blockquote>
+<h3 id="variety">Variety</h3>
 
-<p>물론 superposition이 아니라면 phase shift는 무시되겠지만, Grover algorithm에서는 다음과 같이 uniform superposition state를 oracle에 입력으로 넣는다. global phase는 무시한채 식을 쓰면,</p>
+<p>variety란, algebraic set $V$에 대해 $I(V) \subset \bar{K}[X]$가 <strong><font color="red">prime ideal이면 $V$를 variety라고 한다.</font></strong></p>
 
-<center>$O_f(\sum_{x=0}^{2^n-1} \ket{x}) = \sum_{x=0}^{2^n-1} (-1)^{f(x)}\ket{x}$</center>
+<p>$\bar{K}$는 field이므로 noetherian이다. <a href="https://en.wikipedia.org/wiki/Hilbert%27s_basis_theorem">Hilbert basis theorem</a>에 의해 $\bar{K}[X]$도 따라서 noetherian이다. 따라서 $\bar{K}[X]$에 속하는 ideal들은 prime ideal의 곱으로 unique하게 표현할 수 있다. 이와 마찬가지로 algebraic set $V$는 variety들의 union으로 아래와 같이 유일하게 표현된다.</p>
 
-<p>이렇게 얻은 quantum state는 실제로 $f(w)=1$을 만족하는 $w \in \{0,1\}^n$ 한 개만 phase가 -1인 superposition state이다. 이 과정을 reflection 단계라고 부른다. 다음은 여기에 diffusion operator라는 것을 적용할 것이다. diffusion operator $U_s$는 아래와 같이 주어진다.</p>
+<center>$V = V_1 \cup V_2 \cup ... \cup V_n$ where $V_i$ is variety</center>
 
-<center>
-$\newcommand{\bra}[1]{\left&lt; #1 \right|}$
-$U_s = 2\ket{s}\bra{s} - I_n$ where $\ket{s} = \frac{1}{\sqrt{2^n}}(\sum_{i=0}^{2^n-1} \ket{i})$</center>
+<p>ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \{f : f^m \in J \ \textrm{for some} \ m \in \mathbb{Z}^+ \cup \{ 0 \}\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다.</p>
 
-<p>Hilbert space $\mathbb{C}^{N}$에서 생각해보면, diffusion operator는 Hilbert space 위의 벡터 $\ket{s}$에 대한 대칭이동을 의미한다. 또한 oracle operator $O_f$를 적용하는 것은 $\ket{w}$로 생성되는 벡터 공간에 수직인 공간에 대한 대칭 이동을 의미한다. 따라서 이를 $\ket{w}$와 $\ket{s}$에 의해 생성되는 2차원 평면 상에서 그림을 그리면 아래와 같이 동작한다.</p>
+<h3 id="coordinate-ring-and-function-field">Coordinate ring and function field</h3>
 
-<center>
-<figure>
-<img src="/assets/20210216/20210216_1.png" width="40%" />
-<figcaption> 출처 : <a href="https://en.wikipedia.org/wiki/Grover%27s_algorithm">위키피디아 - "Grover's algorithm"</a></figcaption>
-</figure>
-</center>
+<p>algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고 하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다.</p>
 
-<p>위 그림과 같이 $\ket{v}$에 $O_f$와 $U_s$를 차례대로 적용하면, 반시계 방향으로 $\theta$ 만큼 1회 회전한다는 것을 알 수 있다. recursive하게 이를 $r$번 적용하면 총 $r\theta$ 만큼 회전하게 되어 우리가 원하는 $\ket{w}$ 벡터에 최대한 가까운 값을 얻기 위해서는 $\sin^2((r+\frac{1}{2})\theta)$ 값이 최대가 되는 $r$을 선택한다. $\sin(\frac{\theta}{2}) = \frac{1}{\sqrt{N}}$을 만족하므로, $r \approx \pi \sqrt{N}/4$ 일 때, $\ket{w}$에 가장 가깝다. 이로써 subexponential time 안에 해를 찾을 수 있음을 알 수 있다. 에러의 최대 크기는 $\ket{w}$와 $\theta$ 만큼 차이 날 때 인데, 이 때 $\ket{w}$에 projection한 크기는 대략 $\sqrt{\frac{N-2}{N}}$이므로 원하는 답이 나오지 않을 확률은 대략 $\frac{2}{N}$ 정도 됨을 알 수 있다. 이는 $\log N$에 대해 exponential하게 작아지는 값이므로 높은 확률로 해를 구할 수 있다.</p>
+<p>만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in \bar{K}[V]$와 $\sigma \in G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다.</p>
 
-<h3 id="diffusion-operator">Diffusion operator</h3>
+<p>$\dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 <a href="https://en.wikipedia.org/wiki/Transcendence_degree">transcendence degree</a>를 말한다. 예를 들어, $V : f(x_1, …, x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left&lt; f \right&gt;$는 algebraic basis가 $n-1$개 이므로 $\dim(V) = n-1$임을 알 수 있다.</p>
 
-<p>Diffusion operator는 $U_s = 2\ket{s}\bra{s} - I_n$인데 이를 어떻게 quantum circuit으로 구현할 수 있을까?</p>
-
-<p>$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\dagger}$를 만족하므로 사실 우리는 $2\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, …, \ket{2^n -1})$로 생각해보자.</p>
-
-<p>$\ket{0^n}$의 값을 제외한 나머지 basis들에 대해 phase를 $\pi$만큼 shift 시켜주는 것이다. global phase를 $-1$ 곱해주면 이는 $\ket{0^n}$만 $\pi$만큼 phase shift 시키고, 나머지는 가만히 냅두는 것과 같다. $C^{n-1}$-NOT gate를 이용하면 아래 그림과 같이 circuit을 구성하면 된다.</p>
+<p><strong><font color="red">function field $\bar{K}(V)$의 원소는 맵핑 $f: V \rightarrow \bar{K}$로 obvious하게 대응됨을 알 수 있다.</font></strong> 이게 굉장히 재미있는 부분인데, algebraic set $V$에 있는 점 각각을 $\bar{K}$로 임의로 맵핑하는 것은 사실 $\bar{K}(V)$에 속하지 않을 수도 있다. $\bar{K}(V)$는 polynomial 특성(?)을 가지는 맵핑 $V \rightarrow \bar{K}$에 관한 정보를 담고 있다고 볼 수 있다.</p>
 
 <center>
 <figure>
-<img src="/assets/20210216/20210216_2.png" width="40%" />
-<figcaption>4-qubit에서 Diffusion operator 구현</figcaption>
+<img src="/assets/20210217/20210217_1.png" width="70%" />
+<figcaption>
+$\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시<br />$f: C \rightarrow \mathbb{R}$ where $C : Y=X^3 - 4X^2 + X + 6 \subset \mathbb{R}^2$
+</figcaption>
 </figure>
 </center>
 
-<h2 id="grover-algorithm-with-an-arbitrary-phase">Grover algorithm with an arbitrary phase</h2>
+<h2 id="projective-space">Projective space</h2>
 
-<p>앞서 설명한 Grover algorithm은 $U_s = 2\ket{s}\bra{s} - I_n$와 같은 diffusion operator를 사용한다. 위에서는 이를 평면 위에서 벡터의 회전으로 해석했지만, 이번에는 외분점 개념으로 생각해보자. 어렸을 때, 선분의 외분점 공식을 배운적이 있을 것이다. 실수 선분 위에 서로 다른 두 점 $a, b$가 주어졌을 때, 다음 그림과 같은 외분점 $c$ 구하려면 $c = \frac{mb - na}{m-n}$ 식을 이용해 구할 수 있다.</p>
+<p>우리가 위에서 사용했던 $\mathbb{A}^n$은 Affine space라고 부른다. Projective space $\mathbb{P}^n$은 아래와 같이 정의된다.</p>
 
-<center>
-<img src="/assets/20210216/20210216_3.png" width="40%" />
-</center>
+<center>$\mathbb{P}^n = \mathbb{A}^{n+1}/\sim$</center>
 
-<p>diffusion operator도 자세히 보면 외분점을 구하는 공식과 같다. quantum state $\ket{\psi} \propto \sum_{k=0}^{2^n -1}x_k\ket{k}$에 대해 diffusion operator를 적용해보면, 아래 공식을 만족한다.</p>
-
-<center>$U_s\ket{\psi} = 2\ket{s}\bra{s}\ket{\psi} - \ket{\psi}$</center>
-
-<p>여기서 basis $\ket{k}$의 크기를 구하면 아래와 같다.</p>
-
-<center>$\bra{k}U_s\ket{\psi} = 2\bra{k}\ket{s}\bra{s}\ket{\psi} - \bra{k}\ket{\psi} = \frac{2}{N}(\sum_{i=0}^{2^n -1} x_i) - x_k$</center>
-
-<p>$M = \frac{1}{N}(\sum_{i=0}^{2^n -1} x_i)$라고 하면, 식은 아래와 같다.</p>
-
-<center>$2 \cdot M - x_k$</center>
-
-<p>이는 점 $M$과 $x_k$가 주어졌을 때, $2:1$ 외분점을 뜻한다. $x_k$가 1일 때와 -1 일 때 $M$에 대한 외분점이 달라지기 때문에 원하는 basis에 대한 amplitude를 키울 수 있게되는 것이다. 여기서 잠시 생각해보면, 외분점을 잘 조절해서 $x_k = 1$ 일 때, $(l+1) \cdot M - l \cdot 1 \approx 0$이 되도록 할 수 있지 않을까? 이러면 $O(\sqrt{N})$번 iteration을 돌릴 필요 없이 단 한 번의 oracle query만으로 해를 구할 수 있게 된다. 위 식을 만족하기 위해서는 $l = \frac{M}{1-M}$을 만족해야 한다. 가장 처음 iteration에서 $x_w = -1$이고 나머지는 다 1이므로 사실 $M = \frac{2^n -2}{2^n}$이다. 그러면 $l = 2^{n-1} -1$이다.</p>
-
-<p>diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이라도 변경해볼 수 있을지 생각해보자. 기존의 diffusion circuit에서 아래와 같은 circuit으로 변경하면 비율을 $m:n = (1-e^{i\beta}) : 1$로 줄일 수 있다.</p>
-
-<center>
-<figure>
-<img src="/assets/20210216/20210216_4.png" width="40%" />
-<figcaption>4-qubit에서 $\beta$-phase diffusion transform 구현</figcaption>
-</figure>
-</center>
-
-<p>이를 논문에서는 $\beta$-phase diffusion transform이라고 한다. 하지만 $e^{i\beta} = -\frac{1}{l}$이 되려면, $M = \frac{2^n -2}{2^n}$에 대해서는 한 번의 query로 해를 찾을 수 있는 $\beta$가 존재하지 않는다.</p>
-
-<p>이 부분을 보완하기 위해 $M$ 값을 바꾸는 방법을 사용할 것이다. oracle $O_f$ 대신에 phase $\gamma$만큼 변화시키는 $\gamma$-phase oracle을 이용하면 $M$ 값이 변화한다. $\gamma$-phase oracle을 적용하면 얻을 수 있는 quantum state는 아래와 같다.</p>
-
-<center>$U_{\gamma}\ket{\psi} = \sum_{x=0}^{2^n-1} (e^{i\gamma})^{f(x)}\ket{x}$</center>
-
-<p>여기서 $M$ 값은 $\frac{2^n -1 + e^{i\gamma}}{2^n}$이다. 이러면 $l = \frac{2^n -1 +e^{i\gamma}}{1-e^{i\gamma}}$이 되어야 한 번의 query로 해를 구할 수 있다. 그러면 $\beta$-phase diffusion transform을 사용한다고 했을 때, $e^{i\beta} = -\frac{1-e^{i\gamma}}{2^n -1 +e^{i\gamma}}$를 만족해야한다. 근데 이 식도 자세히 보면, 좌변의 norm은 1인데 비해, 우변의 norm은 $n$이 커질수록 exponential하게 작아짐을 알 수 있다. 이러면 $n$ 값이 조금만 커도 해당 식을 만족하는 $0 \leq \beta, \gamma &lt; 2\pi$가 존재하지 않는다.</p>
-
-<p>여기서 $f(x)=1$인 해의 개수가 오직 한 개라는 조건의 한계점을 느낄 수 있다. 만약 해의 개수가 $r$개라면, 식이 어떻게 변화할지 생각해보자. $M$은 아래와 같이 바뀐다.</p>
-
-<center>$M = \frac{2^n - r + r \cdot e^{i\gamma}}{2^n}$</center>
-
-<p>그러면 한 번의 query로 해를 찾을 수 있는 $\beta$값은 아래 식으로 구할 수 있다.</p>
-
-<center>$e^{i\beta} = -\frac{r - r \cdot e^{i\gamma}}{2^n -r + r \cdot e^{i\gamma}} = -\frac{1 - e^{i\gamma}}{\frac{2^n}{r} -1 + e^{i\gamma}}$</center>
-
-<p>식을 다시 $f(x)=1$을 만족하는 해의 비율인 $x = \frac{r}{2^n}$ 값에 대해 정리하면 아래와 같다.</p>
-
-<center>$x = \frac{1}{e^{i(\gamma - \beta)} -e^{-i\beta} -e^{i\gamma} + 1} = \frac{1}{(1-e^{i\gamma})(1-e^{-i\beta})}$</center>
-
-<p>$\newcommand{\norm}[1]{\left| #1 \right|}$
-$x$는 0 이상 1 이하 실수이므로, 이를 만족하기 위해서는 $\gamma = \beta$이어야 한다. 이런 경우, $x = \norm{\frac{1}{(1-e^{i\gamma})}}^2 \geq \frac{1}{4}$이다. 따라서 $f(x)=1$을 만족하는 해의 개수가 최소 ${2^n -2}$개는 되어야 한 번의 query로 해를 찾을 수 있다. 이 때, $\beta = \gamma = \cos^{-1}(1-\frac{1}{2x})$이다.</p>
-
-<h3 id="알고리즘의-적용">알고리즘의 적용</h3>
-
-<p><a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a> 논문 21페이지로 잠시 돌아가면, CSIDH에 대한 oracle을 만들기 위해 Elliptic curve 위의 $l$-order point $P$를 구할 때, curve 위의 랜덤한 점 $P$를 uniform superposition state로 만들어 해당 점의 order가 $l$인 점 $P$를 구하는 Grover algorithm의 입력으로 넣어주는 상황을 생각해보자. 이 때, curve위의 임의의 점 중에서 order가 $l$인 점의 비율은 대략 $\frac{l-1}{l}$이다. 이는 어떤 $l$ 값에 대해서도 비율이 $1/4$를 넘으므로 한 번의 query로 Grover algorithm을 적용할 수 있는 상황이된다.</p>
-
-<p>여기서 눈여겨 볼 점은 한 번의 query로 Grover algorithm을 수행하기 위해서는 phase shift gate를 구현해야한다는 것이다. 이는 <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a> 논문 22페이지에 아래와 같이 언급되어 있다.</p>
+<p>relation $~$는 $(y_1, …, y_{n+1}) \sim ({y_1}’, …, {y_{n+1}}’)$이면 $(y_1, …, y_{n+1}) = (\lambda{y_1}’, …, \lambda{y_{n+1}}’)$ for some $\lambda \in \bar{K}$를 의미한다.</p>
 
 <blockquote>
-  <p>For a phase shift gate synthesized from Clifford+T gates, we estimate from [<a href="https://arxiv.org/pdf/1206.5236.pdf">28</a>] that it can be approximated up to an error of $2^{-50}$ using around $2^{14}$ T-gates, which is negligible compared to the cost of the exponentiation in the test function</p>
+  <p>projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 n차 다항식과 m차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.(<a href="https://en.wikipedia.org/wiki/B%C3%A9zout%27s_theorem">Bezout’s theorem</a>) 이와 같은 특성을 사용하게 위해 projective space를 사용한다.</p>
 </blockquote>
+
+<p>projective algebraic set $V$는 homogeneous 함수들로 generate되는 ideal $I \in \bar{K}[X_1, …, X_{n+1}]$로부터 정의되며, $I(V)$ 또한 homogeneous 함수들로 generate되는 ideal을 말한다. 아래와 같은 subset을 이용하면 projective set $\mathbb{P}^n$과 affine set $\mathbb{A}^n$을 연결할 수 있다.</p>
+
+<center>$U_i = \{ [y_1/y_i, ..., 1, ..., y_{n+1}/y_i] \in \mathbb{P}^n : y_i \neq 0 \}$</center>
+
+<p>$\phi_i : U_i \rightarrow \mathbb{A}^{n}$인 one-to-one map을 obvious하게 정의할 수 있다. 그러면 아래와 같은 조건을 만족한다.</p>
+
+<center>$\mathbb{P}^n = \phi_1^{-1}(\mathbb{A}^n) \cup ... \cup \phi_{n+1}^{-1}(\mathbb{A}^n)$</center>
+
+<p>projective algebraic set $V$가 주어졌을 때, 이를 affine space에서 바라본다면, $\phi_i(V \cap U_i)$가 되고, $V - U_i$에 속하는 점들을 point at infinity라고 부른다.</p>
 
 <blockquote>
-  <p><em>논문 [<a href="https://arxiv.org/pdf/1206.5236.pdf">28</a>]은 읽어보는게 좋을 것 같다!</em></p>
+  <p>Elliptic Curve Cryptography에서 사용하는 그 point at infinity의 개념이 여기서 나온 것이다.</p>
 </blockquote>
 
-<p>논문에서처럼 phase shift gate는 한 번 수행할 때마다 $2^{-50}$으로 매우 작은 실패 확률을 가지고 있고, Grover algorithm with a single query에서는 phase shift gate를 polynomial 횟수(대략 $n$번)만 사용하므로 에러는 무시할만한 수준으로 보인다.</p>
-</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2021-02-16T00:00:00+09:00"><!-- start custom article footer snippet -->
+<p>affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\{f_1, …, f_m\} \subset \bar{K}[X_1, …, X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\{ f_1^{\ast}, …,f_m^{\ast} \} \subset \bar{K}[X_1, …, X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V’$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V’ \cap U_{n+1})$을 만족한다.</p>
+
+<p>따라서 우리는 projective algebraic set $V \in \mathbb{P}^n$이 주어지면 이를 affine algebraic set으로 표현할 수 있고, 이는 곧 dehomogenization된 polynomial $\in \bar{K}[X_1, …,X_n]$으로 표현할 수 있다!</p>
+
+<h2 id="rational-map-and-morphism">Rational map and Morphism</h2>
+
+<p>두 개의 projective variety $V_1 \in \mathbb{P}^n$과 $V_2 \in \mathbb{P}^m$이 주어졌을 때, 아래와 같은 map을 생각하자.</p>
+
+<center>$\varphi : V_1 \rightarrow V_2$ where $\varphi(P) = [f_1(P), ..., f_{m+1}(P)]$ for $P \in V_1$, $f_i \in \bar{K}(V)$</center>
+
+<p>이렇게 정의된 mapping은 well-define되며, rational map이라고 부른다. rational map의 정의에 따르면, rational map $\varphi$가 모든 점 $P \in V_1$ 위에서 정의될 필요는 없다. 모든 점 $P \in V_1$ 위에서 정의된다면 이러한 rational map을 morphism이라고 부른다.</p>
+
+<blockquote>
+  <p>이런식으로 morphism을 정의하면 rational map은 variety topology(<a href="https://en.wikipedia.org/wiki/Zariski_topology">zariski topology</a>)에 대한 continuous function이 된다!</p>
+</blockquote>
+
+<p>projective variety $V_1, V_2$에 대해 두 morphism $\psi : V_1 \rightarrow V_2$와 $\varphi : V_2 \rightarrow V_1$가 존재해서, $\psi \circ \varphi$와 $\varphi \circ \psi$가 identity가 되면 $V_1, V_2$는 isomorphic하다고 한다.</p>
+</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2021-02-17T00:00:00+09:00"><!-- start custom article footer snippet -->
 
 <!-- end custom article footer snippet -->
 <div class="article__subscribe"></div><div class="article__license"><div class="license">
@@ -547,7 +530,7 @@ $x$는 0 이상 1 이하 실수이므로, 이를 만족하기 위해서는 $\gam
       </a>
     </p>
   </div></div></footer>
-<div class="article__section-navigator clearfix"><div class="previous"><span>PREVIOUS</span><a href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">Quantum algorithm for Hidden Shift Problem#2</a></div><div class="next"><span>NEXT</span><a href="/2021/02/17/Variety-and-Morphism.html">Variety and Morphism</a></div></div></div>
+<div class="article__section-navigator clearfix"><div class="previous"><span>PREVIOUS</span><a href="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html">Grover Algorithm with a Single Query</a></div></div></div>
 
 </div>
 

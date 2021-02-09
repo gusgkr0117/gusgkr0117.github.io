@@ -12,18 +12,23 @@ key: post_20210217
 
 * 다항식을 통해 얻을 수 있는 점들의 집합은 대수적으로 어떤 특성을 갖는지 분석하는 것이 대수기하학이다. 이것의 기본이 되는 기념이 algebraic set, variety라고 할 수 있다.
 
-* $K$ : field, $\bar{K}$ : algebraic closure of $K$, $G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$
+* Notation
+	* $K$ : field
+	* $\bar{K}$ : algebraic closure of $K$
+	* $G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$
 
 * $K[X_1, X_2, ... , X_n]$는 간단히 $K[X]$로 표기하도록 하겠다.
 
-* $\mathbb{A}^n = \\{(y_1, y_2, ..., y_n) : y_i \in bar{K} for 1 \leq i \leq n\\}$이고, $\mathbb{A}^n(K) = \\{(y_1, y_2, ..., y_n) : y_i \in K for 1 \leq i \leq n\\}$로 표기하겠다.
+* Affine Space
+	* $\mathbb{A}^n = \\{(y_1, y_2, ..., y_n) : y_i \in \bar{K} \ \textrm{for} \ 1 \leq i \leq n\\}$
+	* $\mathbb{A}^n(K) = \\{(y_1, y_2, ..., y_n) : y_i \in K \ \textrm{for} \ 1 \leq i \leq n\\}$
 
 
 ## Algebraic set
 
-$\bar{K}[X]$ 상의 ideal $I \subset bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다.
+$\bar{K}[X]$ 상의 ideal $I \subset \bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다.
 
-<center>$V_I = \{ P \in \mathbb{A}^n : f(P) = 0 for \forall f \in I \}$</center>
+<center>$V_I = \{ P \in \mathbb{A}^n : f(P) = 0 \ \textrm{for} \ \forall f \in I \}$</center>
 
 algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$가 만일 $K[X]$에 들어있는 함수들로 generate 된다면, $V$는 $K$ 위에서 정의되었다고 하며 이를 $V/K$라고 표기한다. $V(K)$는 $V$에 속하는 점들 중에서 $K$ 위에서 정의된 점들을 말하며 아래와 같이 정의된다.
 
@@ -31,7 +36,7 @@ algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$�
 
 또한 $I(K) = I(V) \cap K[X] \subset \bar{K}[X]$로 정의한다. 정의에 따르면 $V/K$에 대해 아래와 같은 식을 도출 할 수 있다.
 
-<center>$I(V) = I(K)\bar{K}[X]$ if $V$ is defined over $K$</center>
+<center>$I(V) = I(K)\bar{K}[X]$ &nbsp;&nbsp;if $V$ is defined over $K$</center>
 
 ### Variety
 
@@ -41,29 +46,36 @@ $\bar{K}$는 field이므로 noetherian이다. [Hilbert basis theorem](https://en
 
 <center>$V = V_1 \cup V_2 \cup ... \cup V_n$ where $V_i$ is variety</center>
 
-ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \\{f : f^m \in J for some m \in \mathbb{Z}^+ \cup {0}\\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다.
+ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \\{f : f^m \in J \ \textrm{for some} \ m \in \mathbb{Z}^+ \cup \\{ 0 \\}\\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다.
 
 ### Coordinate ring and function field
 
-algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다.
+algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고 하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다.
 
-만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in bar{K}[V]$와 $\sigma G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다.
+만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in \bar{K}[V]$와 $\sigma \in G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다.
 
-$dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 transcendence degree를 말한다. 예를 들어, $V : f(x_1, ..., x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left< f \right>$는 algebraic basis가 $n-1$개 이므로 $dim(V) = n-1$임을 알 수 있다.
+$\dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 [transcendence degree](https://en.wikipedia.org/wiki/Transcendence_degree)를 말한다. 예를 들어, $V : f(x_1, ..., x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left< f \right>$는 algebraic basis가 $n-1$개 이므로 $\dim(V) = n-1$임을 알 수 있다.
 
 **<font color="red">function field $\bar{K}(V)$의 원소는 맵핑 $f: V \rightarrow \bar{K}$로 obvious하게 대응됨을 알 수 있다.</font>** 이게 굉장히 재미있는 부분인데, algebraic set $V$에 있는 점 각각을 $\bar{K}$로 임의로 맵핑하는 것은 사실 $\bar{K}(V)$에 속하지 않을 수도 있다. $\bar{K}(V)$는 polynomial 특성(?)을 가지는 맵핑 $V \rightarrow \bar{K}$에 관한 정보를 담고 있다고 볼 수 있다.
 
-<center><img src="/assets/20210217_1.png" width="40%"></center>
+<center>
+<figure>
+<img src="/assets/20210217/20210217_1.png" width="70%">
+<figcaption>
+$\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시<br>$f: C \rightarrow \mathbb{R}$ where $C : Y=X^3 - 4X^2 + X + 6 \subset \mathbb{R}^2$
+</figcaption>
+</figure>
+</center>
 
 ## Projective space
 
 우리가 위에서 사용했던 $\mathbb{A}^n$은 Affine space라고 부른다. Projective space $\mathbb{P}^n$은 아래와 같이 정의된다.
 
- > projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 n차 다항식과 m차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.([Bezout's theorem](https://en.wikipedia.org/wiki/B%C3%A9zout%27s_theorem)) 이와 같은 특성을 사용하게 위해 projective space를 사용한다.
-
 <center>$\mathbb{P}^n = \mathbb{A}^{n+1}/\sim$</center>
 
 relation $\~$는 $(y_1, ..., y_{n+1}) \sim ({y_1}', ..., {y_{n+1}}')$이면 $(y_1, ..., y_{n+1}) = (\lambda{y_1}', ..., \lambda{y_{n+1}}')$ for some $\lambda \in \bar{K}$를 의미한다.
+
+> projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 n차 다항식과 m차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.([Bezout's theorem](https://en.wikipedia.org/wiki/B%C3%A9zout%27s_theorem)) 이와 같은 특성을 사용하게 위해 projective space를 사용한다.
 
 projective algebraic set $V$는 homogeneous 함수들로 generate되는 ideal $I \in \bar{K}[X_1, ..., X_{n+1}]$로부터 정의되며, $I(V)$ 또한 homogeneous 함수들로 generate되는 ideal을 말한다. 아래와 같은 subset을 이용하면 projective set $\mathbb{P}^n$과 affine set $\mathbb{A}^n$을 연결할 수 있다.
 
