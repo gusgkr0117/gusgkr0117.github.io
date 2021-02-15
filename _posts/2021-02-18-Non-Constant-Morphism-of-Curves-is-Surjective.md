@@ -20,26 +20,26 @@ Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 tran
 
 curve 위에서 어떤 proper closed subvariety(아직 zariski topology를 정리하지 않았으므로 여기서는 간단히 affine variety를 생각하자)는 항상 점 한개로 구성됨을 증명하자. 아래 두 개의 claim을 거쳐야 한다.
 
-#### Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C)\\\K$에 대해 $K(C)$는 $K(t)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1))
+##### Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C)\\\K$에 대해 $K(C)$는 $K(t)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1))
 
 _Proof)_ 임의의 원소 $x \in K(C)\\\K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 <font color='red'>$K$가 algebraically closed</font>인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다.
 
-<right>□</right>
+<div style="text-align: right">□</div>
 
-#### Claim 2. $K$가 algebraically closed이고, Ring $R$이 존재해서 quotient field $K(C)$를 갖는다고 하면, $R$ 위의 prime ideal $I$에 대해 항상 $R/I \cong K$이다.(Fulton 6. Proposition 9(3))
+##### Claim 2. $K$가 algebraically closed이고, Ring $R$이 존재해서 quotient field $K(C)$를 갖는다고 하면, $R$ 위의 prime ideal $I$에 대해 항상 $R/I \cong K$이다.(Fulton 6. Proposition 9(3))
 
 _Proof)_ 귀류법으로 $R/I$ 상에서 $K$에 포함되지 않는 $x$가 존재한다고 가정하자. 그러면 **Claim 1.** 에 의해서 $K(C)$는 $K(x)$에 대한 algebraic field extension이다. 그러면 $y \in I$에 대해 minimal polynomial $f = \sum_{i} a_{i}(x)X^i \in K(x)[X]$가 존재해서 $\sum_{i} a_{i}(x) y^i = 0$을 만족한다. 
 $f$는 minimal polynomial이므로 $a_0(x) \neq 0$이다. quotient ring $R/I$ 상에서 $f(y) = a_0(x) = 0$이 된다. 이는 $x$가 $K$에 대해 algebraic하다는 의미로 모순이다. 따라서 이러한 $x$가 존재하지 않는다. 
 
-<right>□</right>
+<div style="text-align: right">□</div>
 
 이제 **Claim 2.** 를 이용해 아래의 **Proposition 3.** 을 증명할 것이다.
 
-#### Proposition 3. $K$가 algebraically closed 일 때, Curve 위에 존재하는 모든 proper closed subvariety 점 하나로 구성된다.(Fulton 6. Proposition 10(4))
+##### Proposition 3. $K$가 algebraically closed 일 때, Curve 위에 존재하는 모든 proper closed subvariety 점 하나로 구성된다.(Fulton 6. Proposition 10(4))
 
 _Proof)_ Curve $C$에 대한 coordinate ring $K[C]$를 생각하자. curve 위의 closed subvariety $W \subset C$는 $K[C]$에 속하는 prime ideal $I \subset K[C]$에 대응된다. **Claim 2.** 에 의해 $K[C]/I \cong K$ 임을 알고 있다. 이는 subvariety W에 대한 coordinate ring $K[W]$와 isomorphic하다. 따라서 subvariety $W$는 Curve $C$ 위의 한 점이 된다.
 
-<right>□</right>
+<div style="text-align: right">□</div>
 
 ### Non-constant morphism of curves is surjective 
 
