@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en">
   <head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Variety and Morphism - Manbo's blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Non-constant Morphism of Curves is surjective - Manbo's blog</title>
 
-<meta name="description" content="해당 글은 Silverman의 Arithmetic of Elliptic Curves의 Chapter 1을 정리한 것이다.        Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $...">
-<link rel="canonical" href="/2021/02/17/Variety-and-Morphism.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
+<meta name="description" content="해당 글은 Fulton의 Algebraic Curves와 Silverman의 Arithmetic of Elliptic Curves를 정리한 것이다.        Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 ...">
+<link rel="canonical" href="/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
 
 <meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/browserconfig.xml">
 
@@ -385,13 +385,13 @@ const randNum = Math.floor(Math.random() * bgList.length);
 bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__content"><div class ="main"><div class="article__info clearfix"><ul class="left-col menu"><li>
               <a class="button button--secondary button--pill button--sm"
                 href="/archive.html?tag=Mathematics">Mathematics</a>
-            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 17, 2021</span>
-            </li></ul></div><div class="article__header"><header><h1>Variety and Morphism</h1></header><span class="split-space">&nbsp;</span>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Feb 18, 2021</span>
+            </li></ul></div><div class="article__header"><header><h1>Non-constant Morphism of Curves is surjective</h1></header><span class="split-space">&nbsp;</span>
           <a class="edit-on-github"
             title="Edit on Github"
-            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2021-02-17-Variety-and-Morphism.md">
-            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">Variety와 Morphism 이해가기</p><a href="http://hits.dwyl.com//2021/02/17/Variety-and-Morphism.html" target="_blank">
-                      <img src="http://hits.dwyl.com//2021/02/17/Variety-and-Morphism.html.svg" />
+            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2021-02-18-Non-Constant-Morphism-of-Curves-is-Surjective.md">
+            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">왜 Morphism of curve가 constant 아니면 surjective 인지 알아보자</p><a href="http://hits.dwyl.com//2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html" target="_blank">
+                      <img src="http://hits.dwyl.com//2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html.svg" />
                     </a></div></div>
               </div>
             </div><div class ="main"><div class="grid grid--reverse">
@@ -402,125 +402,75 @@ bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__
               <div class="col-main cell cell--auto"><!-- start custom main top snippet -->
 
 <!-- end custom main top snippet -->
-<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Variety and Morphism"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-17T00:00:00+09:00">
+<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Non-constant Morphism of Curves is surjective"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-02-18T00:00:00+09:00">
     <meta itemprop="keywords" content="Mathematics"><div class="js-article-content"><div class="layout--article"><!-- start custom article top snippet -->
 
 <!-- end custom article top snippet -->
 <div class="article__content" itemprop="articleBody"><ul>
   <li>
-    <p>해당 글은 Silverman의 <a href="https://www.springer.com/gp/book/9780387094939">Arithmetic of Elliptic Curves</a>의 Chapter 1을 정리한 것이다.</p>
+    <p>해당 글은 Fulton의 <a href="http://www.math.lsa.umich.edu/~wfulton/CurveBook.pdf">Algebraic Curves</a>와 Silverman의 <a href="https://www.springer.com/gp/book/9780387094939">Arithmetic of Elliptic Curves</a>를 정리한 것이다.</p>
   </li>
   <li>
-    <p>Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $x,y$가 아니라 $x_1, x_2, …, x_n$으로 많다면 정수해를 어떻게 찾을 수 있을까? 그리고 그들은 어떤 특징을 가질까?</p>
-  </li>
-  <li>
-    <p>다항식을 통해 얻을 수 있는 점들의 집합은 대수적으로 어떤 특성을 갖는지 분석하는 것이 대수기하학이다. 이것의 기본이 되는 기념이 algebraic set, variety라고 할 수 있다.</p>
-  </li>
-  <li>Notation
-    <ul>
-      <li>$K$ : field</li>
-      <li>$\bar{K}$ : algebraic closure of $K$</li>
-      <li>$G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$</li>
-    </ul>
-  </li>
-  <li>
-    <p>$K[X_1, X_2, … , X_n]$는 간단히 $K[X]$로 표기하도록 하겠다.</p>
-  </li>
-  <li>Affine Space
-    <ul>
-      <li>$\mathbb{A}^n = \{(y_1, y_2, …, y_n) : y_i \in \bar{K} \ \textrm{for} \ 1 \leq i \leq n\}$</li>
-      <li>$\mathbb{A}^n(K) = \{(y_1, y_2, …, y_n) : y_i \in K \ \textrm{for} \ 1 \leq i \leq n\}$</li>
-    </ul>
+    <p>Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 <a href="https://math.stackexchange.com/questions/2969598/if-isogenous-elliptic-curves-have-equal-numbers-of-points-how-can-isogenies-hav">surjective가 아니게 되는 문제에 대한 의문</a>을 해결한다.</p>
   </li>
 </ul>
 
-<h2 id="algebraic-set">Algebraic set</h2>
+<h2 id="dimension-of-a-curve">Dimension of a curve</h2>
 
-<p>$\bar{K}[X]$ 상의 ideal $I \subset \bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다.</p>
+<p>Variety $V$의 dimension은 function field $K(V)$를 field extension of $K$라고 생각했을 때, 해당 extension의 transcendence degree를 말한다. transcendence degree는 algebraic 하게 generate되지 않는 extension field 위의 원소들의 dimension을 뜻한다. transcendence degree가 $n$이면, algebraic basis의 개수는 $n$개가 된다.</p>
 
-<center>$V_I = \{ P \in \mathbb{A}^n : f(P) = 0 \ \textrm{for} \ \forall f \in I \}$</center>
+<p>Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 transcendence degree가 1이라는 의미이다. algebraic basis는 한 개이고, 이를 $t \in K(C) \setminus K$라고 하자. 그러면 $K(C)$는 $K(t)$에 대한 algebraic field extension(finite field extension)이다.</p>
 
-<p>algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$가 만일 $K[X]$에 들어있는 함수들로 generate 된다면, $V$는 $K$ 위에서 정의되었다고 하며 이를 $V/K$라고 표기한다. $V(K)$는 $V$에 속하는 점들 중에서 $K$ 위에서 정의된 점들을 말하며 아래와 같이 정의된다.</p>
+<h2 id="any-proper-closed-subvariety-of-a-curve-is-a-point">Any proper closed subvariety of a curve is a point</h2>
 
-<center>$V(K) = V \cap \mathbb{A}^n(K)$</center>
+<p>curve 위에서 어떤 proper closed subvariety(아직 zariski topology를 정리하지 않았으므로 여기서는 간단히 affine variety를 생각하자)는 항상 점 한개로 구성됨을 증명하자. 아래 두 개의 claim을 거쳐야 한다.</p>
 
-<p>또한 $I(K) = I(V) \cap K[X] \subset \bar{K}[X]$로 정의한다. 정의에 따르면 $V/K$에 대해 아래와 같은 식을 도출 할 수 있다.</p>
+<h5 id="claim-1-k가-algebraically-closed-이면-임의의-원소-x-in-kc-setminus-k에-대해-kc는-kx에-대한-algebraic-field-extension이다fulton-6-proposition-91">Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C) \setminus K$에 대해 $K(C)$는 $K(x)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1))</h5>
 
-<center>$I(V) = I(K)\bar{K}[X]$ &nbsp;&nbsp;if $V$ is defined over $K$</center>
+<p><em>Proof)</em> algebraic basis를 $t \in K(C) \setminus K$라고 하자. 임의의 원소 $x \in K(C) \setminus K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 <font color="red">$K$가 algebraically closed</font>인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다.</p>
 
-<h3 id="variety">Variety</h3>
+<div style="text-align: right">□</div>
 
-<p>variety란, algebraic set $V$에 대해 $I(V) \subset \bar{K}[X]$가 <strong><font color="red">prime ideal이면 $V$를 variety라고 한다.</font></strong></p>
+<h5 id="claim-2-k가-algebraically-closed이고-ring-r이-존재해서-quotient-field-kc를-갖는다고-하면-r-위의-prime-ideal-i에-대해-항상-ri-cong-k이다fulton-6-proposition-93">Claim 2. $K$가 algebraically closed이고, Ring $R$이 존재해서 quotient field $K(C)$를 갖는다고 하면, $R$ 위의 prime ideal $I$에 대해 항상 $R/I \cong K$이다.(Fulton 6. Proposition 9(3))</h5>
 
-<p>$\bar{K}$는 field이므로 noetherian이다. <a href="https://en.wikipedia.org/wiki/Hilbert%27s_basis_theorem">Hilbert basis theorem</a>에 의해 $\bar{K}[X]$도 따라서 noetherian이다. 따라서 $\bar{K}[X]$에 속하는 ideal들은 prime ideal의 곱으로 unique하게 표현할 수 있다. 이와 마찬가지로 algebraic set $V$는 variety들의 union으로 아래와 같이 유일하게 표현된다.</p>
+<p><em>Proof)</em> 귀류법으로 $R/I$ 상에서 $K$에 포함되지 않는 $x$가 존재한다고 가정하자. 그러면 <strong>Claim 1.</strong> 에 의해서 $K(C)$는 $K(x)$에 대한 algebraic field extension이다. 그러면 $y \in I$에 대해 minimal polynomial $f = \sum_{i} a_{i}(x)X^i \in K(x)[X]$가 존재해서 $\sum_{i} a_{i}(x) y^i = 0$을 만족한다. 
+$f$는 minimal polynomial이므로 $a_0(x) \neq 0$이다. quotient ring $R/I$ 상에서 $f(y) = a_0(x) = 0$이 된다. 이는 $x$가 $K$에 대해 algebraic하다는 의미로 모순이다. 따라서 이러한 $x$가 존재하지 않는다.</p>
 
-<center>$V = V_1 \cup V_2 \cup ... \cup V_n$ where $V_i$ is variety</center>
+<div style="text-align: right">□</div>
 
-<p>ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \{f : f^m \in J \ \textrm{for some} \ m \in \mathbb{Z}^+ \cup \{ 0 \}\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다.</p>
+<p>이제 <strong>Claim 2.</strong> 를 이용해 아래의 <strong>Proposition 3.</strong> 을 증명할 것이다.</p>
 
-<h3 id="coordinate-ring-and-function-field">Coordinate ring and function field</h3>
+<h5 id="proposition-3-k가-algebraically-closed-일-때-curve-위에-존재하는-모든-proper-closed-subvariety-점-하나로-구성된다fulton-6-proposition-104">Proposition 3. $K$가 algebraically closed 일 때, Curve 위에 존재하는 모든 proper closed subvariety 점 하나로 구성된다.(Fulton 6. Proposition 10(4))</h5>
 
-<p>algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고 하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다.</p>
+<p><em>Proof)</em> Curve $C$에 대한 coordinate ring $K[C]$를 생각하자. curve 위의 closed subvariety $W \subset C$는 $K[C]$에 속하는 prime ideal $I \subset K[C]$에 대응된다. <strong>Claim 2.</strong> 에 의해 $K[C]/I \cong K$ 임을 알고 있다. 이는 subvariety W에 대한 coordinate ring $K[W]$와 isomorphic하다. 따라서 subvariety $W$는 Curve $C$ 위의 한 점이 된다.</p>
 
-<p>만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in \bar{K}[V]$와 $\sigma \in G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다.</p>
+<div style="text-align: right">□</div>
 
-<p>$\dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 <a href="https://en.wikipedia.org/wiki/Transcendence_degree">transcendence degree</a>를 말한다. 예를 들어, $V : f(x_1, …, x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left&lt; f \right&gt;$는 algebraic basis가 $n-1$개 이므로 $\dim(V) = n-1$임을 알 수 있다.</p>
+<h2 id="non-constant-morphism-of-curves-is-surjective">Non-constant morphism of curves is surjective</h2>
 
-<p><strong><font color="red">function field $\bar{K}(V)$의 원소는 맵핑 $f: V \rightarrow \bar{K}$로 obvious하게 대응됨을 알 수 있다.</font></strong> 이게 굉장히 재미있는 부분인데, algebraic set $V$에 있는 점 각각을 $\bar{K}$로 임의로 맵핑하는 것은 사실 $\bar{K}(V)$에 속하지 않을 수도 있다. $\bar{K}(V)$는 polynomial 특성(?)을 가지는 맵핑 $V \rightarrow \bar{K}$에 관한 정보를 담고 있다고 볼 수 있다.</p>
+<p>Morphism $\varphi: C_1 \rightarrow C_2$는 zariski topology 상에서 continuous하다. $C_2$는 curve이므로 <strong>Proposition 3.</strong> 에 의해 $C_2$ 위의 proper closed subvariety는 하나의 점으로 구성된다. morphism은 $C_1$ 위의 모든 점에서 define되며, $C_1$은 closed subvariety이므로 morphism $\varphi$의 image는 하나의 점이거나 Curve $C_2$ 전체가 된다. 따라서 constant이거나 surjective인 것이다!</p>
 
-<center>
-<figure>
-<img src="/assets/20210217/20210217_1.png" width="70%" />
-<figcaption>
-$\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시<br />$f: C \rightarrow \mathbb{R}$ where $C : Y=X^3 - 4X^2 + X + 6 \subset \mathbb{R}^2$
-</figcaption>
-</figure>
-</center>
+<h2 id="degree-of-a-morphism">Degree of a morphism</h2>
 
-<h2 id="projective-space">Projective space</h2>
+<p>non-constant morphism은 surjective이다. 또한 morphism $\varphi$에 대한 induced map $\tilde{\varphi}: K(C_2) \rightarrow K(C_1)$을 생각했을 때, $\tilde{\varphi}(K(C_2))$는 transcendence degree 1을 갖는다. 따라서 $K(C_1)$은 $\tilde{\varphi}(K(C_2))$에 대한 algebraic field extension이 되며, 아래와 같이 extension degree를 morphism의 degree로 정의할 수 있다.</p>
 
-<p>우리가 위에서 사용했던 $\mathbb{A}^n$은 Affine space라고 부른다. Projective space $\mathbb{P}^n$은 아래와 같이 정의된다.</p>
+<center>$deg(\varphi) = [K(C_1):\tilde{\varphi}(K(C_2))]$</center>
 
-<center>$\mathbb{P}^n = \mathbb{A}^{n+1}/\sim$</center>
+<p>해당 degree는 isogeny에서 group homomorphism의 degree 정의와 유사한 의미를 갖는다. group homomorphism에서는 kernel의 크기로 degree를 정하기 때문에 inseparable degree가 표현되지 않지만, 위와 같이 정의된 morphism의 degree는 inseparable degree를 반영한다.(inseparable degree를 가지려면 field $K$의 characteristic이 0보다 커야하며, 이에 대한 algebraic closure $\bar{\mathbb{F}}_p$를 생각한다.)</p>
 
-<p>relation $\sim$는 $(y_1, …, y_{n+1}) \sim (y_1^{\prime}, …, y_{n+1}^{\prime})$이면 $(y_1, …, y_{n+1}) = (\lambda y_1^{\prime}, …, \lambda y_{n+1}^{\prime})$ for some $\lambda \in \bar{K}$를 의미한다.</p>
+<h2 id="curves-on-a-finite-field">Curves on a finite field</h2>
+
+<p>Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 <a href="https://math.stackexchange.com/questions/2969598/if-isogenous-elliptic-curves-have-equal-numbers-of-points-how-can-isogenies-hav">surjective가 아니게 되는 문제에 대한 의문</a>이 발생한다.</p>
 
 <blockquote>
-  <p>projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 $n$차 다항식과 $m$차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.(<a href="https://en.wikipedia.org/wiki/B%C3%A9zout%27s_theorem">Bezout’s theorem</a>) 이와 같은 특성을 사용하게 위해 projective space를 사용한다.</p>
+  <p>사실 이 문제가 머릿속에서 해결이 안되서 포스트로 정리해 본 것이었다. 하지만 생각보다 간단한 문제였던 것 같다..</p>
 </blockquote>
 
-<p>projective algebraic set $V$는 homogeneous 함수들로 generate되는 ideal $I \in \bar{K}[X_1, …, X_{n+1}]$로부터 정의되며, $I(V)$ 또한 homogeneous 함수들로 generate되는 ideal을 말한다. 아래와 같은 subset을 이용하면 projective set $\mathbb{P}^n$과 affine set $\mathbb{A}^n$을 연결할 수 있다.</p>
+<p>이러한 오류가 발생하는 원인은 Finite field $\mathbb{F}_p$ 위에서 우리가 생각하는 일반적인 Curve들이 irreducible하지 않다는 것을 간과한 것이다. Finite field에서는 모든 algebraic set들이 finite 개수의 점을 갖는다. 각각의 점은 variety이기 때문에 variety의 유한 합으로 표현 가능하고, 당연히도 irreducible하지 않게 된다.</p>
 
-<center>$U_i = \{ [y_1/y_i, ..., 1, ..., y_{n+1}/y_i] \in \mathbb{P}^n : y_i \neq 0 \}$</center>
-
-<p>$\phi_i : U_i \rightarrow \mathbb{A}^{n}$인 one-to-one map을 obvious하게 정의할 수 있다. 그러면 아래와 같은 조건을 만족한다.</p>
-
-<center>$\mathbb{P}^n = \phi_1^{-1}(\mathbb{A}^n) \cup ... \cup \phi_{n+1}^{-1}(\mathbb{A}^n)$</center>
-
-<p>projective algebraic set $V$가 주어졌을 때, 이를 affine space에서 바라본다면, $\phi_i(V \cap U_i)$가 되고, $V - U_i$에 속하는 점들을 point at infinity라고 부른다.</p>
-
-<blockquote>
-  <p>Elliptic Curve Cryptography에서 사용하는 그 point at infinity의 개념이 여기서 나온 것이다.</p>
-</blockquote>
-
-<p>affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\{f_1, …, f_m\} \subset \bar{K}[X_1, …, X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\{ f_1^{\ast}, …,f_m^{\ast} \} \subset \bar{K}[X_1, …, X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V’$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V’ \cap U_{n+1})$을 만족한다.</p>
-
-<p>따라서 우리는 projective algebraic set $V \in \mathbb{P}^n$이 주어지면 이를 affine algebraic set으로 표현할 수 있고, 이는 곧 dehomogenization된 polynomial $\in \bar{K}[X_1, …,X_n]$으로 표현할 수 있다!</p>
-
-<h2 id="rational-map-and-morphism">Rational map and Morphism</h2>
-
-<p>두 개의 projective variety $V_1 \in \mathbb{P}^n$과 $V_2 \in \mathbb{P}^m$이 주어졌을 때, 아래와 같은 map을 생각하자.</p>
-
-<center>$\varphi : V_1 \rightarrow V_2$ where $\varphi(P) = [f_1(P), ..., f_{m+1}(P)]$ for $P \in V_1$, $f_i \in \bar{K}(V)$</center>
-
-<p>이렇게 정의된 mapping은 well-define되며, rational map이라고 부른다. rational map의 정의에 따르면, rational map $\varphi$가 모든 점 $P \in V_1$ 위에서 정의될 필요는 없다. 모든 점 $P \in V_1$ 위에서 정의된다면 이러한 rational map을 morphism이라고 부른다.</p>
-
-<blockquote>
-  <p>이런식으로 morphism을 정의하면 rational map은 variety topology(<a href="https://en.wikipedia.org/wiki/Zariski_topology">zariski topology</a>)에 대한 continuous function이 된다!</p>
-</blockquote>
-
-<p>projective variety $V_1, V_2$에 대해 두 morphism $\psi : V_1 \rightarrow V_2$와 $\varphi : V_2 \rightarrow V_1$가 존재해서, $\psi \circ \varphi$와 $\varphi \circ \psi$가 identity가 되면 $V_1, V_2$는 isomorphic하다고 한다.</p>
-</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2021-02-17T00:00:00+09:00"><!-- start custom article footer snippet -->
+<p>variety는 한 점으로만 구성되며, 이러한 점은 coordinate ring이 $\mathbb{F}_p$와 같아져서 dimension이 0이기 때문에 curve가 존재하지 않는다고 볼 수 있다. curve 개념이 생기기 위해서는 field의 원소 개수가 무한해야하며, algebraic closure of finite field $\bar{\mathbb{F}}_p$ 위에서 생각해야할 것이다. 여기서는 curve가 존재하기 때문에 non-constant morphism of curves가 surjective임을 사용할 수 있다.
+또한 p-adic field $\mathbb{Q}_p$에서도 마찬가지로 사용할 수 있다.</p>
+</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2021-02-18T00:00:00+09:00"><!-- start custom article footer snippet -->
 
 <!-- end custom article footer snippet -->
 <div class="article__subscribe"></div><div class="article__license"><div class="license">
@@ -530,7 +480,7 @@ $\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시<br />$f: 
       </a>
     </p>
   </div></div></footer>
-<div class="article__section-navigator clearfix"><div class="previous"><span>PREVIOUS</span><a href="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html">Grover Algorithm with a Single Query</a></div><div class="next"><span>NEXT</span><a href="/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html">Non-constant Morphism of Curves is surjective</a></div></div></div>
+<div class="article__section-navigator clearfix"><div class="previous"><span>PREVIOUS</span><a href="/2021/02/17/Variety-and-Morphism.html">Variety and Morphism</a></div></div></div>
 
 </div>
 
