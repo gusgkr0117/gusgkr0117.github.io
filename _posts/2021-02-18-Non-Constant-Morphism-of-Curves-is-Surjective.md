@@ -14,15 +14,15 @@ key: post_20210218
 
 Variety $V$의 dimension은 function field $K(V)$를 field extension of $K$라고 생각했을 때, 해당 extension의 transcendence degree를 말한다. transcendence degree는 algebraic 하게 generate되지 않는 extension field 위의 원소들의 dimension을 뜻한다. transcendence degree가 $n$이면, algebraic basis의 개수는 $n$개가 된다.
 
-Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 transcendence degree가 1이라는 의미이다. algebraic basis는 한 개이고, 이를 $t \in K(C)\\\\K$라고 하자. 그러면 $K(C)$는 $K(t)$에 대한 algebraic field extension(finite field extension)이다.
+Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 transcendence degree가 1이라는 의미이다. algebraic basis는 한 개이고, 이를 $t \in K(C) \setminus K$라고 하자. 그러면 $K(C)$는 $K(t)$에 대한 algebraic field extension(finite field extension)이다.
 
 ### Any proper closed subvariety of a curve is a point
 
 curve 위에서 어떤 proper closed subvariety(아직 zariski topology를 정리하지 않았으므로 여기서는 간단히 affine variety를 생각하자)는 항상 점 한개로 구성됨을 증명하자. 아래 두 개의 claim을 거쳐야 한다.
 
-##### Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C)\\\\K$에 대해 $K(C)$는 $K(t)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1))
+##### Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C) \setminus K$에 대해 $K(C)$는 $K(t)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1))
 
-_Proof)_ 임의의 원소 $x \in K(C)\\\\K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 <font color='red'>$K$가 algebraically closed</font>인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다.
+_Proof)_ 임의의 원소 $x \in K(C) \setminus K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 <font color='red'>$K$가 algebraically closed</font>인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다.
 
 <div style="text-align: right">□</div>
 
