@@ -49,7 +49,7 @@ Morphism $\varphi: C_1 \rightarrow C_2$는 zariski topology 상에서 continuous
 
 non-constant morphism은 surjective이다. 또한 morphism $\varphi$에 대한 induced map $\bar{\varphi}: K(C_2) \rightarrow K(C_1)$을 생각했을 때, $\bar{\varphi}(K(C_2))$는 transcendence degree 1을 갖는다. 따라서 $K(C_2)$는 $\bar{\varphi}(K(C_2))$에 대한 algebraic field extension이 되며, 아래와 같이 extension degree를 morphism의 degree로 정의할 수 있다.
 
-<center>$deg(\varphi) = [K(C_2):\bar{\varphi}(K(C_2))]$</center>
+<center>$deg(\varphi) = [K(C_1):\bar{\varphi}(K(C_2))]$</center>
 
 해당 degree는 isogeny에서 group homomorphism의 degree 정의와 유사한 의미를 갖는다. group homomorphism에서는 kernel의 크기로 degree를 정하기 때문에 inseparable degree가 표현되지 않지만, 위와 같이 정의된 morphism의 degree는 inseparable degree를 반영한다.(inseparable degree를 가지려면 field $K$의 characteristic이 0보다 커야하며, 이에 대한 algebraic closure $\bar{\mathbb{F}\_p}$를 생각한다.)
 
