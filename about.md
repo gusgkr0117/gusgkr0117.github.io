@@ -26,4 +26,4 @@ titles:
 comments: false
 ---
 
-* Topic : Mathematics, Cryptography, Computer Science
+* Topic : Isogeny, Elliptic Curve, Post Quantum Cryptography, Quantum Analysis
