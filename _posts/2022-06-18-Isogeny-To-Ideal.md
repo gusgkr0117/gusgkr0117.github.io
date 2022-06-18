@@ -30,7 +30,7 @@ left $\mathcal{O}_1$-ideal $I$가 어떤 isogeny $\phi:E_1 \rightarrow E_2$에 �
 
 > 일단 SQISign의 환경과 같이 주어지는 left ideal $I$의 norm은 $\mathcal{l}^e$ 꼴을 가진다고 하자.
 
-$E(\mathbb{F}\_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}\_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $\#E(\mathbb{F}\_{p^2})$ 으로 제한된다. 만일 주어진 ideal의 norm이 $\#E(\mathbb{F}\_{p^2})$ 값을 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}\_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.
+$E(\mathbb{F}\_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}\_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $E(\mathbb{F}\_{p^2})$ 의 점 개수로 제한된다. 만일 주어진 ideal의 norm이 $E(\mathbb{F}\_{p^2})$의 점 개수를 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}\_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.
 
 $n(I) = \mathcal{l}^e$이라고 하자. $\mathbb{F}_{p^2}$위에서 표현할 수 있는 최대 degree가 $\mathcal{l}^f$라고 할 때, $e > f$인 경우, ideal $I$를 분해해야 한다. 이는 아래와 같이 수행할 수 있다.
 
@@ -123,6 +123,46 @@ GEN gamma_conj = alg_conj(A, gamma);
     GEN H2_two = lideal_create(A, order, gamma_conj, powuu(2, e2));
 
     odd_isogeny psi_2 = ideal_to_isogeny_O0_T(H2_odd, famat_Z_gcd(famat_mul(global_setup.gen_p_plus_fact, global_setup.gen_p_minus_fact),lideal_norm(H2_odd)));
+
+...
+
+    two_walk phi_2 = ideal_to_isogeny_O0_two(H2_two);
 ```
 
-`psi_1`을 계산한 이후엔 $\bar{\gamma}$에 해당하는 `gamma_conj` 값을 이용해 ideal `H2_odd`를 만든다.
+`psi_1`을 계산한 이후엔 $\bar{\gamma}$에 해당하는 `gamma_conj` 값을 이용해 ideal `H2_odd`와 `H2_two`를 만든다. 각각은 $n(L)/T$와 $2^{f_2}$ degree를 가진다. `H2_odd`는 `ideal_to_isogeny_O0_T`라는 함수를 통해 미리 계산된 endomorphism action들을 이용해 isogeny `psi_2`로 변환할 수 있으며, `H2_two`는 `ideal_to_isogeny_O0_two` 함수를 이용해 마찬가지로 isogeny `phi_2`로 변환 후, `psi_2`를 이용해 push forward한다. 이 때 `psi_2`만큼의 odd degree isogeny 연산이 들어간다.
+
+```c++
+    proj from = psi_1_dual_source, from0 = psi_1_dual_source;
+    proj to = phi_2_adjusted_target; // phi_2 source
+    two_walk_long phi_2_dual_eta;
+    init_trivial_two_walk_long(&phi_2_dual_eta);
+
+    if (dist > 0) {
+        bool done;
+        assert(dist != 1); // for now, the case dist == 1 crashes
+        done = MITM2(&eta, &from, &to, dist);
+        assert(done);
+        two_walk_composition_ss(&phi_2_dual_eta, &phi_2_dual, &eta);
+    }
+    else {
+        two_walk_stol(&phi_2_dual_eta, &phi_2_dual);
+    }
+```
+
+`psi_1`과 `phi_2`를 얻은 후, `psi_1`의 codomain curve `from`과 `phi_2`의 codomain curve `to` 사이에 degree가 $2^\Delta$인 isogeny를 `MITM` 함수를 이용해 meet-in-the-middle 방식으로 찾는다. 이렇게 찾은 $2^\Delta$-degree isogeny가 `eta`이다.
+
+```c++
+    phi_L->source = global_setup.E0;
+    phi_L->phi1 = psi_2;
+
+    phi_L->phi2_dual_set = false;
+
+    // since psi_1_dual has already been computed...
+    phi_L->middle = psi_1_dual_source; // = psi_1_dual_source
+    phi_L->phi2 = push_odd_isogeny_through_two_walk_long(&psi_1_dual, &phi_L->middle, &phi_2_dual_eta);
+
+    phi_L->phi2_set = true;
+```
+
+그 다음엔 `psi_1_dual`을 `phi_2_dual_eta`를 통해 push forward하고, 이를 `phi_L->phi2`에 저장한다. 이는 2의 지수승 degree를 갖는 isogeny를 연산하는 것이므로 연산량이 많지 않다. ideal `L_`에 대응되는 isogeny $\phi_L$은 위 코드와 같이 `phi_L->phi1 = psi_2`와 `phi_L->phi2`의 합성으로 구성됨을 알 수 있다.
+
