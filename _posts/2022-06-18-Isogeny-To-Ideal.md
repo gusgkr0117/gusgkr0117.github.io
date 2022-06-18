@@ -30,7 +30,7 @@ left $\mathcal{O}_1$-ideal $I$가 어떤 isogeny $\phi:E_1 \rightarrow E_2$에 �
 
 > 일단 SQISign의 환경과 같이 주어지는 left ideal $I$의 norm은 $\mathcal{l}^e$ 꼴을 가진다고 하자.
 
-$E(\mathbb{F}\_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}\_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $\#E(\mathbb{F}\_{p^2})$ 으로 제한된다. 만일 주어진 ideal의 norm이 $\#E(\mathbb{F}_{p^2})$ 값을 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}\_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.
+$E(\mathbb{F}\_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}\_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $\#E(\mathbb{F}\_{p^2})$ 으로 제한된다. 만일 주어진 ideal의 norm이 $\#E(\mathbb{F}\_{p^2})$ 값을 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}\_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.
 
 $n(I) = \mathcal{l}^e$이라고 하자. $\mathbb{F}_{p^2}$위에서 표현할 수 있는 최대 degree가 $\mathcal{l}^f$라고 할 때, $e > f$인 경우, ideal $I$를 분해해야 한다. 이는 아래와 같이 수행할 수 있다.
 
@@ -70,7 +70,7 @@ void ideal_to_isogeny_two_2f_delta(two_walk_long *phi, GEN *L,
 인 degree $\mathcal{l}^{f}$인 ideal $I_1$에 대응되는 isogeny를 $\phi_1$이라고 할 때, $\phi_1 \circ \phi_K($`torsion_basis`$)$를 계산한 값이다.
 * `phi_K_target`은 $\phi_1 \circ \phi_K$의 codomain curve를 의미한다.
 * `delta`는 meet-in-the-middle을 수행하기 위한 degree $\Delta$를 의미한다.
-* ideal `I_long`은 ideal `I`에 포함되면서 degree가 $\mathcal{l}^{total}$인 앞으로 변환하고자 하는 나머지 ideal을 의미한다.
+* ideal `I_long`은 ideal `I`에 포함되면서 degree가 $\mathcal{l}^{rest}$인 앞으로 변환하고자 하는 나머지 ideal을 의미한다.
 
 출력 값은 아래와 같다.
 * `phi`는 degree가 $\mathcal{l}^{2f+\Delta}$이면서 $E_1 \rightarrow E_2$인 isogeny를 의미한다.
@@ -95,3 +95,34 @@ GEN L_;
     }
 ```
 
+`alpha`는 $J\cdot \alpha = K$를 만족하는 $\alpha \in J$를 구한 값으로, $I\cdot \alpha$는 `I`에서 `J`에 해당하는 부분만 `K`로 변환하는 것을 의미한다. 이렇게 나온 ideal `M`은 $2^e$ 꼴의 degree를 갖는다. ideal `M`을 계산하는 이유는 odd smooth degree이면서 `I`와 equivalent한 ideal `L_`을 만들기 위해서이다. 이를 위해서는 KLPT 알고리즘을 사용해야하는데 앞서 설명했듯이 이를 위해서는 입력 값으로 들어가는 ideal의 degree가 원하는 odd smooth degree와 서로소여야 한다. 이를 위해서 $2^e$ 꼴의 degree를 갖는 ideal `M`을 계산할 필요가 있었던 것이다.
+
+```c++
+GEN a = lideal_isom(J, K); // J*a = K
+    if (gcmp(lideal_norm(K), gen_1) == 0) { a = alg_scalar(A,gen_1); /* make sure we don't apply a distorsion */ }
+
+    GEN M = lideal_mul(I, a);
+    assert(lideal_isom(L_,M));
+    GEN b = lideal_isom(L_,M); // L_*gamma = M
+    GEN gamma = gmul(b, lideal_norm(L_));
+
+    GEN n;
+    alg_primitive(&n, A, order, gamma);
+    assert(gcmp(n,gen_1) == 0);
+
+
+
+    GEN H1_odd = lideal_create(A, order, gamma, ggcd(global_setup.gen_odd_torsion, lideal_norm(L_)));
+```
+
+다음은 `gamma` 값을 계산해 이를 generator로 하는 degree `T`의 left $\mathcal{O}_0$-ideal `H1_odd`를 만드는 과정이다. 이렇게 만든 ideal `H1_odd`를 통해 대응되는 isogeny kernel을 미리 계산해둔 `T`-torsion basis에 대한 계수로 표현하고, `phi_K_basis`에 바로 곱해서 더해주면, isogeny 연산 필요없이 바로 push forward된 isogeny $H_1$의 kernel을 얻을 수 있다. 해당 isogeny가 코드에서 `psi_1`이고, 이의 dual isogeny가 `psi_1_dual`이다.
+
+```c++
+GEN gamma_conj = alg_conj(A, gamma);
+    GEN H2_odd = lideal_create(A, order, gamma_conj, gdiv(lideal_norm(L_), lideal_norm(H1_odd)));
+    GEN H2_two = lideal_create(A, order, gamma_conj, powuu(2, e2));
+
+    odd_isogeny psi_2 = ideal_to_isogeny_O0_T(H2_odd, famat_Z_gcd(famat_mul(global_setup.gen_p_plus_fact, global_setup.gen_p_minus_fact),lideal_norm(H2_odd)));
+```
+
+`psi_1`을 계산한 이후엔 $\bar{\gamma}$에 해당하는 `gamma_conj` 값을 이용해 ideal `H2_odd`를 만든다.
