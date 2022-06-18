@@ -24,13 +24,13 @@ $\mathcal{O}_0$의 basis들을 활용해 원하는 norm을 가지는 원소 $\be
 
 left $\mathcal{O}_1$-ideal $I$가 어떤 isogeny $\phi:E_1 \rightarrow E_2$에 대응된다는 것은 알겠는데, left ideal $I$가 주어졌을 때, 대응되는 isogeny를 어떻게 practical하게 계산할 수 있을까? 실제 서명기법에서 활용하기 위해서는 어떻게 효율적으로 계산할 수 있을까?
 
-일단 "효율적으로 계산할 수 있는 Isogeny"란 무엇인가 생각해보아야 한다. Isogeny의 kernel point들이 모두 적절히 낮은 차원의 field extension $\mathbb{F}_{p^n}$ 위에서 정의된다면, Velu's formula를 이용해 효율적으로 계산할 수 있을 것이다. "적절히 낮은 차원"의 기준을 $\mathbb{F}_{p^2}$ 이라고 한다면, 우리는 모든 연산을 $\mathbb{F}_{p^2}$ 위에서 수행하고 싶은 상황이다.
+일단 "효율적으로 계산할 수 있는 Isogeny"란 무엇인가 생각해보아야 한다. Isogeny의 kernel point들이 모두 적절히 낮은 차원의 field extension $\mathbb{F}\_{p^n}$ 위에서 정의된다면, Velu's formula를 이용해 효율적으로 계산할 수 있을 것이다. "적절히 낮은 차원"의 기준을 $\mathbb{F}\_{p^2}$ 이라고 한다면, 우리는 모든 연산을 $\mathbb{F}\_{p^2}$ 위에서 수행하고 싶은 상황이다.
 
 ### Ideal을 분해하자
 
 > 일단 SQISign의 환경과 같이 주어지는 left ideal $I$의 norm은 $\mathcal{l}^e$ 꼴을 가진다고 하자.
 
-$E(\mathbb{F}_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $\#E(\mathbb{F}_{p^2})$ 으로 제한된다. 만일 주어진 ideal의 norm이 $\#E(\mathbb{F}_{p^2})$ 값을 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.
+$E(\mathbb{F}\_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}\_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $\#E(\mathbb{F}\_{p^2})$ 으로 제한된다. 만일 주어진 ideal의 norm이 $\#E(\mathbb{F}_{p^2})$ 값을 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}\_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.
 
 $n(I) = \mathcal{l}^e$이라고 하자. $\mathbb{F}_{p^2}$위에서 표현할 수 있는 최대 degree가 $\mathcal{l}^f$라고 할 때, $e > f$인 경우, ideal $I$를 분해해야 한다. 이는 아래와 같이 수행할 수 있다.
 
