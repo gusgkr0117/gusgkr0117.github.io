@@ -6,6 +6,9 @@ use_math: true
 key: post_20240225
 ---
 
+* Computing the isomorphism between given two Montgomery curves
+* Usefulness of 2-torsion points on Montgomery curves
+
 Implementing [FESTA](https://eprint.iacr.org/2023/660)(Isogeny based PKE), I needed to implement the point evaluation through an isomorphism between given two curves. I looked it up and couldn't find any paper explaining about this. Possibly i'm the only one who couldn't find it. Anyway I decided to derive a proper algorithm for this myself. In this article, I will explain how I did to compute the isomorphism in an efficient way when two distinct Montgomery curves are given as input.
 
 ## Isomorphism between two Montgomery curves
