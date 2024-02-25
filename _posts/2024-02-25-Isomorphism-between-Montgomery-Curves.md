@@ -1,7 +1,7 @@
 ---
 title: Isomorphism between Montgomery Curves
 subtitle: Efficient Computation of Isomorphism
-tags: Mathematics
+tags: Mathematics, PQCrypto
 use_math: true
 key: post_20240225
 ---
