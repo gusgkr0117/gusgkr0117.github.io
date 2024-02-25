@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="en">
   <head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Montgomery Multiplication - Manbo's blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"><title>Ideal To Isogeny - Manbo's blog</title>
 
-<meta name="description" content="Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.  $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)">
-<link rel="canonical" href="http://localhost:4000/2021/01/31/Montgomery-Multiplication.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
+<meta name="description" content="Deuring Correspondence에 의하면 Isogeny와 Ideal은 대응관계에 있다.  Supersingular elliptic curve $E$에 대해서 maximal order $\mathcal{O}$에 대해 $\mathrm{End}(E) \cong \mathcal{...">
+<link rel="canonical" href="http://localhost:4000/2022/06/18/Isogeny-To-Ideal.html"><link rel="alternate" type="application/rss+xml" title="Manbo's blog" href="/feed.xml"><!-- start favicons snippet, use https://realfavicongenerator.net/ --><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png"><link rel="manifest" href="/assets/site.webmanifest"><link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5"><link rel="shortcut icon" href="/assets/favicon.ico">
 
 <meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/browserconfig.xml">
 
@@ -383,13 +383,13 @@ const randNum = Math.floor(Math.random() * bgList.length);
 
 bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__content"><div class ="main"><div class="article__info clearfix"><ul class="left-col menu"><li>
               <a class="button button--secondary button--pill button--sm"
-                href="/archive.html?tag=Mathematics">Mathematics</a>
-            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Jan 31, 2021</span>
-            </li></ul></div><div class="article__header"><header><h1>Montgomery Multiplication</h1></header><span class="split-space">&nbsp;</span>
+                href="/archive.html?tag=PQCrypto">PQCrypto</a>
+            </li></ul><ul class="right-col menu"><li><i class="far fa-calendar-alt"></i> <span>Jun 18, 2022</span>
+            </li></ul></div><div class="article__header"><header><h1>Ideal To Isogeny</h1></header><span class="split-space">&nbsp;</span>
           <a class="edit-on-github"
             title="Edit on Github"
-            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2021-01-31-Montgomery-Multiplication.md">
-            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">Montomery Multiplication 이해하기</p><a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgusgkr0117.github.io&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false"/></a></div></div>
+            href="https://github.com/gusgkr0117/gusgkr0117.github.io/tree/main/_posts/2022-06-18-Isogeny-To-Ideal.md">
+            <i class="far fa-edit"></i></a></div><p class="overlay__excerpt">Ideal을 Isogeny로 변환하는 방법(SQISign 참조)</p><a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgusgkr0117.github.io&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false"/></a></div></div>
               </div>
             </div><div class ="main"><div class="grid grid--reverse">
 
@@ -399,193 +399,177 @@ bg.style.backgroundImage = `url(${bgList[randNum]})`;</script><div class="hero__
               <div class="col-main cell cell--auto"><!-- start custom main top snippet -->
 
 <!-- end custom main top snippet -->
-<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Montgomery Multiplication"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2021-01-31T00:00:00+09:00">
-    <meta itemprop="keywords" content="Mathematics"><div class="js-article-content"><div class="layout--article"><!-- start custom article top snippet -->
+<article itemscope itemtype="http://schema.org/Article"><meta itemprop="headline" content="Ideal To Isogeny"><meta itemprop="author" content="manbo"/><meta itemprop="datePublished" content="2022-06-18T00:00:00+09:00">
+    <meta itemprop="keywords" content="PQCrypto"><div class="js-article-content"><div class="layout--article"><!-- start custom article top snippet -->
 
 <!-- end custom article top snippet -->
 <div class="article__content" itemprop="articleBody"><ul>
-  <li>Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.</li>
-  <li>$\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)</li>
+  <li>Deuring Correspondence에 의하면 Isogeny와 Ideal은 대응관계에 있다.</li>
+  <li>Supersingular elliptic curve $E$에 대해서 maximal order $\mathcal{O}$에 대해 $\mathrm{End}(E) \cong \mathcal{O}$를 만족할 때, $E$를 codomain으로 가지는 isogeny $\phi:E \rightarrow E’$은 left $\mathcal{O}$-ideal $I$에 대응된다.</li>
+  <li>Isogeny 기반 서명 기법인 SQISign에서 서명 시 가장 오래걸리는 부분이 바로 $\mathcal{l}^e$-Ideal을 Isogeny로 변환하는 과정이다.</li>
 </ul>
 
 <!--more-->
 
-<h2 id="빠른-모듈러-곱의-철학">빠른 모듈러 곱의 철학</h2>
+<h2 id="klpt-알고리즘">KLPT 알고리즘</h2>
 
-<p>소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다.
-단순한 방법으로 $a \cdot b$를 수행하고 이 값이 $p$보다 작아질 때까지 $p$를 빼주면 된다.
-조금 더 개선한 방법으로는 $0 \leq a \cdot b - k \cdot p &lt; p$를 만족하는 k를 $[0,p)$ 구간에서 binary search 해주는 방법이 있겠다. 이는 대략 $O(\log p)$의 시간복잡도를 가진다.</p>
+<p>KLPT 알고리즘은 임의의 ideal $I$가 주어졌을 때, ideal $I$와 equivalent하면서 원하는 norm을 가지는 다른 ideal $J$를 찾는 알고리즘이다. KLPT 알고리즘은 따로 포스팅을 통해 다루기로하고, 여기서는 KLPT 알고리즘이 IdealToIsogeny에서 어떤 역할을 하고, 이를 어떻게 활용하는지에 대해서만 짚고 넘어가도록 하겠다.</p>
 
-<p>Modular 곱셈에서는 modular $p$를 해주는 연산이 가장 오래걸린다. modular 연산에 걸리는 시간을 효율적으로 줄이는게 Modular Multiplication 연산을 빠르게 수행할 수 있는 방법이다.</p>
+<p>기본적인 KLPT 알고리즘은 special $p$-extremal maximal order $\mathcal{O}_0$의 특성을 활용한다. $\mathcal{O}_0$에는 $\mathbb{Z} + i\mathbb{Z} + j\mathbb{Z} + ij\mathbb{Z}$를 suborder로 포함하고 있다는 특징을 가지며, $\mathcal{O}_0$의 basis는 $1, i, \frac{i + j}{2}, \frac{1 + ij}{2}$이고, supersingular elliptic curve $E(\bar{\mathbb{F}_p}) : y^2 = x^3 + x$의 endomorphism ring과 isomorphic 하다는 것이 알려져있다. 이러한 특별한 maximal order $\mathcal{O}_0$를 이용해 원하는 ideal을 계산하는 것이 KLPT 알고리즘의 핵심이다.</p>
 
-<p>그런데 이진수를 사용한다면, $p = 2^k$꼴인 $p$에 대해서는 modular 연산이 k개의 least significant bit를 남기고 지우는 행위와 같다는 것을 알 수 있다. 이는 AND 논리 연산으로 아주 간단히 구현할 수 있다. $p \&amp; (2^k-1)$을 연산하면 되기 때문이다. 이러한 점에서 착안해 modular $p$연산을 modular $2^k$연산으로 변환하여 연산을 빠르게 수행하려는 것이 Montgomery Multiplication의 철학이다.</p>
+<p>$\mathcal{O}_0$의 basis들을 활용해 원하는 norm을 가지는 원소 $\beta \in I \subset \mathcal{O}_0$를 찾게 되는데, 원하는 norm 값이 $N$이라면, $\gcd(N,n(I)) = 1$을 만족해야만 해 $\beta$를 구할 수 있다.</p>
 
-<h2 id="montgomery-reduction">Montgomery reduction</h2>
+<h2 id="ideal을-isogeny로-변환">Ideal을 Isogeny로 변환</h2>
 
-<p>$a \cdot b$의 값을 $[0,p-1]$사이로 reduction 시킨다는 것은 수의 길이를 줄인다는 의미이다. 수의 길이를 줄이는 가장 빠른 방법은 당연히 right shift 연산을 통해 lsb를 버리는 방법이다. 그렇다면 right shift를 통해서 reduction 시킬 수 있는 상황이 존재할까?</p>
+<p>left $\mathcal{O}_1$-ideal $I$가 어떤 isogeny $\phi:E_1 \rightarrow E_2$에 대응된다는 것은 알겠는데, left ideal $I$가 주어졌을 때, 대응되는 isogeny를 어떻게 practical하게 계산할 수 있을까? 실제 서명기법에서 활용하기 위해서는 어떻게 효율적으로 계산할 수 있을까?</p>
 
-<p>right shift는 $2^k$로 나누는 연산이므로 $2^k$로 나누어서 $a \cdot b$를 얻을 수 있어야한다. 여기서 Montgomery form의 아이디어가 발생한다. 모듈러 곱 연산을 할 때마다 $2^k$로 나누는 연산을 해야만 하도록 만들기 위해서 우리는 $a$와 $b$로부터 $a \cdot b$를 얻는 것 대신에 $a \cdot 2^k$와 $b \cdot 2^k$로부터 $a \cdot b \cdot 2^k$를 얻도록 만들 것이다. 이러면 자연스럽게 $ a2^k \cdot b2^k$를 연산해준 다음 $2^k$를 다시 나누어줘야 한다. 이렇게 되면 이왕 $2^k$로 나눠주어야 하는 김에 right shift 연산으로 길이도 $\log p$로 줄여서 자연스럽게 $ab2^k$ 값이 $[0,p-1]$ 안에 들어오도록 만들 수 있다.</p>
+<p>일단 “효율적으로 계산할 수 있는 Isogeny”란 무엇인가 생각해보아야 한다. Isogeny의 kernel point들이 모두 적절히 낮은 차원의 field extension $\mathbb{F}_{p^n}$ 위에서 정의된다면, Velu’s formula를 이용해 효율적으로 계산할 수 있을 것이다. “적절히 낮은 차원”의 기준을 $\mathbb{F}_{p^2}$ 이라고 한다면, 우리는 모든 연산을 $\mathbb{F}_{p^2}$ 위에서 수행하고 싶은 상황이다.</p>
 
-<p>그래도 아직 충분하지 않다. 우리는 $T = (a2^k \mod p) \times (b2^k \mod p)$를 $R = 2^k$로 나누는 연산을 수행할 때, right shift 연산을 사용하고 싶은건데 $T$ 값은 밑에서 $k$ 비트 만큼이 모두 0이라는 보장이 없기 때문이다. $p$값을 적절히 더해줘서 $k$만큼의 lsb를 0으로 만들어주면 그제서야 right shift를 사용할 수 있다.</p>
+<h3 id="ideal을-분해하자">Ideal을 분해하자</h3>
 
-<p>$p$를 $n$번 더해줘야 $T$ 값을 우리가 원하는 형태로 만들 수 있다고 하면, $T + np \equiv 0 \mod R$ 식을 만족하는 $n$을 찾아야한다. 식을 다시쓰면,</p>
+<blockquote>
+  <p>일단 SQISign의 환경과 같이 주어지는 left ideal $I$의 norm은 $\mathcal{l}^e$ 꼴을 가진다고 하자.</p>
+</blockquote>
 
-<center>$n \equiv T \times (-1 \times p^{-1}) \mod R$</center>
+<p>$E(\mathbb{F}_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $E(\mathbb{F}_{p^2})$ 의 점 개수로 제한된다. 만일 주어진 ideal의 norm이 $E(\mathbb{F}_{p^2})$의 점 개수를 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.</p>
 
-<p>이 된다. $p$는 고정되어 있으므로, $p’ = ((-1 \times p^{-1}) \mod R)$은 미리 계산해서 저장해두면, $Tp’ \mod R$만 계산하면 된다. 이 모듈러 곱은 AND 연산으로 간단히 수행될 것이다. $\lfloor (T + np)/R \rfloor$를 계산하면 크기 범위는 $[0, \lfloor (p-1)^2/R \rfloor + (p-1)]$이 될 것이다. $k = \lceil \log p \rceil$라고 하면, $R = 2^k \geq p-1$이므로, $\lfloor ((p-1)^2/R) \rfloor \leq (p-1)$가 된다. 정리하면, 아래와 같은 결론을 내릴 수 있다.</p>
+<p>$n(I) = \mathcal{l}^e$이라고 하자. $\mathbb{F}_{p^2}$위에서 표현할 수 있는 최대 degree가 $\mathcal{l}^f$라고 할 때, $e &gt; f$인 경우, ideal $I$를 분해해야 한다. 이는 아래와 같이 수행할 수 있다.</p>
 
-<center><b>$k \geq \lceil \log p \rceil$이면, $\lfloor (T + np)/R \rfloor$는 $[0, 2(p-1)]$ 범위 안에 들어온다.</b></center>
+<p>$I = \mathcal{O}&lt;\alpha, l^e&gt;$이라고 할 때, $I_i = \mathcal{O}&lt;\alpha, l^{if}&gt;$ for $i \in [1,\lfloor e/f\rfloor]$라고 하면, $I \subset I_{\lfloor e/f\rfloor} \subset … \subset I_2 \subset I_1$을 만족한다. $I_i$에 대응되는 isogeny를 $\phi_i$라고 하면, 이를 이용해서 $\phi$를 degree가 $\mathcal{l}^f$보다 작은 isogeny들로 분해할 수 있다.</p>
 
-<p>$k = \lceil \log p \rceil$일 때, $T \in [0, (p-1)^2]$을 입력 받아서 미리 계산해둔 $p’ = ((-1 \times p^{-1}) \mod R)$를 이용해서 $n = (T \times p’ \mod R)$을 계산하고, $T + np$를 $k$-right shift 해주면 $T$에 대한 montgomery reduction이 된다.</p>
+<h3 id="smooth-odd-degree-isogeny의-필요성">Smooth Odd Degree Isogeny의 필요성</h3>
 
-<p>montgomery reduction을 통해 modular reduction을 수행한다면 곱셈 한번과 덧셈 한번만큼의 연산만 필요하기 때문에 앞서 생각한 binary search보다는 훨씬 많은 연산을 줄인다는 것을 알 수 있다.</p>
+<blockquote>
+  <p>여기서 “odd”가 들어가는 이유는 SQISign에서 실제로는 $l=2$로 사용하기 때문이다. 즉, $l$과 coprime인 smooth degree isogeny의 필요성을 의미한다. 여기서부터는 $l=2$로 가정하고 설명하도록 하겠다.</p>
+</blockquote>
 
-<p>이를 pseudo code로 표현하면 아래와 같다.</p>
+<p>left $\mathcal{O}$-ideal $I$의 generator가 $\alpha \in I$라고 할 때, $\alpha$가 실제로 codomain curve $E$에서 어떤 endomorphism에 해당되는지 알아야지 대응되는 $\phi_I$의 kernel을 구할 수 있을 것이다. 하지만 $\mathcal{O}$와 $\mathrm{End}(E)$의 일대일 대응관계를 바로 알아내기가 어렵기 때문에 우리는 sepcial maximal order인 $\mathcal{O}_0$를 활용해야 한다.</p>
 
-<h3 id="montgomery-reduction-algorithm">Montgomery reduction algorithm</h3>
+<p>$\mathcal{O}_0$를 활용하기 위해서 $\mathcal{O}_0$으로 pull back한 후에, 대응되는 isogeny의 kernel을 구하고, 해당 kernel의 basis를 다시 curve $E$로 push forward 해줄것이다. 그렇다면 $E_0$에서 $E$로 가는 isogeny $\phi_J$가 필요할 것이고, push forward와 pull back을 이용하기 위해서는 $\gcd(n(I), n(J))=1$이라는 조건이 필요하다. 우리가 $I$의 degree는 $\mathcal{l}^e$ 꼴이라는 것을 알고 있으므로, $\mathcal{l}=2$일 때, ideal $J$ degree는 odd이기만 하면 된다. 또한 push forward를 위해서는 $\phi_J$에 대한 point evaluation 연산이 필요하기 때문에 odd이면서 smooth degree를 가져야만 효율적인 연산이 가능하다.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k = ceil(log p)
-function REDC is
-    input: Integers R=2^k and p with gcd(R, p) = 1,
-           Integer p′ in [0, R − 1] such that NN′ ≡ −1 mod R,
-           Integer T in the range [0, Rp − 1].
-    output: Integer S in the range [0, p − 1] such that S ≡ TR^(-1) mod p
+<blockquote>
+  <p>다시말해 special order $\mathcal{O}_0$를 활용하기 위해서는 coprime이면서 smooth degree를 갖는 isogeny $\phi_J$를 이용해서 $\mathcal{O}_0$에서 계산한 $\mathcal{l}^e$ degree의 isogeny를 “밀어”(push forward)주어야한다. 따라서 odd smooth isogeny와 odd smooth isogeny computation이 필요하다.</p>
+</blockquote>
 
-    n ← ((T mod R)p′) mod R
-    t ← (T + np) / R
-    if t ≥ p then
-        return t − p
-    else
-        return t
-    end if
-end function
+<h3 id="meet-in-the-middle과-l2fdelta-isogeny">Meet-in-the-Middle과 $l^{2f+\Delta}$-isogeny</h3>
+
+<p>large odd degree isogeny를 연산하는 것은 꽤 오래걸리는 작업이기 때문에 odd degree isogeny 연산 횟수를 줄이는 것이 서명 기법을 빠르게하는 핵심 아이디어가 된다. ideal $I$를 많은 개수의 ideal로 분해할수록 odd degree isogeny의 연산 횟수가 늘어날 것이기 때문에 최대한 적게 분해되도록 해야한다. 이를 위해 SQISign 저자는 meet-in-the-middle을 활용하는 아이디어를 제안했다.</p>
+
+<p>원래는 $\mathcal{l}^{2f}$-degree의 ideal을 isogeny로 변환하려면 odd degree isogeny 연산을 두 번 수행해야 할 것이다. 하지만 저자는 여기에 meet-in-the-middle을 활용하면 작은 degree $\mathcal{l}^{\Delta}$를 가지는 ideal에 한해서는 odd degree isogeny 연산을 할 필요없이 전수조사를 통해서 isogeny로 변환할 수 있다는 사실을 적용했다. 즉, odd degree isogeny 연산을 두 번 수행했을 때, $\mathcal{l}^{2f+\Delta}$만큼의 isogeny를 얻게되기 때문에 변환 속도가 더 빨라지게 된다.</p>
+
+<h3 id="sqisign의-ideal_to_isogeny_two_2f_delta-함수-코드리딩">SQISign의 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_two_2f_delta</code> 함수 코드리딩</h3>
+
+<p>앞서 설명한 $2^{2f+\Delta}$ degree인 ideal $I$를 isogeny로 변환하는 방식이 <a href="https://github.com/SQISign/sqisign">SQISign Git</a>에 오픈소스로 구현이 되어 있다. 해당 섹션에서는 idiso.c에 구현되어있는 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_two_2f_delta</code> 함수가 어떻게 구현되어 있는지 따라가보고자 한다.</p>
+
+<p>일단 함수의 인자 값은 아래와 같다.</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">ideal_to_isogeny_two_2f_delta</span><span class="p">(</span><span class="n">two_walk_long</span> <span class="o">*</span><span class="n">phi</span><span class="p">,</span> <span class="n">GEN</span> <span class="o">*</span><span class="n">L</span><span class="p">,</span>
+    <span class="n">special_isogeny</span> <span class="o">*</span><span class="n">phi_L</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">I</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">J</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">K</span><span class="p">,</span>
+    <span class="n">proj</span> <span class="o">*</span><span class="n">phi_K_basis</span><span class="p">,</span> <span class="n">proj</span> <span class="o">*</span><span class="n">phi_K_target</span><span class="p">,</span> <span class="kt">int</span> <span class="n">delta</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">I_long</span><span class="p">)</span>
 </code></pre></div></div>
-<p><a href="https://en.wikipedia.org/wiki/Montgomery_modular_multiplication">wiki 참조</a></p>
+<p>변환하고자하는 ideal의 domain을 $E_1$, codomain을 $E_2$라고 할 때, 각 인자에 대한 설명은 아래와 같다.</p>
+<ul>
+  <li>ideal <code class="language-plaintext highlighter-rouge">J</code>는 odd smooth degree이면서 $E_0 \rightarrow E_1$인 left $\mathcal{O}_0$-ideal이다.</li>
+  <li>ideal <code class="language-plaintext highlighter-rouge">I</code>는 변환하고자 하는 ideal과 ideal <code class="language-plaintext highlighter-rouge">J</code>를 합성하여 degree가 $n(J)\cdot \mathcal{l}^{2f+\Delta}$이면서 $E_0 \rightarrow E_2$인 left $\mathcal{O}_0$-ideal이다.</li>
+  <li>ideal <code class="language-plaintext highlighter-rouge">K</code>는 ideal <code class="language-plaintext highlighter-rouge">J</code>와 equivalent하면서 degree가 $\mathcal{l}^e$꼴인 left $\mathcal{O}_0$-ideal 이다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_K_basis</code>는 <code class="language-plaintext highlighter-rouge">I</code> $\subset I_1 \cdot$ <code class="language-plaintext highlighter-rouge">K</code>
+인 degree $\mathcal{l}^{f}$인 ideal $I_1$에 대응되는 isogeny를 $\phi_1$이라고 할 때, $\phi_1 \circ \phi_K($<code class="language-plaintext highlighter-rouge">torsion_basis</code>$)$를 계산한 값이다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_K_target</code>은 $\phi_1 \circ \phi_K$의 codomain curve를 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">delta</code>는 meet-in-the-middle을 수행하기 위한 degree $\Delta$를 의미한다.</li>
+  <li>ideal <code class="language-plaintext highlighter-rouge">I_long</code>은 ideal <code class="language-plaintext highlighter-rouge">I</code>에 포함되면서 degree가 $\mathcal{l}^{rest}$인 앞으로 변환하고자 하는 나머지 ideal을 의미한다.</li>
+</ul>
 
-<h2 id="multi-precision-reduction">Multi-precision reduction</h2>
+<p>출력 값은 아래와 같다.</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">phi</code>는 degree가 $\mathcal{l}^{2f+\Delta}$이면서 $E_1 \rightarrow E_2$인 isogeny를 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">L</code>은 odd smooth degree이면서 $E_0 \rightarrow E_1$인 ideal을 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_L</code>은 <code class="language-plaintext highlighter-rouge">L</code>에 대응되는 isogeny를 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_K_basis</code>와 <code class="language-plaintext highlighter-rouge">phi_K_target</code>에는 다음 ideal 변환과정에 사용할 basis와 codomain curve가 들어간다.</li>
+</ul>
 
-<p>지금까지는 $R = 2^k$인 일반적인 경우를 생각했지만, 컴퓨터의 연산단위는 8-bit, 16-bit, 32-bit, 64-bit와 같이 고정되어 있다. 따라서 이에 맞게 연산을 해주는게 더 빠를 것이다. 대표적인 예로 8-bit인 경우, 8-bit 크기의 레지스터에서 곱셈 또는 덧셈 연산을 하면 자동적으로 $2^8$에 대한 모듈러 곱셈, 덧셈을 연산하게 된다.</p>
+<p>다음은 함수의 초반부이다.</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GEN</span> <span class="n">L_</span><span class="p">;</span>
 
-<p>그런데 앞에서 $k \geq \lceil \log p \rceil$ 조건이 있어야한다고 언급했는데 어떻게 $k$를 8, 16, 32, 64와 같은 값으로 줄일 수 있을까?</p>
+    <span class="k">if</span> <span class="p">(</span><span class="n">len_step</span> <span class="o">+</span> <span class="n">Z_lval</span><span class="p">(</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dbllog2r</span><span class="p">(</span><span class="n">itor</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">p</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span><span class="o">/</span><span class="mf">2.</span> <span class="o">+</span> <span class="mi">10</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="n">GEN</span> <span class="n">M</span><span class="p">;</span>
+        <span class="n">GEN</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">lideal_isom</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">);</span> <span class="c1">// J*alpha = K</span>
 
-<p>결국 우리가 구하고자 하는 값은 $\lfloor (T + np)/R \rfloor$이므로 레지스터 크기가 8일 때, $k = 8*l \geq \lceil \log p \rceil$꼴인 $k$를 선택해서 $2^8$로 나눠주는 연산을 $l$번 수행하면 된다. 아래와 같은 루틴을 수행한다.</p>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">lideal_mul</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">alpha</span><span class="p">);</span> <span class="c1">// I*alpha, equivalent to I, but norm a power of 2</span>
 
-<p>1) $T+np \equiv 0 \mod 2^8$이 되는 $n \in [0, 2^8-1]$을 찾는다.<br />
-2) $T+np$에 8-right shift를 취한다.<br />
-3) 1), 2)를 $l-1$번 더 반복한다.</p>
-
-<p>자세한 알고리즘은 아래와 같다.</p>
-
-<h3 id="multi-precision-reduction-algorithm">Multi-precision reduction algorithm</h3>
-
-<p>아래 알고리즘은 $k$-right shift를 마지막에 한 번에 수행하는 방식이다. 실제로 right shift를 수행하지 않고, 출력값을 복사할 때, $k$-bit 밀려서 복사하는 방식으로 수행한다. 따라서 연산량이 전혀 들지 않는다</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>B = 2^8 or 2^16 or 2^32
-function MultiPrecisionREDC is
-    Input: Integer p with gcd(B, p) = 1, stored as an array of m words,
-           Integer R = B^r,     --thus, r = log_B(R)
-           Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B),
-           Integer T in the range 0 ≤ T &lt; Rp, stored as an array of r + m words.
-
-    Output: Integer S in [0, p − 1] such that TR^(−1) ≡ S (mod p), stored as an array of m words.
-
-    Set T[r + m] = 0  (extra carry word)
-    for 0 ≤ i &lt; r do
-        --loop1- Make T divisible by Bi+1
-
-        c ← 0
-        n ← T[i] ⋅ p′ mod B
-        for 0 ≤ j &lt; m do
-            --loop2- Add the low word of n ⋅ p[j] and the carry from earlier, and find the new carry
-
-            x ← T[i + j] + n ⋅ p[j] + c
-            T[i + j] ← x mod B
-            c ← ⌊x / B⌋
-        end for
-        for m ≤ j ≤ r + m − i do
-            --loop3- Continue carrying
-
-            x ← T[i + j] + c
-            T[i + j] ← x mod B
-            c ← ⌊x / B⌋
-        end for
-    end for
-
-    for 0 ≤ i ≤ m do
-        S[i] ← T[i + r]
-    end for
-
-    if S ≥ p then
-        return S − p
-    else
-        return S
-    end if
-end function
+        <span class="n">L_</span> <span class="o">=</span> <span class="n">klpt_special_smooth_small_2e_input</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">famat_sqr</span><span class="p">(</span><span class="n">famat_mul</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_plus_fact</span><span class="p">,</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_minus_fact</span><span class="p">)));</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">L_</span> <span class="o">=</span> <span class="n">klpt_special_smooth</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">famat_sqr</span><span class="p">(</span><span class="n">famat_mul</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_plus_fact</span><span class="p">,</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_minus_fact</span><span class="p">)));</span>
+    <span class="p">}</span>
 </code></pre></div></div>
 
-<h3 id="multi-precision-multiplication-algorithm">Multi-precision multiplication algorithm</h3>
+<p><code class="language-plaintext highlighter-rouge">alpha</code>는 $J\cdot \alpha = K$를 만족하는 $\alpha \in J$를 구한 값으로, $I\cdot \alpha$는 <code class="language-plaintext highlighter-rouge">I</code>에서 <code class="language-plaintext highlighter-rouge">J</code>에 해당하는 부분만 <code class="language-plaintext highlighter-rouge">K</code>로 변환하는 것을 의미한다. 이렇게 나온 ideal <code class="language-plaintext highlighter-rouge">M</code>은 $2^e$ 꼴의 degree를 갖는다. ideal <code class="language-plaintext highlighter-rouge">M</code>을 계산하는 이유는 odd smooth degree이면서 <code class="language-plaintext highlighter-rouge">I</code>와 equivalent한 ideal <code class="language-plaintext highlighter-rouge">L_</code>을 만들기 위해서이다. 이를 위해서는 KLPT 알고리즘을 사용해야하는데 앞서 설명했듯이 이를 위해서는 입력 값으로 들어가는 ideal의 degree가 원하는 odd smooth degree와 서로소여야 한다. 이를 위해서 $2^e$ 꼴의 degree를 갖는 ideal <code class="language-plaintext highlighter-rouge">M</code>을 계산할 필요가 있었던 것이다.</p>
 
-<p>앞서 설명한 reduction을 이용해 실제 Montgomery 곱셈을 진행한다면 곱셈과 reduction을 하나로 합쳐야한다. 이 둘은 사실 따로 수행할 필요 없이 하나의 함수 안에 약간의 최적화로 수행할 수 있다.</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GEN</span> <span class="n">a</span> <span class="o">=</span> <span class="n">lideal_isom</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">);</span> <span class="c1">// J*a = K</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">gcmp</span><span class="p">(</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="n">gen_1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="n">a</span> <span class="o">=</span> <span class="n">alg_scalar</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">gen_1</span><span class="p">);</span> <span class="cm">/* make sure we don't apply a distorsion */</span> <span class="p">}</span>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>B = 2^8 or 2^16 or 2^32
-function MultiPrecisionREDC is
-    Input: Integer p with gcd(B, p) = 1, stored as an array of m words,
-           Integer R = B^r,     --thus, r = log_B(R)
-           Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B),
-           Integer A in the range 0 ≤ A &lt; p, stored as an array of m words.
-           Integer B in the range 0 ≤ B &lt; p, stored as an array of m words.
+    <span class="n">GEN</span> <span class="n">M</span> <span class="o">=</span> <span class="n">lideal_mul</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">lideal_isom</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span><span class="n">M</span><span class="p">));</span>
+    <span class="n">GEN</span> <span class="n">b</span> <span class="o">=</span> <span class="n">lideal_isom</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span><span class="n">M</span><span class="p">);</span> <span class="c1">// L_*gamma = M</span>
+    <span class="n">GEN</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">gmul</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">lideal_norm</span><span class="p">(</span><span class="n">L_</span><span class="p">));</span>
 
-    Output: Integer S in [0, p − 1] such that ABR^(−1) ≡ S (mod p), stored as an array of m words.
+    <span class="n">GEN</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">alg_primitive</span><span class="p">(</span><span class="o">&amp;</span><span class="n">n</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">gcmp</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">gen_1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
 
-    --initialize array T
-    for 0 ≤ i &lt; r + m do
-    	T[i] = 0
-    end for
 
-    Set T[r + m] = 0  (extra carry word)
 
-    for 0 ≤ i &lt; r do
-        --loop1- Make T divisible by Bi+1
-
-        c ← 0
-        n ← (T[i] + A[0] ⋅ B[i]) ⋅ p′ mod B
-        for 0 ≤ j &lt; m do
-            --loop2- Add n ⋅ p to T
-
-            x ← T[i + j] + n ⋅ p[j] + c
-            T[i + j] ← x mod B
-            c ← ⌊x / B⌋
-        end for
-        T[i + m] ← T[i + m] + c
-
-        c ← 0
-        for 0 ≤ j &lt; m do
-            --loop3- Add A ⋅ B[i] to T
-
-            x ← T[i + j] + A[j] ⋅ B[i] + c
-            T[i + j] ← x mod B
-            c ← ⌊x / B⌋
-        end for
-        T[i + m] ← T[i + m] + c
-
-        --assert- A ⋅ B[i] + n ⋅ p는 B^(m+1)을 넘지 않으므로 더 이상의 캐리가 발생하지 않는다.
-
-    end for
-
-    for 0 ≤ i ≤ m do
-        S[i] ← T[i + r]
-    end for
-
-    if S ≥ p then
-        return S − p
-    else
-        return S
-    end if
-end function
+    <span class="n">GEN</span> <span class="n">H1_odd</span> <span class="o">=</span> <span class="n">lideal_create</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">ggcd</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_odd_torsion</span><span class="p">,</span> <span class="n">lideal_norm</span><span class="p">(</span><span class="n">L_</span><span class="p">)));</span>
 </code></pre></div></div>
 
-<p><a href="https://github.com/gusgkr0117/Montgomery-Multiplication">visual studio c++ source code</a></p>
-</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2021-01-31T00:00:00+09:00"><!-- start custom article footer snippet -->
+<p>다음은 <code class="language-plaintext highlighter-rouge">gamma</code> 값을 계산해 이를 generator로 하는 degree <code class="language-plaintext highlighter-rouge">T</code>의 left $\mathcal{O}_0$-ideal <code class="language-plaintext highlighter-rouge">H1_odd</code>를 만드는 과정이다. 이렇게 만든 ideal <code class="language-plaintext highlighter-rouge">H1_odd</code>를 통해 대응되는 isogeny kernel을 미리 계산해둔 <code class="language-plaintext highlighter-rouge">T</code>-torsion basis에 대한 계수로 표현하고, <code class="language-plaintext highlighter-rouge">phi_K_basis</code>에 바로 곱해서 더해주면, isogeny 연산 필요없이 바로 push forward된 isogeny $H_1$의 kernel을 얻을 수 있다. 해당 isogeny가 코드에서 <code class="language-plaintext highlighter-rouge">psi_1</code>이고, 이의 dual isogeny가 <code class="language-plaintext highlighter-rouge">psi_1_dual</code>이다.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GEN</span> <span class="n">gamma_conj</span> <span class="o">=</span> <span class="n">alg_conj</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">gamma</span><span class="p">);</span>
+    <span class="n">GEN</span> <span class="n">H2_odd</span> <span class="o">=</span> <span class="n">lideal_create</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma_conj</span><span class="p">,</span> <span class="n">gdiv</span><span class="p">(</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">L_</span><span class="p">),</span> <span class="n">lideal_norm</span><span class="p">(</span><span class="n">H1_odd</span><span class="p">)));</span>
+    <span class="n">GEN</span> <span class="n">H2_two</span> <span class="o">=</span> <span class="n">lideal_create</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma_conj</span><span class="p">,</span> <span class="n">powuu</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">e2</span><span class="p">));</span>
+
+    <span class="n">odd_isogeny</span> <span class="n">psi_2</span> <span class="o">=</span> <span class="n">ideal_to_isogeny_O0_T</span><span class="p">(</span><span class="n">H2_odd</span><span class="p">,</span> <span class="n">famat_Z_gcd</span><span class="p">(</span><span class="n">famat_mul</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_plus_fact</span><span class="p">,</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_minus_fact</span><span class="p">),</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">H2_odd</span><span class="p">)));</span>
+
+<span class="p">...</span>
+
+    <span class="n">two_walk</span> <span class="n">phi_2</span> <span class="o">=</span> <span class="n">ideal_to_isogeny_O0_two</span><span class="p">(</span><span class="n">H2_two</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">psi_1</code>을 계산한 이후엔 $\bar{\gamma}$에 해당하는 <code class="language-plaintext highlighter-rouge">gamma_conj</code> 값을 이용해 ideal <code class="language-plaintext highlighter-rouge">H2_odd</code>와 <code class="language-plaintext highlighter-rouge">H2_two</code>를 만든다. 각각은 $n(L)/T$와 $2^{f_2}$ degree를 가진다. <code class="language-plaintext highlighter-rouge">H2_odd</code>는 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_O0_T</code>라는 함수를 통해 미리 계산된 endomorphism action들을 이용해 isogeny <code class="language-plaintext highlighter-rouge">psi_2</code>로 변환할 수 있으며, <code class="language-plaintext highlighter-rouge">H2_two</code>는 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_O0_two</code> 함수를 이용해 마찬가지로 isogeny <code class="language-plaintext highlighter-rouge">phi_2</code>로 변환 후, <code class="language-plaintext highlighter-rouge">psi_2</code>를 이용해 push forward한다. 이 때 <code class="language-plaintext highlighter-rouge">psi_2</code>만큼의 odd degree isogeny 연산이 들어간다.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">proj</span> <span class="n">from</span> <span class="o">=</span> <span class="n">psi_1_dual_source</span><span class="p">,</span> <span class="n">from0</span> <span class="o">=</span> <span class="n">psi_1_dual_source</span><span class="p">;</span>
+    <span class="n">proj</span> <span class="n">to</span> <span class="o">=</span> <span class="n">phi_2_adjusted_target</span><span class="p">;</span> <span class="c1">// phi_2 source</span>
+    <span class="n">two_walk_long</span> <span class="n">phi_2_dual_eta</span><span class="p">;</span>
+    <span class="n">init_trivial_two_walk_long</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">dist</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">bool</span> <span class="n">done</span><span class="p">;</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">dist</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// for now, the case dist == 1 crashes</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="n">MITM2</span><span class="p">(</span><span class="o">&amp;</span><span class="n">eta</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">from</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">to</span><span class="p">,</span> <span class="n">dist</span><span class="p">);</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">done</span><span class="p">);</span>
+        <span class="n">two_walk_composition_ss</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_2_dual</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">eta</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">two_walk_stol</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_2_dual</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">psi_1</code>과 <code class="language-plaintext highlighter-rouge">phi_2</code>를 얻은 후, <code class="language-plaintext highlighter-rouge">psi_1</code>의 codomain curve <code class="language-plaintext highlighter-rouge">from</code>과 <code class="language-plaintext highlighter-rouge">phi_2</code>의 codomain curve <code class="language-plaintext highlighter-rouge">to</code> 사이에 degree가 $2^\Delta$인 isogeny를 <code class="language-plaintext highlighter-rouge">MITM</code> 함수를 이용해 meet-in-the-middle 방식으로 찾는다. 이렇게 찾은 $2^\Delta$-degree isogeny가 <code class="language-plaintext highlighter-rouge">eta</code>이다.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">source</span> <span class="o">=</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">E0</span><span class="p">;</span>
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi1</span> <span class="o">=</span> <span class="n">psi_2</span><span class="p">;</span>
+
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi2_dual_set</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+
+    <span class="c1">// since psi_1_dual has already been computed...</span>
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">middle</span> <span class="o">=</span> <span class="n">psi_1_dual_source</span><span class="p">;</span> <span class="c1">// = psi_1_dual_source</span>
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi2</span> <span class="o">=</span> <span class="n">push_odd_isogeny_through_two_walk_long</span><span class="p">(</span><span class="o">&amp;</span><span class="n">psi_1_dual</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">middle</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">);</span>
+
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi2_set</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>그 다음엔 <code class="language-plaintext highlighter-rouge">psi_1_dual</code>을 <code class="language-plaintext highlighter-rouge">phi_2_dual_eta</code>를 통해 push forward하고, 이를 <code class="language-plaintext highlighter-rouge">phi_L-&gt;phi2</code>에 저장한다. 이는 2의 지수승 degree를 갖는 isogeny를 연산하는 것이므로 연산량이 많지 않다. ideal <code class="language-plaintext highlighter-rouge">L_</code>에 대응되는 isogeny $\phi_L$은 위 코드와 같이 <code class="language-plaintext highlighter-rouge">phi_L-&gt;phi1 = psi_2</code>와 <code class="language-plaintext highlighter-rouge">phi_L-&gt;phi2</code>의 합성으로 구성됨을 알 수 있다.</p>
+
+</div><section class="article__sharing d-print-none"></section><div class="d-print-none"><footer class="article__footer"><meta itemprop="dateModified" content="2022-06-18T00:00:00+09:00"><!-- start custom article footer snippet -->
 
 <!-- end custom article footer snippet -->
 <div class="article__subscribe"></div><div class="article__license"><div class="license">
@@ -595,7 +579,7 @@ end function
       </a>
     </p>
   </div></div></footer>
-<div class="article__section-navigator clearfix"><div class="next"><span>NEXT</span><a href="/2021/02/07/Elliptic-Curve-and-Isogeny.html">Elliptic Curve and Isogeny</a></div></div></div>
+<div class="article__section-navigator clearfix"><div class="previous"><span>PREVIOUS</span><a href="/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html">Non-constant Morphism of Curves is surjective</a></div><div class="next"><span>NEXT</span><a href="/2023/12/25/Math-and-Philosophy.html">Math and Philosophy 1</a></div></div></div>
 
 </div>
 

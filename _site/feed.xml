@@ -1,505 +1,826 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" hreflang="en" /><updated>2021-02-15T20:26:39+09:00</updated><id>/feed.xml</id><title type="html">Manbo’s blog</title><subtitle>Hello, welcome to Manbo's blog
-</subtitle><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><entry><title type="html">Non-constant Morphism of Curves is surjective</title><link href="/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html" rel="alternate" type="text/html" title="Non-constant Morphism of Curves is surjective" /><published>2021-02-18T00:00:00+09:00</published><updated>2021-02-18T00:00:00+09:00</updated><id>/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective</id><content type="html" xml:base="/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html">&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;해당 글은 Fulton의 &lt;a href=&quot;http://www.math.lsa.umich.edu/~wfulton/CurveBook.pdf&quot;&gt;Algebraic Curves&lt;/a&gt;와 Silverman의 &lt;a href=&quot;https://www.springer.com/gp/book/9780387094939&quot;&gt;Arithmetic of Elliptic Curves&lt;/a&gt;를 정리한 것이다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 &lt;a href=&quot;https://math.stackexchange.com/questions/2969598/if-isogenous-elliptic-curves-have-equal-numbers-of-points-how-can-isogenies-hav&quot;&gt;surjective가 아니게 되는 문제에 대한 의문&lt;/a&gt;을 해결한다.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" hreflang="en" /><updated>2024-02-25T15:53:49+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Manbo’s blog</title><subtitle>Hello, welcome to Manbo&apos;s blog
+</subtitle><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><entry><title type="html">Isomorphism between Montgomery Curves</title><link href="http://localhost:4000/2024/02/25/Isomorphism-between-Montgomery-Curves.html" rel="alternate" type="text/html" title="Isomorphism between Montgomery Curves" /><published>2024-02-25T00:00:00+09:00</published><updated>2024-02-25T00:00:00+09:00</updated><id>http://localhost:4000/2024/02/25/Isomorphism-between-Montgomery-Curves</id><content type="html" xml:base="http://localhost:4000/2024/02/25/Isomorphism-between-Montgomery-Curves.html"><![CDATA[<ul>
+  <li>Computing the isomorphism between given two Montgomery curves</li>
+  <li>Usefulness of 2-torsion points on Montgomery curves</li>
+</ul>
+
+<p>Implementing <a href="https://eprint.iacr.org/2023/660">FESTA</a>(Isogeny based PKE), I needed to implement the point evaluation through an isomorphism between given two curves. I looked it up and couldn’t find any paper explaining about this. Possibly i’m the only one who couldn’t find it. Anyway I decided to derive a proper algorithm for this myself. In this article, I will explain how I did to compute the isomorphism in an efficient way when two distinct Montgomery curves are given as input.</p>
+
+<h2 id="isomorphism-between-two-montgomery-curves">Isomorphism between two Montgomery curves</h2>
+<p>To check if two curves are isomorphic, we need to compare its j-invariant. <a href="https://en.wikipedia.org/wiki/J-invariant">J-invariant</a> is literally a value which is invariant up to isomorphisms. Suppose that we have as input a Montgomery curve below.</p>
+
+<center>
+$\begin{aligned}
+E_A : y^2 = x^3 + Ax^2 + x \\
+\text{ where } A \in \mathbb{F}_{p^2}
+\end{aligned}
+$</center>
+
+<p>The j-invariant of this curve is known as $j(E) = 8(A^2 - 3)^3/(A^2 - 4) \in \mathbb{F}_{p^2}$. If we are given another Montgomery curve $E_{A’}$, the condition for the equivalence of these curves is $(A’^2 - 3)^3/(A’^2-4) = (A^2 -3)^3/(A^2 -4)$. Through this equation, we can easily expect that $E_{-A}$ is always isomorphic with $E_{A}$. This form of equivalent curve is called <a href="https://en.wikipedia.org/wiki/Twists_of_elliptic_curves"><em>twisted curve</em></a> and we already know that the isomorphism is $(x,y) \mapsto (-x,yi) $. However, there are still other equivalent curves than the twisted curve and we need to find the isomorphisms to them. How can we efficiently find the isomorphism between two given equivalent curves?</p>
+
+<h2 id="looking-at-the-2-torsion-points">Looking at the 2-torsion points</h2>
+<p>A Montgomery curve always has all three 2-torsion points on the horizontal line $y=0$. One of them is obviously $(0,0)$ which satisfies the curve equation and the other two points satisfy the equation $x^2 + Ax + 1 = 0$(For non-singular cases, we don’t need to consider the multiple root). If there is an isomorphism between $E_A$ and $E_{A’}$, the 2-torsion points on $E_A$ are mapped to the 2-torsion points on $E_{A’}$, which is pretty obvious. Since the isomorphism is consisted of scalings and transitions, we can try all scaling and transition functions which maps 2-torsion points to 2-torsion points, which simplifies our problem.</p>
+
+<center>
+<figure>
+<img src="/assets/20240225/montgomery_curve.png" width="70%" />
+<img src="/assets/20240225/2-torsion.png" width="70%" />
+</figure>
+</center>
+
+<h2 id="finding-the-isomorphism">Finding the isomorphism</h2>
+<p>We can represent an isomorphism $\phi : E_A \rightarrow E_{A’}$ as a map $(x,y) \mapsto (ux+v, wy)$ where $u, v \neq 0$. By applying this map to the curve equation of $E_A$, we obtain the four equations below and $u, v$ can be represented by $A$ and $A’$. Excluding the twisted curve case, we can get $v \neq 0$.</p>
+
+<center>
+$
+\begin{aligned}
+E_{A'}(ux+v, wy) : w^2y^2 &amp;= (ux+v)^3 + A'(ux+v)^2 + (ux+v) \cong E_{A} \\
+\Leftrightarrow v^2 + A'v + 1 &amp;= 0\\
+u^3 &amp;= w^2 \\
+3v + A' &amp;= uA \\
+v^2 - 1 &amp;= u^2
+\end{aligned}
+$
+</center>
+
+<p>These four equations are reduced to $v = \frac{A’^2 + 2A^2 - 9}{A’(3 - A^2)}$ and $u = \frac{3v + A’}{A}$. Note that we cannot determine $w$ uniquely but this isn’t any matter for us to compute corresponding kernel group instead of the specific point. In practice we only use points on the <em>Kummer line</em> instead of the points on the real curve even when we calculate an isogeny.</p>
+
+<h2 id="implementation">Implementation</h2>
+<p>Using <a href="https://www.rust-lang.org/">Rust</a>, you can implement above equation as follows :</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[derive(Clone)]</span>
+<span class="k">pub</span> <span class="k">struct</span> <span class="n">CurveIsomorphism</span> <span class="p">{</span>
+    <span class="n">u</span><span class="p">:</span> <span class="n">Fq</span><span class="p">,</span>
+    <span class="n">v</span><span class="p">:</span> <span class="n">Fq</span><span class="p">,</span>
+    <span class="n">w</span><span class="p">:</span> <span class="n">Fq</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">CurveIsomorphism</span> <span class="p">{</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">domain</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">Curve</span><span class="p">,</span> <span class="n">codomain</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">Curve</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="k">Self</span> <span class="p">{</span>
+        <span class="nd">debug_assert_eq!</span><span class="p">(</span>
+            <span class="n">domain</span><span class="nf">.j_invariant</span><span class="p">(),</span>
+            <span class="n">codomain</span><span class="nf">.j_invariant</span><span class="p">(),</span>
+            <span class="s">"Given curves are not isomorphic!"</span>
+        <span class="p">);</span>
+        <span class="k">let</span> <span class="p">(</span><span class="n">A2</span><span class="p">,</span> <span class="n">A1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">domain</span><span class="nf">.get_constant</span><span class="p">(),</span> <span class="n">codomain</span><span class="nf">.get_constant</span><span class="p">());</span>
+        <span class="k">let</span> <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="n">A1</span><span class="nf">.square</span><span class="p">()</span> <span class="o">+</span> <span class="n">A2</span><span class="nf">.square</span><span class="p">()</span><span class="nf">.mul2</span><span class="p">()</span> <span class="o">-</span> <span class="nn">Fq</span><span class="p">::</span><span class="n">THREE</span><span class="nf">.square</span><span class="p">())</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">A1</span> <span class="o">*</span> <span class="p">(</span><span class="nn">Fq</span><span class="p">::</span><span class="n">THREE</span> <span class="o">-</span> <span class="n">A2</span><span class="nf">.square</span><span class="p">()));</span>
+        <span class="k">let</span> <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="nn">Fq</span><span class="p">::</span><span class="n">THREE</span> <span class="o">*</span> <span class="n">v</span> <span class="o">+</span> <span class="n">A1</span><span class="p">)</span> <span class="o">/</span> <span class="n">A2</span><span class="p">;</span>
+        <span class="k">let</span> <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">u</span><span class="nf">.square</span><span class="p">())</span><span class="nf">.sqrt</span><span class="p">()</span><span class="na">.0</span><span class="p">;</span>
+        <span class="n">CurveIsomorphism</span> <span class="p">{</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">pub</span> <span class="k">fn</span> <span class="nf">eval</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">,</span> <span class="n">P</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">Point</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Point</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="p">(</span><span class="n">Px</span><span class="p">,</span> <span class="n">Py</span><span class="p">)</span> <span class="o">=</span> <span class="n">P</span><span class="nf">.to_xy</span><span class="p">();</span>
+        <span class="k">let</span> <span class="n">imP</span> <span class="o">=</span> <span class="nn">Point</span><span class="p">::</span><span class="nf">new_xy</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="k">self</span><span class="py">.u</span> <span class="o">*</span> <span class="n">Px</span> <span class="o">+</span> <span class="k">self</span><span class="py">.v</span><span class="p">),</span> <span class="o">&amp;</span><span class="p">(</span><span class="k">self</span><span class="py">.w</span> <span class="o">*</span> <span class="n">Py</span><span class="p">));</span>
+        <span class="n">imP</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The entire source code is available at my <a href="https://github.com/gusgkr0117/festa_rs">festa_rs github</a></p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html"><![CDATA[Computing the isomorphism between given two Montgomery curves Usefulness of 2-torsion points on Montgomery curves Implementing FESTA(Isogeny based PKE), I needed to implement the point evaluation through an isomorphism between given two curves. I looked it up and couldn’t find any paper explaining about this. Possibly i’m the only one who couldn’t find it. Anyway I decided to derive a proper algorithm for this myself. In this article, I will explain how I did to compute the isomorphism in an efficient way when two distinct Montgomery curves are given as input. Isomorphism between two Montgomery curves To check if two curves are isomorphic, we need to compare its j-invariant. J-invariant is literally a value which is invariant up to isomorphisms. Suppose that we have as input a Montgomery curve below. $\begin{aligned} E_A : y^2 = x^3 + Ax^2 + x \\ \text{ where } A \in \mathbb{F}_{p^2} \end{aligned} $ The j-invariant of this curve is known as $j(E) = 8(A^2 - 3)^3/(A^2 - 4) \in \mathbb{F}_{p^2}$. If we are given another Montgomery curve $E_{A’}$, the condition for the equivalence of these curves is $(A’^2 - 3)^3/(A’^2-4) = (A^2 -3)^3/(A^2 -4)$. Through this equation, we can easily expect that $E_{-A}$ is always isomorphic with $E_{A}$. This form of equivalent curve is called twisted curve and we already know that the isomorphism is $(x,y) \mapsto (-x,yi) $. However, there are still other equivalent curves than the twisted curve and we need to find the isomorphisms to them. How can we efficiently find the isomorphism between two given equivalent curves? Looking at the 2-torsion points A Montgomery curve always has all three 2-torsion points on the horizontal line $y=0$. One of them is obviously $(0,0)$ which satisfies the curve equation and the other two points satisfy the equation $x^2 + Ax + 1 = 0$(For non-singular cases, we don’t need to consider the multiple root). If there is an isomorphism between $E_A$ and $E_{A’}$, the 2-torsion points on $E_A$ are mapped to the 2-torsion points on $E_{A’}$, which is pretty obvious. Since the isomorphism is consisted of scalings and transitions, we can try all scaling and transition functions which maps 2-torsion points to 2-torsion points, which simplifies our problem. Finding the isomorphism We can represent an isomorphism $\phi : E_A \rightarrow E_{A’}$ as a map $(x,y) \mapsto (ux+v, wy)$ where $u, v \neq 0$. By applying this map to the curve equation of $E_A$, we obtain the four equations below and $u, v$ can be represented by $A$ and $A’$. Excluding the twisted curve case, we can get $v \neq 0$. $ \begin{aligned} E_{A'}(ux+v, wy) : w^2y^2 &amp;= (ux+v)^3 + A'(ux+v)^2 + (ux+v) \cong E_{A} \\ \Leftrightarrow v^2 + A'v + 1 &amp;= 0\\ u^3 &amp;= w^2 \\ 3v + A' &amp;= uA \\ v^2 - 1 &amp;= u^2 \end{aligned} $ These four equations are reduced to $v = \frac{A’^2 + 2A^2 - 9}{A’(3 - A^2)}$ and $u = \frac{3v + A’}{A}$. Note that we cannot determine $w$ uniquely but this isn’t any matter for us to compute corresponding kernel group instead of the specific point. In practice we only use points on the Kummer line instead of the points on the real curve even when we calculate an isogeny. Implementation Using Rust, you can implement above equation as follows : #[derive(Clone)] pub struct CurveIsomorphism { u: Fq, v: Fq, w: Fq, } impl CurveIsomorphism { pub fn new(domain: &amp;Curve, codomain: &amp;Curve) -&gt; Self { debug_assert_eq!( domain.j_invariant(), codomain.j_invariant(), "Given curves are not isomorphic!" ); let (A2, A1) = (domain.get_constant(), codomain.get_constant()); let v = (A1.square() + A2.square().mul2() - Fq::THREE.square()) / (A1 * (Fq::THREE - A2.square())); let u = (Fq::THREE * v + A1) / A2; let w = (u * u.square()).sqrt().0; CurveIsomorphism { u, v, w } } pub fn eval(&amp;self, P: &amp;Point) -&gt; Point { let (Px, Py) = P.to_xy(); let imP = Point::new_xy(&amp;(self.u * Px + self.v), &amp;(self.w * Py)); imP } } The entire source code is available at my festa_rs github]]></summary></entry><entry><title type="html">Math and Philosophy 1</title><link href="http://localhost:4000/2023/12/25/Math-and-Philosophy.html" rel="alternate" type="text/html" title="Math and Philosophy 1" /><published>2023-12-25T00:00:00+09:00</published><updated>2023-12-25T00:00:00+09:00</updated><id>http://localhost:4000/2023/12/25/Math-and-Philosophy</id><content type="html" xml:base="http://localhost:4000/2023/12/25/Math-and-Philosophy.html"><![CDATA[<ul>
+  <li>수학이 제시하는 철학적 질문에 대한 고찰의 시작</li>
+  <li>수학은 추상화를 통한 생각의 본질에 도달하는 과정</li>
+  <li>“나”는 “타인”을 통해 존재한다</li>
+</ul>
+
+<p>얼마전 differential manifold에 관해 공부하다가 문득 철학적인 의문이 떠올랐다. 과연 우리가 생각하는 공간이란 무엇일까?
+또한 어떤 사물(Object)이 존재한다는 것은 무엇인가? 이 질문에 답하기에 앞서, 내가 왜 이런 질문을 갖게 되었는지 설명해보려한다.</p>
+
+<h2 id="사과는-무엇인가">사과는 무엇인가?</h2>
+
+<p>우리가 살면서 보고, 듣고, 만져서 지각하는 사물은 무수히 많다. 그리고 우리는 사물들을 주로 “언어”를 통해 인지하고, 분류한다. 예를들어 “사과”를 떠올려보자.
+내 앞에 두 개의 사과가 있는데 하나는 멀쩡하고, 하나는 벌레가 파먹었다고 해보자. 그럼 이 둘은 분명 다른데 왜 같은 “사과”라고 생각하는걸까?
+보기에 달라보이는 둘의 공통점은 같은 “성질”을 지니고 있다는 것이다. 이 “사과의 성질”을 색이 빨갛고, 베어먹으면 아삭한 식감을 가지고 단단한 것이라고 정의해보자.
+하지만 이 “성질”은 아직 “사과”들만 지칭하기엔 아직 부족하다. 사과도 덜 익었을 때 색이 달라지고, 아삭하고, 단단한 과일들은 사과 말고도 많기 때문이다.
+사실 우리는 이것이 분류학이 탄생한 이유임을 알고 있다. 많은 전문가들이 이미 “사과”의 생물학적 분류를 만들어 놓았다. 조금만 찾아보면 사과는 식물 중에서 속씨식물군으로 분류되며, 장미목, 장미과 등등에 속한다고 한다.
+나는 여기서 조금 더 이상한 질문을 해보려 한다. 이런 분류를 하기 위해서는 사과의 식물세포 안에 들어있는 DNA가 같은지 다른지를 판단하는 과정이 수반된다.
+그렇다면 어떤 두 DNA가 “같다”라는 것은 무엇인가? 어떤 두 object가 같은가 다른가를 판단하는 것을 조금 깊게 생각해보면, 우린 사실 아무것도 모르고 있다는 결론에 이르게된다.</p>
+
+<h2 id="같음은-무엇인가">같음은 무엇인가?</h2>
+
+<p>두 과일의 차이점을 분석하기 위해 DNA 분석을 진행한다고 해보자. DNA가 같다는 것은 무엇인가? 당연히 DNA를 구성하는 분자구조가 같음을 의미한다.
+분자구조가 같다는 것은 무엇인가? 분자를 구성하는 원자들의 종류와 원자들이 결합해있는 모양이 같다라는 것이다.
+모양이 같다는 것은 그럼 무엇인가? 언뜻 당연해 보이는 질문이지만, 조금 생각해보면 우리는 사실 이 질문에 답하지 못한다. 정말 간단하고 쉬운 질문 같아 보이지만, 우리는 “같음”에 대한 정의를 가지고 있지 않다.
+혹자는 “아니 우리는 오감을 통해 본능적으로 같은 사물들을 분류하고, 인지하는 것인데, 굳이 복잡한 정의를 만들어서 그것에 부합하는지 일일이 확인할 필요가 있나?”라고 질문할 것이다.
+그러면 나는 되묻는다. “나와 타인의 오감이 같은 것을 인지하고 있음을 어떻게 아는가? 그리고 인지하는 것이 ‘같음’은 어떻게 알 수 있는가?”
+현실에서 두 개의 object가 “같다”라고 하는 것은 실제로 완벽하게 엄밀하지 않다. 같은지 다른지 판단조차 할 수 없는게 현실이다.
+이런 복잡하고 알 수 없는 현실세계를 잠시 떠나서 공리를 통해 구축된 완벽한 사고실험을 할 수 있는 고요한 수학의 세계로 가보자.</p>
 
-&lt;h2 id=&quot;dimension-of-a-curve&quot;&gt;Dimension of a curve&lt;/h2&gt;
+<h2 id="공간의-같음은-무엇인가">공간의 같음은 무엇인가?</h2>
 
-&lt;p&gt;Variety $V$의 dimension은 function field $K(V)$를 field extension of $K$라고 생각했을 때, 해당 extension의 transcendence degree를 말한다. transcendence degree는 algebraic 하게 generate되지 않는 extension field 위의 원소들의 dimension을 뜻한다. transcendence degree가 $n$이면, algebraic basis의 개수는 $n$개가 된다.&lt;/p&gt;
+<p>수학의 세계에서도 사실 “같음”을 우리는 잘 모른다. 물론, 1과 1이 서로 같음을 알 수 있다. 평면에서 한 점으로부터 같은 거리에 있는 점들의 집합을 원이라고 하면, 반지름이 같은 원과 원은 같다.
+하지만 그런 것은 사실 “분류”라고 할 수 없다. “1과 1이 같다”라고 말할 때 “같음”은 사실 동어반복이다. “1월은 1월이야” 또는 “사과는 사과야”라고 말하는 것에 지나지 않는다. 의미가 없다는 뜻이다.
+의미있는 분류를 시작하기위해, 먼저 우리의 직관적인 판단(또는 본능)에 의존해보자. 우리는 반지름의 크기가 다른 원도 같은 “원”으로 부른다. 모든 약간 찌그러진 원은 “타원”이라고 부른다.
+모든 평평한 면을 “평면”이라고 부르고, 높이와 반지름에 상관없이 원통으로 생긴 것들을 모두 “원기둥”으로 부른다. 생각해보면 이는 현실세계에서 우리가 물체를 인식하는 방법(보고, 만지고, 듣고)으로부터 나온 분류법이지만,
+여기에 어떤 “규칙”을 우리는 찾을 수 있다. 반지름의 크기와 상관없이, 찌그러진 정도와 상관없이, 높이와 밑면에 상관없이 라는 말들을 곰곰히 생각해보면 이를 다시말해
+“자르지 않고, 늘이거나 줄이거나 구부려도 우리는 같은 것으로 본다”라는 기준을 세워볼 수 있다.
+이 기준이 절대적으로 옳다라는 것은 아니다.(옳은 것은 사실 없다. 이 기준을 통해 분류하면 원과 타원은 같게 된다.) 다만 일단 이렇게 기준을 세워놓고 이 기준에 맞게 수학적 정의들을 세운 뒤, 물체를 분류했을 때, 우리의 직관과 얼마나 잘
+맞아 떨어지는지 보는 것은 매우 흥미로울 것이다. 이것이 가능하다면 이는 위상수학(Topology)으로 이어지는데 위상에 대한 기술적 분석은 다음에 다루려고 한다. 그전에 우리는 도대체 뭘 늘이고 줄인다는 것인지 알아야한다.</p>
 
-&lt;p&gt;Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 transcendence degree가 1이라는 의미이다. algebraic basis는 한 개이고, 이를 $t \in K(C) \setminus K$라고 하자. 그러면 $K(C)$는 $K(t)$에 대한 algebraic field extension(finite field extension)이다.&lt;/p&gt;
+<h2 id="뭘-늘이고-줄이고-구부린다는-것인가">뭘 늘이고 줄이고 구부린다는 것인가?</h2>
 
-&lt;h2 id=&quot;any-proper-closed-subvariety-of-a-curve-is-a-point&quot;&gt;Any proper closed subvariety of a curve is a point&lt;/h2&gt;
+<p>도대체 뭘 늘이고, 줄이고, 구부린다는 것인가? 사고 실험은 말 그대로 눈에 보이지 않고, 만져지지도 않는 것인데 “무엇”을 늘이고, 줄인다는 것일까?
+그래서 우리는 “무엇”이 필요하다. 정확히는 “존재”가 필요하다. A가 “존재한다” 또는 “존재하지 않는다”는 것을 말할 수 있어야 우리는 모든 것을 시작할 수 있다.
+이것이 바로 집합론(Set theory)의 시작이다. “존재”라는 단어 마저도 “B”라고 추상화하면 앞의 문장은 “A가 B한다.” 또는 “A가 B하지 않는다.” 라고 말할 수 있다. 이 둘은 동시에 만족할 수 없다.
+우리는 이것을 Set B라고 한다. A는 Set B에 포함되거나 포함되지 않으며, 둘을 동시에 만족시킬 수 없다. 이러한 논리를 전개할 수 있는 세계를 정의한 것이 수학적 “공리”다.</p>
 
-&lt;p&gt;curve 위에서 어떤 proper closed subvariety(아직 zariski topology를 정리하지 않았으므로 여기서는 간단히 affine variety를 생각하자)는 항상 점 한개로 구성됨을 증명하자. 아래 두 개의 claim을 거쳐야 한다.&lt;/p&gt;
+<blockquote>
+  <p><em>수학은 사실 현실세계를 그대로 표상하기 위한 것은 아니다. 현실에서 우리가 보고, 듣고, 맡고, 만져서 알아낸 어떤 패턴으로부터 영감을 받아 우리의 머릿속에서 만들어낸 이상적인 세계다.</em>
+<em>우리는 그것으로 그저 놀 뿐이다. 그 안에 어떤 의미가 있을 수도 있고, 없을 수도 있으며, 의미를 찾는 것 자체가 무의미 할 수 있다.</em></p>
+</blockquote>
 
-&lt;h5 id=&quot;claim-1-k가-algebraically-closed-이면-임의의-원소-x-in-kc-setminus-k에-대해-kc는-kx에-대한-algebraic-field-extension이다fulton-6-proposition-91&quot;&gt;Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C) \setminus K$에 대해 $K(C)$는 $K(x)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1))&lt;/h5&gt;
+<p>여기서 우리는 굉장히 재미있는 철학적 교훈을 얻을 수 있다. 우리는 분명 A의 존재성을 나타내려고 했는데, B가 필요하게 되었다. “A는 B이다.”라는 어떤 “의미있는” 명제를 만들어내기 위해서는
+두 개의 object가 필요하다는 것을 깨닫는다. A의 존재는 B로부터 출발하고, B의 존재도 A로부터 출발한다. 이 둘은 서로를 존재하게 하며, 서로 다르지만 사실 다르지 않다.(언뜻 불교에서 말하는 깨달음일지도 모르겠다.)
+여기서 말하는 것은 단순한 말장난이 아니다. 더 나아가면 어떤 object의 본질은 사실 다른 object와의 상호작용이라는 것을 알 수 있다. 결국 상호작용, 관계맺음 자체가 우리의 존재다.</p>
 
-&lt;p&gt;&lt;em&gt;Proof)&lt;/em&gt; algebraic basis를 $t \in K(C) \setminus K$라고 하자. 임의의 원소 $x \in K(C) \setminus K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 &lt;font color=&quot;red&quot;&gt;$K$가 algebraically closed&lt;/font&gt;인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다.&lt;/p&gt;
+<blockquote>
+  <p><em>타자와의 상호작용이 없으면 우리는 없어진다.</em></p>
+</blockquote>
 
-&lt;div style=&quot;text-align: right&quot;&gt;□&lt;/div&gt;
+<p>이렇듯 수학의 세계에서 얻은 영감은 다시 현실세계의 교훈이 된다. “나”라는 의식은 내 환경과의 상호작용 그 자체이며, “사람”으로써 “나라는 사람”은 다른 사람과의 상호작용 그 자체이다.
+반대로 주변환경과의 상호작용이 없으면(깜깜한 암흑 속, 텅빈 공간, 죽음 등) 나는 없으며, 다른사람과의 상호작용이 없으면(인간이 멸종한 세계, 외계인의 행성 등) 나는 사람이 아니다.
+정말 재밌지 않은가? 다시 사과얘기로 돌아가보자. 사과를 사과라고 말해줄 수 있는 사람이 없으면 그것은 사과라고 할 수 있을까? 사과를 보는 내 머릿속에 그려진 어떤 것과
+사과를 보는 다른 사람의 머릿속에 그려진 어떤 것이 서로 관계 맺어지지 않으면 “사과”라는 분류자체가 존재할 수 있을까?</p>
 
-&lt;h5 id=&quot;claim-2-k가-algebraically-closed이고-ring-r이-존재해서-quotient-field-kc를-갖는다고-하면-r-위의-prime-ideal-i에-대해-항상-ri-cong-k이다fulton-6-proposition-93&quot;&gt;Claim 2. $K$가 algebraically closed이고, Ring $R$이 존재해서 quotient field $K(C)$를 갖는다고 하면, $R$ 위의 prime ideal $I$에 대해 항상 $R/I \cong K$이다.(Fulton 6. Proposition 9(3))&lt;/h5&gt;
+<h2 id="수학적-사고에는-철학이-들어있다">수학적 사고에는 철학이 들어있다</h2>
 
-&lt;p&gt;&lt;em&gt;Proof)&lt;/em&gt; 귀류법으로 $R/I$ 상에서 $K$에 포함되지 않는 $x$가 존재한다고 가정하자. 그러면 &lt;strong&gt;Claim 1.&lt;/strong&gt; 에 의해서 $K(C)$는 $K(x)$에 대한 algebraic field extension이다. 그러면 $y \in I$에 대해 minimal polynomial $f = \sum_{i} a_{i}(x)X^i \in K(x)[X]$가 존재해서 $\sum_{i} a_{i}(x) y^i = 0$을 만족한다. 
-$f$는 minimal polynomial이므로 $a_0(x) \neq 0$이다. quotient ring $R/I$ 상에서 $f(y) = a_0(x) = 0$이 된다. 이는 $x$가 $K$에 대해 algebraic하다는 의미로 모순이다. 따라서 이러한 $x$가 존재하지 않는다.&lt;/p&gt;
+<p>집합론을 처음 배울 때, Set은 element의 모임인 것을 배운다. Element는 set에 포함되거나 포함되지 않으며, 동시에 만족할 수 없다. 사실 여기까지는 직관적이고, 쉽다. 그러나 조금 지나면
+우리는 set간에 function이라는 것을 배우고, topology에서는 continuous function을 정의한다. 수학은 사실 항상 이런식이다. 어떤 object를 만들면, 같은 카테고리에 속하는 다른 object와의
+관계(morphism)을 연구한다. 두 Set은 사실 function으로 연결되고, 두 topology space는 continuous function으로 연결되고, 두 group은 homomorphism으로 연결된다.(이런 패턴에 관심이 있다면
+Category theorem을 찾아보시길..) 처음 이런 낯선 개념들을 배울 때 왜 수학자는 어떻게든 function을 정의하고 연구하려고 하는걸까 궁금했다. 하지만 이제는 알게되었다. object들은 morphism이며,
+그 둘은 같은 것임을. 절대적으로 단독으로 존재하는 것은 없다. 모든 것은 상대적이며 둘 이상의 상호작용으로 존재한다.</p>
 
-&lt;div style=&quot;text-align: right&quot;&gt;□&lt;/div&gt;
+<p>이러한 수학적 사고에는 사실 언뜻보면 불교사상과도 같은 철학적 사상이 담겨있다. 수학을 공부할 때 이러한 철학적 사상을 염두해두고 공부하면 수학자들이 어떤 의도를 가지고 논리를 만들었는지
+조금 더 수월하게 이해가 간다. 이것을 알고 수학을 공부하는 것과 모르고 수학을 공부하는 것은 천지(天地) 차이다. 혹자는 수학을 단순히 패턴을 찾아내는 것으로 배웠거나 그렇게 생각할 수도 있다.
+나도 그렇게 생각했고, 패턴을 찾는 즐거운 놀이(?)로 생각하기도 했었다. 하지만 패턴을 찾는 것은 수학을 하기위한 “도구”일 뿐이다. 수학은 본질을 찾아내는 것이다. 그리고 그것은 철학이다.
+의미있는 수학은 사실 철학이다.</p>
 
-&lt;p&gt;이제 &lt;strong&gt;Claim 2.&lt;/strong&gt; 를 이용해 아래의 &lt;strong&gt;Proposition 3.&lt;/strong&gt; 을 증명할 것이다.&lt;/p&gt;
+<blockquote>
+  <p><em>난 왜 철학이 문과인지 모르겠다.</em></p>
+</blockquote>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html"><![CDATA[수학이 제시하는 철학적 질문에 대한 고찰의 시작 수학은 추상화를 통한 생각의 본질에 도달하는 과정 “나”는 “타인”을 통해 존재한다 얼마전 differential manifold에 관해 공부하다가 문득 철학적인 의문이 떠올랐다. 과연 우리가 생각하는 공간이란 무엇일까? 또한 어떤 사물(Object)이 존재한다는 것은 무엇인가? 이 질문에 답하기에 앞서, 내가 왜 이런 질문을 갖게 되었는지 설명해보려한다. 사과는 무엇인가? 우리가 살면서 보고, 듣고, 만져서 지각하는 사물은 무수히 많다. 그리고 우리는 사물들을 주로 “언어”를 통해 인지하고, 분류한다. 예를들어 “사과”를 떠올려보자. 내 앞에 두 개의 사과가 있는데 하나는 멀쩡하고, 하나는 벌레가 파먹었다고 해보자. 그럼 이 둘은 분명 다른데 왜 같은 “사과”라고 생각하는걸까? 보기에 달라보이는 둘의 공통점은 같은 “성질”을 지니고 있다는 것이다. 이 “사과의 성질”을 색이 빨갛고, 베어먹으면 아삭한 식감을 가지고 단단한 것이라고 정의해보자. 하지만 이 “성질”은 아직 “사과”들만 지칭하기엔 아직 부족하다. 사과도 덜 익었을 때 색이 달라지고, 아삭하고, 단단한 과일들은 사과 말고도 많기 때문이다. 사실 우리는 이것이 분류학이 탄생한 이유임을 알고 있다. 많은 전문가들이 이미 “사과”의 생물학적 분류를 만들어 놓았다. 조금만 찾아보면 사과는 식물 중에서 속씨식물군으로 분류되며, 장미목, 장미과 등등에 속한다고 한다. 나는 여기서 조금 더 이상한 질문을 해보려 한다. 이런 분류를 하기 위해서는 사과의 식물세포 안에 들어있는 DNA가 같은지 다른지를 판단하는 과정이 수반된다. 그렇다면 어떤 두 DNA가 “같다”라는 것은 무엇인가? 어떤 두 object가 같은가 다른가를 판단하는 것을 조금 깊게 생각해보면, 우린 사실 아무것도 모르고 있다는 결론에 이르게된다. 같음은 무엇인가? 두 과일의 차이점을 분석하기 위해 DNA 분석을 진행한다고 해보자. DNA가 같다는 것은 무엇인가? 당연히 DNA를 구성하는 분자구조가 같음을 의미한다. 분자구조가 같다는 것은 무엇인가? 분자를 구성하는 원자들의 종류와 원자들이 결합해있는 모양이 같다라는 것이다. 모양이 같다는 것은 그럼 무엇인가? 언뜻 당연해 보이는 질문이지만, 조금 생각해보면 우리는 사실 이 질문에 답하지 못한다. 정말 간단하고 쉬운 질문 같아 보이지만, 우리는 “같음”에 대한 정의를 가지고 있지 않다. 혹자는 “아니 우리는 오감을 통해 본능적으로 같은 사물들을 분류하고, 인지하는 것인데, 굳이 복잡한 정의를 만들어서 그것에 부합하는지 일일이 확인할 필요가 있나?”라고 질문할 것이다. 그러면 나는 되묻는다. “나와 타인의 오감이 같은 것을 인지하고 있음을 어떻게 아는가? 그리고 인지하는 것이 ‘같음’은 어떻게 알 수 있는가?” 현실에서 두 개의 object가 “같다”라고 하는 것은 실제로 완벽하게 엄밀하지 않다. 같은지 다른지 판단조차 할 수 없는게 현실이다. 이런 복잡하고 알 수 없는 현실세계를 잠시 떠나서 공리를 통해 구축된 완벽한 사고실험을 할 수 있는 고요한 수학의 세계로 가보자. 공간의 같음은 무엇인가? 수학의 세계에서도 사실 “같음”을 우리는 잘 모른다. 물론, 1과 1이 서로 같음을 알 수 있다. 평면에서 한 점으로부터 같은 거리에 있는 점들의 집합을 원이라고 하면, 반지름이 같은 원과 원은 같다. 하지만 그런 것은 사실 “분류”라고 할 수 없다. “1과 1이 같다”라고 말할 때 “같음”은 사실 동어반복이다. “1월은 1월이야” 또는 “사과는 사과야”라고 말하는 것에 지나지 않는다. 의미가 없다는 뜻이다. 의미있는 분류를 시작하기위해, 먼저 우리의 직관적인 판단(또는 본능)에 의존해보자. 우리는 반지름의 크기가 다른 원도 같은 “원”으로 부른다. 모든 약간 찌그러진 원은 “타원”이라고 부른다. 모든 평평한 면을 “평면”이라고 부르고, 높이와 반지름에 상관없이 원통으로 생긴 것들을 모두 “원기둥”으로 부른다. 생각해보면 이는 현실세계에서 우리가 물체를 인식하는 방법(보고, 만지고, 듣고)으로부터 나온 분류법이지만, 여기에 어떤 “규칙”을 우리는 찾을 수 있다. 반지름의 크기와 상관없이, 찌그러진 정도와 상관없이, 높이와 밑면에 상관없이 라는 말들을 곰곰히 생각해보면 이를 다시말해 “자르지 않고, 늘이거나 줄이거나 구부려도 우리는 같은 것으로 본다”라는 기준을 세워볼 수 있다. 이 기준이 절대적으로 옳다라는 것은 아니다.(옳은 것은 사실 없다. 이 기준을 통해 분류하면 원과 타원은 같게 된다.) 다만 일단 이렇게 기준을 세워놓고 이 기준에 맞게 수학적 정의들을 세운 뒤, 물체를 분류했을 때, 우리의 직관과 얼마나 잘 맞아 떨어지는지 보는 것은 매우 흥미로울 것이다. 이것이 가능하다면 이는 위상수학(Topology)으로 이어지는데 위상에 대한 기술적 분석은 다음에 다루려고 한다. 그전에 우리는 도대체 뭘 늘이고 줄인다는 것인지 알아야한다. 뭘 늘이고 줄이고 구부린다는 것인가? 도대체 뭘 늘이고, 줄이고, 구부린다는 것인가? 사고 실험은 말 그대로 눈에 보이지 않고, 만져지지도 않는 것인데 “무엇”을 늘이고, 줄인다는 것일까? 그래서 우리는 “무엇”이 필요하다. 정확히는 “존재”가 필요하다. A가 “존재한다” 또는 “존재하지 않는다”는 것을 말할 수 있어야 우리는 모든 것을 시작할 수 있다. 이것이 바로 집합론(Set theory)의 시작이다. “존재”라는 단어 마저도 “B”라고 추상화하면 앞의 문장은 “A가 B한다.” 또는 “A가 B하지 않는다.” 라고 말할 수 있다. 이 둘은 동시에 만족할 수 없다. 우리는 이것을 Set B라고 한다. A는 Set B에 포함되거나 포함되지 않으며, 둘을 동시에 만족시킬 수 없다. 이러한 논리를 전개할 수 있는 세계를 정의한 것이 수학적 “공리”다. 수학은 사실 현실세계를 그대로 표상하기 위한 것은 아니다. 현실에서 우리가 보고, 듣고, 맡고, 만져서 알아낸 어떤 패턴으로부터 영감을 받아 우리의 머릿속에서 만들어낸 이상적인 세계다. 우리는 그것으로 그저 놀 뿐이다. 그 안에 어떤 의미가 있을 수도 있고, 없을 수도 있으며, 의미를 찾는 것 자체가 무의미 할 수 있다. 여기서 우리는 굉장히 재미있는 철학적 교훈을 얻을 수 있다. 우리는 분명 A의 존재성을 나타내려고 했는데, B가 필요하게 되었다. “A는 B이다.”라는 어떤 “의미있는” 명제를 만들어내기 위해서는 두 개의 object가 필요하다는 것을 깨닫는다. A의 존재는 B로부터 출발하고, B의 존재도 A로부터 출발한다. 이 둘은 서로를 존재하게 하며, 서로 다르지만 사실 다르지 않다.(언뜻 불교에서 말하는 깨달음일지도 모르겠다.) 여기서 말하는 것은 단순한 말장난이 아니다. 더 나아가면 어떤 object의 본질은 사실 다른 object와의 상호작용이라는 것을 알 수 있다. 결국 상호작용, 관계맺음 자체가 우리의 존재다. 타자와의 상호작용이 없으면 우리는 없어진다. 이렇듯 수학의 세계에서 얻은 영감은 다시 현실세계의 교훈이 된다. “나”라는 의식은 내 환경과의 상호작용 그 자체이며, “사람”으로써 “나라는 사람”은 다른 사람과의 상호작용 그 자체이다. 반대로 주변환경과의 상호작용이 없으면(깜깜한 암흑 속, 텅빈 공간, 죽음 등) 나는 없으며, 다른사람과의 상호작용이 없으면(인간이 멸종한 세계, 외계인의 행성 등) 나는 사람이 아니다. 정말 재밌지 않은가? 다시 사과얘기로 돌아가보자. 사과를 사과라고 말해줄 수 있는 사람이 없으면 그것은 사과라고 할 수 있을까? 사과를 보는 내 머릿속에 그려진 어떤 것과 사과를 보는 다른 사람의 머릿속에 그려진 어떤 것이 서로 관계 맺어지지 않으면 “사과”라는 분류자체가 존재할 수 있을까? 수학적 사고에는 철학이 들어있다 집합론을 처음 배울 때, Set은 element의 모임인 것을 배운다. Element는 set에 포함되거나 포함되지 않으며, 동시에 만족할 수 없다. 사실 여기까지는 직관적이고, 쉽다. 그러나 조금 지나면 우리는 set간에 function이라는 것을 배우고, topology에서는 continuous function을 정의한다. 수학은 사실 항상 이런식이다. 어떤 object를 만들면, 같은 카테고리에 속하는 다른 object와의 관계(morphism)을 연구한다. 두 Set은 사실 function으로 연결되고, 두 topology space는 continuous function으로 연결되고, 두 group은 homomorphism으로 연결된다.(이런 패턴에 관심이 있다면 Category theorem을 찾아보시길..) 처음 이런 낯선 개념들을 배울 때 왜 수학자는 어떻게든 function을 정의하고 연구하려고 하는걸까 궁금했다. 하지만 이제는 알게되었다. object들은 morphism이며, 그 둘은 같은 것임을. 절대적으로 단독으로 존재하는 것은 없다. 모든 것은 상대적이며 둘 이상의 상호작용으로 존재한다. 이러한 수학적 사고에는 사실 언뜻보면 불교사상과도 같은 철학적 사상이 담겨있다. 수학을 공부할 때 이러한 철학적 사상을 염두해두고 공부하면 수학자들이 어떤 의도를 가지고 논리를 만들었는지 조금 더 수월하게 이해가 간다. 이것을 알고 수학을 공부하는 것과 모르고 수학을 공부하는 것은 천지(天地) 차이다. 혹자는 수학을 단순히 패턴을 찾아내는 것으로 배웠거나 그렇게 생각할 수도 있다. 나도 그렇게 생각했고, 패턴을 찾는 즐거운 놀이(?)로 생각하기도 했었다. 하지만 패턴을 찾는 것은 수학을 하기위한 “도구”일 뿐이다. 수학은 본질을 찾아내는 것이다. 그리고 그것은 철학이다. 의미있는 수학은 사실 철학이다. 난 왜 철학이 문과인지 모르겠다.]]></summary></entry><entry><title type="html">Ideal To Isogeny</title><link href="http://localhost:4000/2022/06/18/Isogeny-To-Ideal.html" rel="alternate" type="text/html" title="Ideal To Isogeny" /><published>2022-06-18T00:00:00+09:00</published><updated>2022-06-18T00:00:00+09:00</updated><id>http://localhost:4000/2022/06/18/Isogeny-To-Ideal</id><content type="html" xml:base="http://localhost:4000/2022/06/18/Isogeny-To-Ideal.html"><![CDATA[<ul>
+  <li>Deuring Correspondence에 의하면 Isogeny와 Ideal은 대응관계에 있다.</li>
+  <li>Supersingular elliptic curve $E$에 대해서 maximal order $\mathcal{O}$에 대해 $\mathrm{End}(E) \cong \mathcal{O}$를 만족할 때, $E$를 codomain으로 가지는 isogeny $\phi:E \rightarrow E’$은 left $\mathcal{O}$-ideal $I$에 대응된다.</li>
+  <li>Isogeny 기반 서명 기법인 SQISign에서 서명 시 가장 오래걸리는 부분이 바로 $\mathcal{l}^e$-Ideal을 Isogeny로 변환하는 과정이다.</li>
+</ul>
 
-&lt;h5 id=&quot;proposition-3-k가-algebraically-closed-일-때-curve-위에-존재하는-모든-proper-closed-subvariety-점-하나로-구성된다fulton-6-proposition-104&quot;&gt;Proposition 3. $K$가 algebraically closed 일 때, Curve 위에 존재하는 모든 proper closed subvariety 점 하나로 구성된다.(Fulton 6. Proposition 10(4))&lt;/h5&gt;
+<!--more-->
 
-&lt;p&gt;&lt;em&gt;Proof)&lt;/em&gt; Curve $C$에 대한 coordinate ring $K[C]$를 생각하자. curve 위의 closed subvariety $W \subset C$는 $K[C]$에 속하는 prime ideal $I \subset K[C]$에 대응된다. &lt;strong&gt;Claim 2.&lt;/strong&gt; 에 의해 $K[C]/I \cong K$ 임을 알고 있다. 이는 subvariety W에 대한 coordinate ring $K[W]$와 isomorphic하다. 따라서 subvariety $W$는 Curve $C$ 위의 한 점이 된다.&lt;/p&gt;
+<h2 id="klpt-알고리즘">KLPT 알고리즘</h2>
 
-&lt;div style=&quot;text-align: right&quot;&gt;□&lt;/div&gt;
+<p>KLPT 알고리즘은 임의의 ideal $I$가 주어졌을 때, ideal $I$와 equivalent하면서 원하는 norm을 가지는 다른 ideal $J$를 찾는 알고리즘이다. KLPT 알고리즘은 따로 포스팅을 통해 다루기로하고, 여기서는 KLPT 알고리즘이 IdealToIsogeny에서 어떤 역할을 하고, 이를 어떻게 활용하는지에 대해서만 짚고 넘어가도록 하겠다.</p>
 
-&lt;h2 id=&quot;non-constant-morphism-of-curves-is-surjective&quot;&gt;Non-constant morphism of curves is surjective&lt;/h2&gt;
+<p>기본적인 KLPT 알고리즘은 special $p$-extremal maximal order $\mathcal{O}_0$의 특성을 활용한다. $\mathcal{O}_0$에는 $\mathbb{Z} + i\mathbb{Z} + j\mathbb{Z} + ij\mathbb{Z}$를 suborder로 포함하고 있다는 특징을 가지며, $\mathcal{O}_0$의 basis는 $1, i, \frac{i + j}{2}, \frac{1 + ij}{2}$이고, supersingular elliptic curve $E(\bar{\mathbb{F}_p}) : y^2 = x^3 + x$의 endomorphism ring과 isomorphic 하다는 것이 알려져있다. 이러한 특별한 maximal order $\mathcal{O}_0$를 이용해 원하는 ideal을 계산하는 것이 KLPT 알고리즘의 핵심이다.</p>
 
-&lt;p&gt;Morphism $\varphi: C_1 \rightarrow C_2$는 zariski topology 상에서 continuous하다. $C_2$는 curve이므로 &lt;strong&gt;Proposition 3.&lt;/strong&gt; 에 의해 $C_2$ 위의 proper closed subvariety는 하나의 점으로 구성된다. morphism은 $C_1$ 위의 모든 점에서 define되며, $C_1$은 closed subvariety이므로 morphism $\varphi$의 image는 하나의 점이거나 Curve $C_2$ 전체가 된다. 따라서 constant이거나 surjective인 것이다!&lt;/p&gt;
+<p>$\mathcal{O}_0$의 basis들을 활용해 원하는 norm을 가지는 원소 $\beta \in I \subset \mathcal{O}_0$를 찾게 되는데, 원하는 norm 값이 $N$이라면, $\gcd(N,n(I)) = 1$을 만족해야만 해 $\beta$를 구할 수 있다.</p>
 
-&lt;h2 id=&quot;degree-of-a-morphism&quot;&gt;Degree of a morphism&lt;/h2&gt;
+<h2 id="ideal을-isogeny로-변환">Ideal을 Isogeny로 변환</h2>
 
-&lt;p&gt;non-constant morphism은 surjective이다. 또한 morphism $\varphi$에 대한 induced map $\tilde{\varphi}: K(C_2) \rightarrow K(C_1)$을 생각했을 때, $\tilde{\varphi}(K(C_2))$는 transcendence degree 1을 갖는다. 따라서 $K(C_1)$은 $\tilde{\varphi}(K(C_2))$에 대한 algebraic field extension이 되며, 아래와 같이 extension degree를 morphism의 degree로 정의할 수 있다.&lt;/p&gt;
+<p>left $\mathcal{O}_1$-ideal $I$가 어떤 isogeny $\phi:E_1 \rightarrow E_2$에 대응된다는 것은 알겠는데, left ideal $I$가 주어졌을 때, 대응되는 isogeny를 어떻게 practical하게 계산할 수 있을까? 실제 서명기법에서 활용하기 위해서는 어떻게 효율적으로 계산할 수 있을까?</p>
 
-&lt;center&gt;$deg(\varphi) = [K(C_1):\tilde{\varphi}(K(C_2))]$&lt;/center&gt;
+<p>일단 “효율적으로 계산할 수 있는 Isogeny”란 무엇인가 생각해보아야 한다. Isogeny의 kernel point들이 모두 적절히 낮은 차원의 field extension $\mathbb{F}_{p^n}$ 위에서 정의된다면, Velu’s formula를 이용해 효율적으로 계산할 수 있을 것이다. “적절히 낮은 차원”의 기준을 $\mathbb{F}_{p^2}$ 이라고 한다면, 우리는 모든 연산을 $\mathbb{F}_{p^2}$ 위에서 수행하고 싶은 상황이다.</p>
 
-&lt;p&gt;해당 degree는 isogeny에서 group homomorphism의 degree 정의와 유사한 의미를 갖는다. group homomorphism에서는 kernel의 크기로 degree를 정하기 때문에 inseparable degree가 표현되지 않지만, 위와 같이 정의된 morphism의 degree는 inseparable degree를 반영한다.(inseparable degree를 가지려면 field $K$의 characteristic이 0보다 커야하며, 이에 대한 algebraic closure $\bar{\mathbb{F}}_p$를 생각한다.)&lt;/p&gt;
+<h3 id="ideal을-분해하자">Ideal을 분해하자</h3>
 
-&lt;h2 id=&quot;curves-on-a-finite-field&quot;&gt;Curves on a finite field&lt;/h2&gt;
+<blockquote>
+  <p>일단 SQISign의 환경과 같이 주어지는 left ideal $I$의 norm은 $\mathcal{l}^e$ 꼴을 가진다고 하자.</p>
+</blockquote>
 
-&lt;p&gt;Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 &lt;a href=&quot;https://math.stackexchange.com/questions/2969598/if-isogenous-elliptic-curves-have-equal-numbers-of-points-how-can-isogenies-hav&quot;&gt;surjective가 아니게 되는 문제에 대한 의문&lt;/a&gt;이 발생한다.&lt;/p&gt;
+<p>$E(\mathbb{F}_{p^2})$ 의 point 개수는 유한하기 때문에 $\mathbb{F}_{p^2}$ 으로 계산할 수 있는 isogeny의 최대 degree는 $E(\mathbb{F}_{p^2})$ 의 점 개수로 제한된다. 만일 주어진 ideal의 norm이 $E(\mathbb{F}_{p^2})$의 점 개수를 넘는다면, 우리는 해당 ideal에 대응되는 isogeny의 kernel point를 $\mathbb{F}_{p^2}$ 위에서 표현할 수 없다. 이러한 문제를 해결하기 위해서 우리는 ideal $I$를 degree가 낮은 여러 ideal들로 분해하고, 각각을 $\mathbb{F}_{p^2}$위에서 표현할 것이다.</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;사실 이 문제가 머릿속에서 해결이 안되서 포스트로 정리해 본 것이었다. 하지만 생각보다 간단한 문제였던 것 같다..&lt;/p&gt;
-&lt;/blockquote&gt;
+<p>$n(I) = \mathcal{l}^e$이라고 하자. $\mathbb{F}_{p^2}$위에서 표현할 수 있는 최대 degree가 $\mathcal{l}^f$라고 할 때, $e &gt; f$인 경우, ideal $I$를 분해해야 한다. 이는 아래와 같이 수행할 수 있다.</p>
 
-&lt;p&gt;이러한 오류가 발생하는 원인은 Finite field $\mathbb{F}_p$ 위에서 우리가 생각하는 일반적인 Curve들이 irreducible하지 않다는 것을 간과한 것이다. Finite field에서는 모든 algebraic set들이 finite 개수의 점을 갖는다. 각각의 점은 variety이기 때문에 variety의 유한 합으로 표현 가능하고, 당연히도 irreducible하지 않게 된다.&lt;/p&gt;
+<p>$I = \mathcal{O}&lt;\alpha, l^e&gt;$이라고 할 때, $I_i = \mathcal{O}&lt;\alpha, l^{if}&gt;$ for $i \in [1,\lfloor e/f\rfloor]$라고 하면, $I \subset I_{\lfloor e/f\rfloor} \subset … \subset I_2 \subset I_1$을 만족한다. $I_i$에 대응되는 isogeny를 $\phi_i$라고 하면, 이를 이용해서 $\phi$를 degree가 $\mathcal{l}^f$보다 작은 isogeny들로 분해할 수 있다.</p>
 
-&lt;p&gt;variety는 한 점으로만 구성되며, 이러한 점은 coordinate ring이 $\mathbb{F}_p$와 같아져서 dimension이 0이기 때문에 curve가 존재하지 않는다고 볼 수 있다. curve 개념이 생기기 위해서는 field의 원소 개수가 무한해야하며, algebraic closure of finite field $\bar{\mathbb{F}}_p$ 위에서 생각해야할 것이다. 여기서는 curve가 존재하기 때문에 non-constant morphism of curves가 surjective임을 사용할 수 있다.
-또한 p-adic field $\mathbb{Q}_p$에서도 마찬가지로 사용할 수 있다.&lt;/p&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html">해당 글은 Fulton의 Algebraic Curves와 Silverman의 Arithmetic of Elliptic Curves를 정리한 것이다. Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 surjective가 아니게 되는 문제에 대한 의문을 해결한다. Dimension of a curve Variety $V$의 dimension은 function field $K(V)$를 field extension of $K$라고 생각했을 때, 해당 extension의 transcendence degree를 말한다. transcendence degree는 algebraic 하게 generate되지 않는 extension field 위의 원소들의 dimension을 뜻한다. transcendence degree가 $n$이면, algebraic basis의 개수는 $n$개가 된다. Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 transcendence degree가 1이라는 의미이다. algebraic basis는 한 개이고, 이를 $t \in K(C) \setminus K$라고 하자. 그러면 $K(C)$는 $K(t)$에 대한 algebraic field extension(finite field extension)이다. Any proper closed subvariety of a curve is a point curve 위에서 어떤 proper closed subvariety(아직 zariski topology를 정리하지 않았으므로 여기서는 간단히 affine variety를 생각하자)는 항상 점 한개로 구성됨을 증명하자. 아래 두 개의 claim을 거쳐야 한다. Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C) \setminus K$에 대해 $K(C)$는 $K(x)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1)) Proof) algebraic basis를 $t \in K(C) \setminus K$라고 하자. 임의의 원소 $x \in K(C) \setminus K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 $K$가 algebraically closed인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다. □ Claim 2. $K$가 algebraically closed이고, Ring $R$이 존재해서 quotient field $K(C)$를 갖는다고 하면, $R$ 위의 prime ideal $I$에 대해 항상 $R/I \cong K$이다.(Fulton 6. Proposition 9(3)) Proof) 귀류법으로 $R/I$ 상에서 $K$에 포함되지 않는 $x$가 존재한다고 가정하자. 그러면 Claim 1. 에 의해서 $K(C)$는 $K(x)$에 대한 algebraic field extension이다. 그러면 $y \in I$에 대해 minimal polynomial $f = \sum_{i} a_{i}(x)X^i \in K(x)[X]$가 존재해서 $\sum_{i} a_{i}(x) y^i = 0$을 만족한다. $f$는 minimal polynomial이므로 $a_0(x) \neq 0$이다. quotient ring $R/I$ 상에서 $f(y) = a_0(x) = 0$이 된다. 이는 $x$가 $K$에 대해 algebraic하다는 의미로 모순이다. 따라서 이러한 $x$가 존재하지 않는다. □ 이제 Claim 2. 를 이용해 아래의 Proposition 3. 을 증명할 것이다. Proposition 3. $K$가 algebraically closed 일 때, Curve 위에 존재하는 모든 proper closed subvariety 점 하나로 구성된다.(Fulton 6. Proposition 10(4)) Proof) Curve $C$에 대한 coordinate ring $K[C]$를 생각하자. curve 위의 closed subvariety $W \subset C$는 $K[C]$에 속하는 prime ideal $I \subset K[C]$에 대응된다. Claim 2. 에 의해 $K[C]/I \cong K$ 임을 알고 있다. 이는 subvariety W에 대한 coordinate ring $K[W]$와 isomorphic하다. 따라서 subvariety $W$는 Curve $C$ 위의 한 점이 된다. □ Non-constant morphism of curves is surjective Morphism $\varphi: C_1 \rightarrow C_2$는 zariski topology 상에서 continuous하다. $C_2$는 curve이므로 Proposition 3. 에 의해 $C_2$ 위의 proper closed subvariety는 하나의 점으로 구성된다. morphism은 $C_1$ 위의 모든 점에서 define되며, $C_1$은 closed subvariety이므로 morphism $\varphi$의 image는 하나의 점이거나 Curve $C_2$ 전체가 된다. 따라서 constant이거나 surjective인 것이다! Degree of a morphism non-constant morphism은 surjective이다. 또한 morphism $\varphi$에 대한 induced map $\tilde{\varphi}: K(C_2) \rightarrow K(C_1)$을 생각했을 때, $\tilde{\varphi}(K(C_2))$는 transcendence degree 1을 갖는다. 따라서 $K(C_1)$은 $\tilde{\varphi}(K(C_2))$에 대한 algebraic field extension이 되며, 아래와 같이 extension degree를 morphism의 degree로 정의할 수 있다. $deg(\varphi) = [K(C_1):\tilde{\varphi}(K(C_2))]$ 해당 degree는 isogeny에서 group homomorphism의 degree 정의와 유사한 의미를 갖는다. group homomorphism에서는 kernel의 크기로 degree를 정하기 때문에 inseparable degree가 표현되지 않지만, 위와 같이 정의된 morphism의 degree는 inseparable degree를 반영한다.(inseparable degree를 가지려면 field $K$의 characteristic이 0보다 커야하며, 이에 대한 algebraic closure $\bar{\mathbb{F}}_p$를 생각한다.) Curves on a finite field Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 surjective가 아니게 되는 문제에 대한 의문이 발생한다. 사실 이 문제가 머릿속에서 해결이 안되서 포스트로 정리해 본 것이었다. 하지만 생각보다 간단한 문제였던 것 같다.. 이러한 오류가 발생하는 원인은 Finite field $\mathbb{F}_p$ 위에서 우리가 생각하는 일반적인 Curve들이 irreducible하지 않다는 것을 간과한 것이다. Finite field에서는 모든 algebraic set들이 finite 개수의 점을 갖는다. 각각의 점은 variety이기 때문에 variety의 유한 합으로 표현 가능하고, 당연히도 irreducible하지 않게 된다. variety는 한 점으로만 구성되며, 이러한 점은 coordinate ring이 $\mathbb{F}_p$와 같아져서 dimension이 0이기 때문에 curve가 존재하지 않는다고 볼 수 있다. curve 개념이 생기기 위해서는 field의 원소 개수가 무한해야하며, algebraic closure of finite field $\bar{\mathbb{F}}_p$ 위에서 생각해야할 것이다. 여기서는 curve가 존재하기 때문에 non-constant morphism of curves가 surjective임을 사용할 수 있다. 또한 p-adic field $\mathbb{Q}_p$에서도 마찬가지로 사용할 수 있다.</summary></entry><entry><title type="html">Variety and Morphism</title><link href="/2021/02/17/Variety-and-Morphism.html" rel="alternate" type="text/html" title="Variety and Morphism" /><published>2021-02-17T00:00:00+09:00</published><updated>2021-02-17T00:00:00+09:00</updated><id>/2021/02/17/Variety-and-Morphism</id><content type="html" xml:base="/2021/02/17/Variety-and-Morphism.html">&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;해당 글은 Silverman의 &lt;a href=&quot;https://www.springer.com/gp/book/9780387094939&quot;&gt;Arithmetic of Elliptic Curves&lt;/a&gt;의 Chapter 1을 정리한 것이다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $x,y$가 아니라 $x_1, x_2, …, x_n$으로 많다면 정수해를 어떻게 찾을 수 있을까? 그리고 그들은 어떤 특징을 가질까?&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;다항식을 통해 얻을 수 있는 점들의 집합은 대수적으로 어떤 특성을 갖는지 분석하는 것이 대수기하학이다. 이것의 기본이 되는 기념이 algebraic set, variety라고 할 수 있다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Notation
-    &lt;ul&gt;
-      &lt;li&gt;$K$ : field&lt;/li&gt;
-      &lt;li&gt;$\bar{K}$ : algebraic closure of $K$&lt;/li&gt;
-      &lt;li&gt;$G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;$K[X_1, X_2, … , X_n]$는 간단히 $K[X]$로 표기하도록 하겠다.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Affine Space
-    &lt;ul&gt;
-      &lt;li&gt;$\mathbb{A}^n = \{(y_1, y_2, …, y_n) : y_i \in \bar{K} \ \textrm{for} \ 1 \leq i \leq n\}$&lt;/li&gt;
-      &lt;li&gt;$\mathbb{A}^n(K) = \{(y_1, y_2, …, y_n) : y_i \in K \ \textrm{for} \ 1 \leq i \leq n\}$&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<h3 id="smooth-odd-degree-isogeny의-필요성">Smooth Odd Degree Isogeny의 필요성</h3>
 
-&lt;h2 id=&quot;algebraic-set&quot;&gt;Algebraic set&lt;/h2&gt;
+<blockquote>
+  <p>여기서 “odd”가 들어가는 이유는 SQISign에서 실제로는 $l=2$로 사용하기 때문이다. 즉, $l$과 coprime인 smooth degree isogeny의 필요성을 의미한다. 여기서부터는 $l=2$로 가정하고 설명하도록 하겠다.</p>
+</blockquote>
 
-&lt;p&gt;$\bar{K}[X]$ 상의 ideal $I \subset \bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다.&lt;/p&gt;
+<p>left $\mathcal{O}$-ideal $I$의 generator가 $\alpha \in I$라고 할 때, $\alpha$가 실제로 codomain curve $E$에서 어떤 endomorphism에 해당되는지 알아야지 대응되는 $\phi_I$의 kernel을 구할 수 있을 것이다. 하지만 $\mathcal{O}$와 $\mathrm{End}(E)$의 일대일 대응관계를 바로 알아내기가 어렵기 때문에 우리는 sepcial maximal order인 $\mathcal{O}_0$를 활용해야 한다.</p>
 
-&lt;center&gt;$V_I = \{ P \in \mathbb{A}^n : f(P) = 0 \ \textrm{for} \ \forall f \in I \}$&lt;/center&gt;
+<p>$\mathcal{O}_0$를 활용하기 위해서 $\mathcal{O}_0$으로 pull back한 후에, 대응되는 isogeny의 kernel을 구하고, 해당 kernel의 basis를 다시 curve $E$로 push forward 해줄것이다. 그렇다면 $E_0$에서 $E$로 가는 isogeny $\phi_J$가 필요할 것이고, push forward와 pull back을 이용하기 위해서는 $\gcd(n(I), n(J))=1$이라는 조건이 필요하다. 우리가 $I$의 degree는 $\mathcal{l}^e$ 꼴이라는 것을 알고 있으므로, $\mathcal{l}=2$일 때, ideal $J$ degree는 odd이기만 하면 된다. 또한 push forward를 위해서는 $\phi_J$에 대한 point evaluation 연산이 필요하기 때문에 odd이면서 smooth degree를 가져야만 효율적인 연산이 가능하다.</p>
 
-&lt;p&gt;algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$가 만일 $K[X]$에 들어있는 함수들로 generate 된다면, $V$는 $K$ 위에서 정의되었다고 하며 이를 $V/K$라고 표기한다. $V(K)$는 $V$에 속하는 점들 중에서 $K$ 위에서 정의된 점들을 말하며 아래와 같이 정의된다.&lt;/p&gt;
+<blockquote>
+  <p>다시말해 special order $\mathcal{O}_0$를 활용하기 위해서는 coprime이면서 smooth degree를 갖는 isogeny $\phi_J$를 이용해서 $\mathcal{O}_0$에서 계산한 $\mathcal{l}^e$ degree의 isogeny를 “밀어”(push forward)주어야한다. 따라서 odd smooth isogeny와 odd smooth isogeny computation이 필요하다.</p>
+</blockquote>
 
-&lt;center&gt;$V(K) = V \cap \mathbb{A}^n(K)$&lt;/center&gt;
+<h3 id="meet-in-the-middle과-l2fdelta-isogeny">Meet-in-the-Middle과 $l^{2f+\Delta}$-isogeny</h3>
 
-&lt;p&gt;또한 $I(K) = I(V) \cap K[X] \subset \bar{K}[X]$로 정의한다. 정의에 따르면 $V/K$에 대해 아래와 같은 식을 도출 할 수 있다.&lt;/p&gt;
+<p>large odd degree isogeny를 연산하는 것은 꽤 오래걸리는 작업이기 때문에 odd degree isogeny 연산 횟수를 줄이는 것이 서명 기법을 빠르게하는 핵심 아이디어가 된다. ideal $I$를 많은 개수의 ideal로 분해할수록 odd degree isogeny의 연산 횟수가 늘어날 것이기 때문에 최대한 적게 분해되도록 해야한다. 이를 위해 SQISign 저자는 meet-in-the-middle을 활용하는 아이디어를 제안했다.</p>
 
-&lt;center&gt;$I(V) = I(K)\bar{K}[X]$ &amp;nbsp;&amp;nbsp;if $V$ is defined over $K$&lt;/center&gt;
+<p>원래는 $\mathcal{l}^{2f}$-degree의 ideal을 isogeny로 변환하려면 odd degree isogeny 연산을 두 번 수행해야 할 것이다. 하지만 저자는 여기에 meet-in-the-middle을 활용하면 작은 degree $\mathcal{l}^{\Delta}$를 가지는 ideal에 한해서는 odd degree isogeny 연산을 할 필요없이 전수조사를 통해서 isogeny로 변환할 수 있다는 사실을 적용했다. 즉, odd degree isogeny 연산을 두 번 수행했을 때, $\mathcal{l}^{2f+\Delta}$만큼의 isogeny를 얻게되기 때문에 변환 속도가 더 빨라지게 된다.</p>
 
-&lt;h3 id=&quot;variety&quot;&gt;Variety&lt;/h3&gt;
+<h3 id="sqisign의-ideal_to_isogeny_two_2f_delta-함수-코드리딩">SQISign의 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_two_2f_delta</code> 함수 코드리딩</h3>
 
-&lt;p&gt;variety란, algebraic set $V$에 대해 $I(V) \subset \bar{K}[X]$가 &lt;strong&gt;&lt;font color=&quot;red&quot;&gt;prime ideal이면 $V$를 variety라고 한다.&lt;/font&gt;&lt;/strong&gt;&lt;/p&gt;
+<p>앞서 설명한 $2^{2f+\Delta}$ degree인 ideal $I$를 isogeny로 변환하는 방식이 <a href="https://github.com/SQISign/sqisign">SQISign Git</a>에 오픈소스로 구현이 되어 있다. 해당 섹션에서는 idiso.c에 구현되어있는 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_two_2f_delta</code> 함수가 어떻게 구현되어 있는지 따라가보고자 한다.</p>
 
-&lt;p&gt;$\bar{K}$는 field이므로 noetherian이다. &lt;a href=&quot;https://en.wikipedia.org/wiki/Hilbert%27s_basis_theorem&quot;&gt;Hilbert basis theorem&lt;/a&gt;에 의해 $\bar{K}[X]$도 따라서 noetherian이다. 따라서 $\bar{K}[X]$에 속하는 ideal들은 prime ideal의 곱으로 unique하게 표현할 수 있다. 이와 마찬가지로 algebraic set $V$는 variety들의 union으로 아래와 같이 유일하게 표현된다.&lt;/p&gt;
+<p>일단 함수의 인자 값은 아래와 같다.</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">ideal_to_isogeny_two_2f_delta</span><span class="p">(</span><span class="n">two_walk_long</span> <span class="o">*</span><span class="n">phi</span><span class="p">,</span> <span class="n">GEN</span> <span class="o">*</span><span class="n">L</span><span class="p">,</span>
+    <span class="n">special_isogeny</span> <span class="o">*</span><span class="n">phi_L</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">I</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">J</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">K</span><span class="p">,</span>
+    <span class="n">proj</span> <span class="o">*</span><span class="n">phi_K_basis</span><span class="p">,</span> <span class="n">proj</span> <span class="o">*</span><span class="n">phi_K_target</span><span class="p">,</span> <span class="kt">int</span> <span class="n">delta</span><span class="p">,</span> <span class="n">GEN</span> <span class="n">I_long</span><span class="p">)</span>
+</code></pre></div></div>
+<p>변환하고자하는 ideal의 domain을 $E_1$, codomain을 $E_2$라고 할 때, 각 인자에 대한 설명은 아래와 같다.</p>
+<ul>
+  <li>ideal <code class="language-plaintext highlighter-rouge">J</code>는 odd smooth degree이면서 $E_0 \rightarrow E_1$인 left $\mathcal{O}_0$-ideal이다.</li>
+  <li>ideal <code class="language-plaintext highlighter-rouge">I</code>는 변환하고자 하는 ideal과 ideal <code class="language-plaintext highlighter-rouge">J</code>를 합성하여 degree가 $n(J)\cdot \mathcal{l}^{2f+\Delta}$이면서 $E_0 \rightarrow E_2$인 left $\mathcal{O}_0$-ideal이다.</li>
+  <li>ideal <code class="language-plaintext highlighter-rouge">K</code>는 ideal <code class="language-plaintext highlighter-rouge">J</code>와 equivalent하면서 degree가 $\mathcal{l}^e$꼴인 left $\mathcal{O}_0$-ideal 이다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_K_basis</code>는 <code class="language-plaintext highlighter-rouge">I</code> $\subset I_1 \cdot$ <code class="language-plaintext highlighter-rouge">K</code>
+인 degree $\mathcal{l}^{f}$인 ideal $I_1$에 대응되는 isogeny를 $\phi_1$이라고 할 때, $\phi_1 \circ \phi_K($<code class="language-plaintext highlighter-rouge">torsion_basis</code>$)$를 계산한 값이다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_K_target</code>은 $\phi_1 \circ \phi_K$의 codomain curve를 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">delta</code>는 meet-in-the-middle을 수행하기 위한 degree $\Delta$를 의미한다.</li>
+  <li>ideal <code class="language-plaintext highlighter-rouge">I_long</code>은 ideal <code class="language-plaintext highlighter-rouge">I</code>에 포함되면서 degree가 $\mathcal{l}^{rest}$인 앞으로 변환하고자 하는 나머지 ideal을 의미한다.</li>
+</ul>
 
-&lt;center&gt;$V = V_1 \cup V_2 \cup ... \cup V_n$ where $V_i$ is variety&lt;/center&gt;
+<p>출력 값은 아래와 같다.</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">phi</code>는 degree가 $\mathcal{l}^{2f+\Delta}$이면서 $E_1 \rightarrow E_2$인 isogeny를 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">L</code>은 odd smooth degree이면서 $E_0 \rightarrow E_1$인 ideal을 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_L</code>은 <code class="language-plaintext highlighter-rouge">L</code>에 대응되는 isogeny를 의미한다.</li>
+  <li><code class="language-plaintext highlighter-rouge">phi_K_basis</code>와 <code class="language-plaintext highlighter-rouge">phi_K_target</code>에는 다음 ideal 변환과정에 사용할 basis와 codomain curve가 들어간다.</li>
+</ul>
 
-&lt;p&gt;ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \{f : f^m \in J \ \textrm{for some} \ m \in \mathbb{Z}^+ \cup \{ 0 \}\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다.&lt;/p&gt;
+<p>다음은 함수의 초반부이다.</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GEN</span> <span class="n">L_</span><span class="p">;</span>
 
-&lt;h3 id=&quot;coordinate-ring-and-function-field&quot;&gt;Coordinate ring and function field&lt;/h3&gt;
+    <span class="k">if</span> <span class="p">(</span><span class="n">len_step</span> <span class="o">+</span> <span class="n">Z_lval</span><span class="p">(</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dbllog2r</span><span class="p">(</span><span class="n">itor</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">p</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span><span class="o">/</span><span class="mf">2.</span> <span class="o">+</span> <span class="mi">10</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="n">GEN</span> <span class="n">M</span><span class="p">;</span>
+        <span class="n">GEN</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">lideal_isom</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">);</span> <span class="c1">// J*alpha = K</span>
 
-&lt;p&gt;algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고 하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다.&lt;/p&gt;
+        <span class="n">M</span> <span class="o">=</span> <span class="n">lideal_mul</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">alpha</span><span class="p">);</span> <span class="c1">// I*alpha, equivalent to I, but norm a power of 2</span>
 
-&lt;p&gt;만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in \bar{K}[V]$와 $\sigma \in G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다.&lt;/p&gt;
+        <span class="n">L_</span> <span class="o">=</span> <span class="n">klpt_special_smooth_small_2e_input</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">famat_sqr</span><span class="p">(</span><span class="n">famat_mul</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_plus_fact</span><span class="p">,</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_minus_fact</span><span class="p">)));</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">L_</span> <span class="o">=</span> <span class="n">klpt_special_smooth</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">famat_sqr</span><span class="p">(</span><span class="n">famat_mul</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_plus_fact</span><span class="p">,</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_minus_fact</span><span class="p">)));</span>
+    <span class="p">}</span>
+</code></pre></div></div>
 
-&lt;p&gt;$\dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 &lt;a href=&quot;https://en.wikipedia.org/wiki/Transcendence_degree&quot;&gt;transcendence degree&lt;/a&gt;를 말한다. 예를 들어, $V : f(x_1, …, x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left&amp;lt; f \right&amp;gt;$는 algebraic basis가 $n-1$개 이므로 $\dim(V) = n-1$임을 알 수 있다.&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">alpha</code>는 $J\cdot \alpha = K$를 만족하는 $\alpha \in J$를 구한 값으로, $I\cdot \alpha$는 <code class="language-plaintext highlighter-rouge">I</code>에서 <code class="language-plaintext highlighter-rouge">J</code>에 해당하는 부분만 <code class="language-plaintext highlighter-rouge">K</code>로 변환하는 것을 의미한다. 이렇게 나온 ideal <code class="language-plaintext highlighter-rouge">M</code>은 $2^e$ 꼴의 degree를 갖는다. ideal <code class="language-plaintext highlighter-rouge">M</code>을 계산하는 이유는 odd smooth degree이면서 <code class="language-plaintext highlighter-rouge">I</code>와 equivalent한 ideal <code class="language-plaintext highlighter-rouge">L_</code>을 만들기 위해서이다. 이를 위해서는 KLPT 알고리즘을 사용해야하는데 앞서 설명했듯이 이를 위해서는 입력 값으로 들어가는 ideal의 degree가 원하는 odd smooth degree와 서로소여야 한다. 이를 위해서 $2^e$ 꼴의 degree를 갖는 ideal <code class="language-plaintext highlighter-rouge">M</code>을 계산할 필요가 있었던 것이다.</p>
 
-&lt;p&gt;&lt;strong&gt;&lt;font color=&quot;red&quot;&gt;function field $\bar{K}(V)$의 원소는 맵핑 $f: V \rightarrow \bar{K}$로 obvious하게 대응됨을 알 수 있다.&lt;/font&gt;&lt;/strong&gt; 이게 굉장히 재미있는 부분인데, algebraic set $V$에 있는 점 각각을 $\bar{K}$로 임의로 맵핑하는 것은 사실 $\bar{K}(V)$에 속하지 않을 수도 있다. $\bar{K}(V)$는 polynomial 특성(?)을 가지는 맵핑 $V \rightarrow \bar{K}$에 관한 정보를 담고 있다고 볼 수 있다.&lt;/p&gt;
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GEN</span> <span class="n">a</span> <span class="o">=</span> <span class="n">lideal_isom</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">);</span> <span class="c1">// J*a = K</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">gcmp</span><span class="p">(</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="n">gen_1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="n">a</span> <span class="o">=</span> <span class="n">alg_scalar</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">gen_1</span><span class="p">);</span> <span class="cm">/* make sure we don't apply a distorsion */</span> <span class="p">}</span>
 
-&lt;center&gt;
-&lt;figure&gt;
-&lt;img src=&quot;/assets/20210217/20210217_1.png&quot; width=&quot;70%&quot; /&gt;
-&lt;figcaption&gt;
-$\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시&lt;br /&gt;$f: C \rightarrow \mathbb{R}$ where $C : Y=X^3 - 4X^2 + X + 6 \subset \mathbb{R}^2$
-&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;/center&gt;
+    <span class="n">GEN</span> <span class="n">M</span> <span class="o">=</span> <span class="n">lideal_mul</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">lideal_isom</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span><span class="n">M</span><span class="p">));</span>
+    <span class="n">GEN</span> <span class="n">b</span> <span class="o">=</span> <span class="n">lideal_isom</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span><span class="n">M</span><span class="p">);</span> <span class="c1">// L_*gamma = M</span>
+    <span class="n">GEN</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">gmul</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">lideal_norm</span><span class="p">(</span><span class="n">L_</span><span class="p">));</span>
 
-&lt;h2 id=&quot;projective-space&quot;&gt;Projective space&lt;/h2&gt;
+    <span class="n">GEN</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">alg_primitive</span><span class="p">(</span><span class="o">&amp;</span><span class="n">n</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma</span><span class="p">);</span>
+    <span class="n">assert</span><span class="p">(</span><span class="n">gcmp</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">gen_1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span>
 
-&lt;p&gt;우리가 위에서 사용했던 $\mathbb{A}^n$은 Affine space라고 부른다. Projective space $\mathbb{P}^n$은 아래와 같이 정의된다.&lt;/p&gt;
 
-&lt;center&gt;$\mathbb{P}^n = \mathbb{A}^{n+1}/\sim$&lt;/center&gt;
 
-&lt;p&gt;relation $\sim$는 $(y_1, …, y_{n+1}) \sim (y_1^{\prime}, …, y_{n+1}^{\prime})$이면 $(y_1, …, y_{n+1}) = (\lambda y_1^{\prime}, …, \lambda y_{n+1}^{\prime})$ for some $\lambda \in \bar{K}$를 의미한다.&lt;/p&gt;
+    <span class="n">GEN</span> <span class="n">H1_odd</span> <span class="o">=</span> <span class="n">lideal_create</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">ggcd</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_odd_torsion</span><span class="p">,</span> <span class="n">lideal_norm</span><span class="p">(</span><span class="n">L_</span><span class="p">)));</span>
+</code></pre></div></div>
 
-&lt;blockquote&gt;
-  &lt;p&gt;projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 $n$차 다항식과 $m$차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.(&lt;a href=&quot;https://en.wikipedia.org/wiki/B%C3%A9zout%27s_theorem&quot;&gt;Bezout’s theorem&lt;/a&gt;) 이와 같은 특성을 사용하게 위해 projective space를 사용한다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<p>다음은 <code class="language-plaintext highlighter-rouge">gamma</code> 값을 계산해 이를 generator로 하는 degree <code class="language-plaintext highlighter-rouge">T</code>의 left $\mathcal{O}_0$-ideal <code class="language-plaintext highlighter-rouge">H1_odd</code>를 만드는 과정이다. 이렇게 만든 ideal <code class="language-plaintext highlighter-rouge">H1_odd</code>를 통해 대응되는 isogeny kernel을 미리 계산해둔 <code class="language-plaintext highlighter-rouge">T</code>-torsion basis에 대한 계수로 표현하고, <code class="language-plaintext highlighter-rouge">phi_K_basis</code>에 바로 곱해서 더해주면, isogeny 연산 필요없이 바로 push forward된 isogeny $H_1$의 kernel을 얻을 수 있다. 해당 isogeny가 코드에서 <code class="language-plaintext highlighter-rouge">psi_1</code>이고, 이의 dual isogeny가 <code class="language-plaintext highlighter-rouge">psi_1_dual</code>이다.</p>
 
-&lt;p&gt;projective algebraic set $V$는 homogeneous 함수들로 generate되는 ideal $I \in \bar{K}[X_1, …, X_{n+1}]$로부터 정의되며, $I(V)$ 또한 homogeneous 함수들로 generate되는 ideal을 말한다. 아래와 같은 subset을 이용하면 projective set $\mathbb{P}^n$과 affine set $\mathbb{A}^n$을 연결할 수 있다.&lt;/p&gt;
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">GEN</span> <span class="n">gamma_conj</span> <span class="o">=</span> <span class="n">alg_conj</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">gamma</span><span class="p">);</span>
+    <span class="n">GEN</span> <span class="n">H2_odd</span> <span class="o">=</span> <span class="n">lideal_create</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma_conj</span><span class="p">,</span> <span class="n">gdiv</span><span class="p">(</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">L_</span><span class="p">),</span> <span class="n">lideal_norm</span><span class="p">(</span><span class="n">H1_odd</span><span class="p">)));</span>
+    <span class="n">GEN</span> <span class="n">H2_two</span> <span class="o">=</span> <span class="n">lideal_create</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">gamma_conj</span><span class="p">,</span> <span class="n">powuu</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">e2</span><span class="p">));</span>
 
-&lt;center&gt;$U_i = \{ [y_1/y_i, ..., 1, ..., y_{n+1}/y_i] \in \mathbb{P}^n : y_i \neq 0 \}$&lt;/center&gt;
+    <span class="n">odd_isogeny</span> <span class="n">psi_2</span> <span class="o">=</span> <span class="n">ideal_to_isogeny_O0_T</span><span class="p">(</span><span class="n">H2_odd</span><span class="p">,</span> <span class="n">famat_Z_gcd</span><span class="p">(</span><span class="n">famat_mul</span><span class="p">(</span><span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_plus_fact</span><span class="p">,</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">gen_p_minus_fact</span><span class="p">),</span><span class="n">lideal_norm</span><span class="p">(</span><span class="n">H2_odd</span><span class="p">)));</span>
 
-&lt;p&gt;$\phi_i : U_i \rightarrow \mathbb{A}^{n}$인 one-to-one map을 obvious하게 정의할 수 있다. 그러면 아래와 같은 조건을 만족한다.&lt;/p&gt;
+<span class="p">...</span>
 
-&lt;center&gt;$\mathbb{P}^n = \phi_1^{-1}(\mathbb{A}^n) \cup ... \cup \phi_{n+1}^{-1}(\mathbb{A}^n)$&lt;/center&gt;
+    <span class="n">two_walk</span> <span class="n">phi_2</span> <span class="o">=</span> <span class="n">ideal_to_isogeny_O0_two</span><span class="p">(</span><span class="n">H2_two</span><span class="p">);</span>
+</code></pre></div></div>
 
-&lt;p&gt;projective algebraic set $V$가 주어졌을 때, 이를 affine space에서 바라본다면, $\phi_i(V \cap U_i)$가 되고, $V - U_i$에 속하는 점들을 point at infinity라고 부른다.&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">psi_1</code>을 계산한 이후엔 $\bar{\gamma}$에 해당하는 <code class="language-plaintext highlighter-rouge">gamma_conj</code> 값을 이용해 ideal <code class="language-plaintext highlighter-rouge">H2_odd</code>와 <code class="language-plaintext highlighter-rouge">H2_two</code>를 만든다. 각각은 $n(L)/T$와 $2^{f_2}$ degree를 가진다. <code class="language-plaintext highlighter-rouge">H2_odd</code>는 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_O0_T</code>라는 함수를 통해 미리 계산된 endomorphism action들을 이용해 isogeny <code class="language-plaintext highlighter-rouge">psi_2</code>로 변환할 수 있으며, <code class="language-plaintext highlighter-rouge">H2_two</code>는 <code class="language-plaintext highlighter-rouge">ideal_to_isogeny_O0_two</code> 함수를 이용해 마찬가지로 isogeny <code class="language-plaintext highlighter-rouge">phi_2</code>로 변환 후, <code class="language-plaintext highlighter-rouge">psi_2</code>를 이용해 push forward한다. 이 때 <code class="language-plaintext highlighter-rouge">psi_2</code>만큼의 odd degree isogeny 연산이 들어간다.</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;Elliptic Curve Cryptography에서 사용하는 그 point at infinity의 개념이 여기서 나온 것이다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">proj</span> <span class="n">from</span> <span class="o">=</span> <span class="n">psi_1_dual_source</span><span class="p">,</span> <span class="n">from0</span> <span class="o">=</span> <span class="n">psi_1_dual_source</span><span class="p">;</span>
+    <span class="n">proj</span> <span class="n">to</span> <span class="o">=</span> <span class="n">phi_2_adjusted_target</span><span class="p">;</span> <span class="c1">// phi_2 source</span>
+    <span class="n">two_walk_long</span> <span class="n">phi_2_dual_eta</span><span class="p">;</span>
+    <span class="n">init_trivial_two_walk_long</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">);</span>
 
-&lt;p&gt;affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\{f_1, …, f_m\} \subset \bar{K}[X_1, …, X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\{ f_1^{\ast}, …,f_m^{\ast} \} \subset \bar{K}[X_1, …, X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V’$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V’ \cap U_{n+1})$을 만족한다.&lt;/p&gt;
+    <span class="k">if</span> <span class="p">(</span><span class="n">dist</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">bool</span> <span class="n">done</span><span class="p">;</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">dist</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// for now, the case dist == 1 crashes</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="n">MITM2</span><span class="p">(</span><span class="o">&amp;</span><span class="n">eta</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">from</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">to</span><span class="p">,</span> <span class="n">dist</span><span class="p">);</span>
+        <span class="n">assert</span><span class="p">(</span><span class="n">done</span><span class="p">);</span>
+        <span class="n">two_walk_composition_ss</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_2_dual</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">eta</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">two_walk_stol</span><span class="p">(</span><span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_2_dual</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div></div>
 
-&lt;p&gt;따라서 우리는 projective algebraic set $V \in \mathbb{P}^n$이 주어지면 이를 affine algebraic set으로 표현할 수 있고, 이는 곧 dehomogenization된 polynomial $\in \bar{K}[X_1, …,X_n]$으로 표현할 수 있다!&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">psi_1</code>과 <code class="language-plaintext highlighter-rouge">phi_2</code>를 얻은 후, <code class="language-plaintext highlighter-rouge">psi_1</code>의 codomain curve <code class="language-plaintext highlighter-rouge">from</code>과 <code class="language-plaintext highlighter-rouge">phi_2</code>의 codomain curve <code class="language-plaintext highlighter-rouge">to</code> 사이에 degree가 $2^\Delta$인 isogeny를 <code class="language-plaintext highlighter-rouge">MITM</code> 함수를 이용해 meet-in-the-middle 방식으로 찾는다. 이렇게 찾은 $2^\Delta$-degree isogeny가 <code class="language-plaintext highlighter-rouge">eta</code>이다.</p>
 
-&lt;h2 id=&quot;rational-map-and-morphism&quot;&gt;Rational map and Morphism&lt;/h2&gt;
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">source</span> <span class="o">=</span> <span class="n">global_setup</span><span class="p">.</span><span class="n">E0</span><span class="p">;</span>
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi1</span> <span class="o">=</span> <span class="n">psi_2</span><span class="p">;</span>
 
-&lt;p&gt;두 개의 projective variety $V_1 \in \mathbb{P}^n$과 $V_2 \in \mathbb{P}^m$이 주어졌을 때, 아래와 같은 map을 생각하자.&lt;/p&gt;
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi2_dual_set</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
 
-&lt;center&gt;$\varphi : V_1 \rightarrow V_2$ where $\varphi(P) = [f_1(P), ..., f_{m+1}(P)]$ for $P \in V_1$, $f_i \in \bar{K}(V)$&lt;/center&gt;
+    <span class="c1">// since psi_1_dual has already been computed...</span>
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">middle</span> <span class="o">=</span> <span class="n">psi_1_dual_source</span><span class="p">;</span> <span class="c1">// = psi_1_dual_source</span>
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi2</span> <span class="o">=</span> <span class="n">push_odd_isogeny_through_two_walk_long</span><span class="p">(</span><span class="o">&amp;</span><span class="n">psi_1_dual</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">middle</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">phi_2_dual_eta</span><span class="p">);</span>
 
-&lt;p&gt;이렇게 정의된 mapping은 well-define되며, rational map이라고 부른다. rational map의 정의에 따르면, rational map $\varphi$가 모든 점 $P \in V_1$ 위에서 정의될 필요는 없다. 모든 점 $P \in V_1$ 위에서 정의된다면 이러한 rational map을 morphism이라고 부른다.&lt;/p&gt;
+    <span class="n">phi_L</span><span class="o">-&gt;</span><span class="n">phi2_set</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</code></pre></div></div>
 
-&lt;blockquote&gt;
-  &lt;p&gt;이런식으로 morphism을 정의하면 rational map은 variety topology(&lt;a href=&quot;https://en.wikipedia.org/wiki/Zariski_topology&quot;&gt;zariski topology&lt;/a&gt;)에 대한 continuous function이 된다!&lt;/p&gt;
-&lt;/blockquote&gt;
+<p>그 다음엔 <code class="language-plaintext highlighter-rouge">psi_1_dual</code>을 <code class="language-plaintext highlighter-rouge">phi_2_dual_eta</code>를 통해 push forward하고, 이를 <code class="language-plaintext highlighter-rouge">phi_L-&gt;phi2</code>에 저장한다. 이는 2의 지수승 degree를 갖는 isogeny를 연산하는 것이므로 연산량이 많지 않다. ideal <code class="language-plaintext highlighter-rouge">L_</code>에 대응되는 isogeny $\phi_L$은 위 코드와 같이 <code class="language-plaintext highlighter-rouge">phi_L-&gt;phi1 = psi_2</code>와 <code class="language-plaintext highlighter-rouge">phi_L-&gt;phi2</code>의 합성으로 구성됨을 알 수 있다.</p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="PQCrypto" /><summary type="html"><![CDATA[Deuring Correspondence에 의하면 Isogeny와 Ideal은 대응관계에 있다. Supersingular elliptic curve $E$에 대해서 maximal order $\mathcal{O}$에 대해 $\mathrm{End}(E) \cong \mathcal{O}$를 만족할 때, $E$를 codomain으로 가지는 isogeny $\phi:E \rightarrow E’$은 left $\mathcal{O}$-ideal $I$에 대응된다. Isogeny 기반 서명 기법인 SQISign에서 서명 시 가장 오래걸리는 부분이 바로 $\mathcal{l}^e$-Ideal을 Isogeny로 변환하는 과정이다.]]></summary></entry><entry><title type="html">Non-constant Morphism of Curves is surjective</title><link href="http://localhost:4000/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html" rel="alternate" type="text/html" title="Non-constant Morphism of Curves is surjective" /><published>2021-02-18T00:00:00+09:00</published><updated>2021-02-18T00:00:00+09:00</updated><id>http://localhost:4000/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective</id><content type="html" xml:base="http://localhost:4000/2021/02/18/Non-Constant-Morphism-of-Curves-is-Surjective.html"><![CDATA[<ul>
+  <li>
+    <p>해당 글은 Fulton의 <a href="http://www.math.lsa.umich.edu/~wfulton/CurveBook.pdf">Algebraic Curves</a>와 Silverman의 <a href="https://www.springer.com/gp/book/9780387094939">Arithmetic of Elliptic Curves</a>를 정리한 것이다.</p>
+  </li>
+  <li>
+    <p>Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 <a href="https://math.stackexchange.com/questions/2969598/if-isogenous-elliptic-curves-have-equal-numbers-of-points-how-can-isogenies-hav">surjective가 아니게 되는 문제에 대한 의문</a>을 해결한다.</p>
+  </li>
+</ul>
 
-&lt;p&gt;projective variety $V_1, V_2$에 대해 두 morphism $\psi : V_1 \rightarrow V_2$와 $\varphi : V_2 \rightarrow V_1$가 존재해서, $\psi \circ \varphi$와 $\varphi \circ \psi$가 identity가 되면 $V_1, V_2$는 isomorphic하다고 한다.&lt;/p&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html">해당 글은 Silverman의 Arithmetic of Elliptic Curves의 Chapter 1을 정리한 것이다. Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $x,y$가 아니라 $x_1, x_2, …, x_n$으로 많다면 정수해를 어떻게 찾을 수 있을까? 그리고 그들은 어떤 특징을 가질까? 다항식을 통해 얻을 수 있는 점들의 집합은 대수적으로 어떤 특성을 갖는지 분석하는 것이 대수기하학이다. 이것의 기본이 되는 기념이 algebraic set, variety라고 할 수 있다. Notation $K$ : field $\bar{K}$ : algebraic closure of $K$ $G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$ $K[X_1, X_2, … , X_n]$는 간단히 $K[X]$로 표기하도록 하겠다. Affine Space $\mathbb{A}^n = \{(y_1, y_2, …, y_n) : y_i \in \bar{K} \ \textrm{for} \ 1 \leq i \leq n\}$ $\mathbb{A}^n(K) = \{(y_1, y_2, …, y_n) : y_i \in K \ \textrm{for} \ 1 \leq i \leq n\}$ Algebraic set $\bar{K}[X]$ 상의 ideal $I \subset \bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다. $V_I = \{ P \in \mathbb{A}^n : f(P) = 0 \ \textrm{for} \ \forall f \in I \}$ algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$가 만일 $K[X]$에 들어있는 함수들로 generate 된다면, $V$는 $K$ 위에서 정의되었다고 하며 이를 $V/K$라고 표기한다. $V(K)$는 $V$에 속하는 점들 중에서 $K$ 위에서 정의된 점들을 말하며 아래와 같이 정의된다. $V(K) = V \cap \mathbb{A}^n(K)$ 또한 $I(K) = I(V) \cap K[X] \subset \bar{K}[X]$로 정의한다. 정의에 따르면 $V/K$에 대해 아래와 같은 식을 도출 할 수 있다. $I(V) = I(K)\bar{K}[X]$ &amp;nbsp;&amp;nbsp;if $V$ is defined over $K$ Variety variety란, algebraic set $V$에 대해 $I(V) \subset \bar{K}[X]$가 prime ideal이면 $V$를 variety라고 한다. $\bar{K}$는 field이므로 noetherian이다. Hilbert basis theorem에 의해 $\bar{K}[X]$도 따라서 noetherian이다. 따라서 $\bar{K}[X]$에 속하는 ideal들은 prime ideal의 곱으로 unique하게 표현할 수 있다. 이와 마찬가지로 algebraic set $V$는 variety들의 union으로 아래와 같이 유일하게 표현된다. $V = V_1 \cup V_2 \cup ... \cup V_n$ where $V_i$ is variety ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \{f : f^m \in J \ \textrm{for some} \ m \in \mathbb{Z}^+ \cup \{ 0 \}\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다. Coordinate ring and function field algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고 하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다. 만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in \bar{K}[V]$와 $\sigma \in G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다. $\dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 transcendence degree를 말한다. 예를 들어, $V : f(x_1, …, x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left&amp;lt; f \right&amp;gt;$는 algebraic basis가 $n-1$개 이므로 $\dim(V) = n-1$임을 알 수 있다. function field $\bar{K}(V)$의 원소는 맵핑 $f: V \rightarrow \bar{K}$로 obvious하게 대응됨을 알 수 있다. 이게 굉장히 재미있는 부분인데, algebraic set $V$에 있는 점 각각을 $\bar{K}$로 임의로 맵핑하는 것은 사실 $\bar{K}(V)$에 속하지 않을 수도 있다. $\bar{K}(V)$는 polynomial 특성(?)을 가지는 맵핑 $V \rightarrow \bar{K}$에 관한 정보를 담고 있다고 볼 수 있다. $\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시$f: C \rightarrow \mathbb{R}$ where $C : Y=X^3 - 4X^2 + X + 6 \subset \mathbb{R}^2$ Projective space 우리가 위에서 사용했던 $\mathbb{A}^n$은 Affine space라고 부른다. Projective space $\mathbb{P}^n$은 아래와 같이 정의된다. $\mathbb{P}^n = \mathbb{A}^{n+1}/\sim$ relation $\sim$는 $(y_1, …, y_{n+1}) \sim (y_1^{\prime}, …, y_{n+1}^{\prime})$이면 $(y_1, …, y_{n+1}) = (\lambda y_1^{\prime}, …, \lambda y_{n+1}^{\prime})$ for some $\lambda \in \bar{K}$를 의미한다. projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 $n$차 다항식과 $m$차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.(Bezout’s theorem) 이와 같은 특성을 사용하게 위해 projective space를 사용한다. projective algebraic set $V$는 homogeneous 함수들로 generate되는 ideal $I \in \bar{K}[X_1, …, X_{n+1}]$로부터 정의되며, $I(V)$ 또한 homogeneous 함수들로 generate되는 ideal을 말한다. 아래와 같은 subset을 이용하면 projective set $\mathbb{P}^n$과 affine set $\mathbb{A}^n$을 연결할 수 있다. $U_i = \{ [y_1/y_i, ..., 1, ..., y_{n+1}/y_i] \in \mathbb{P}^n : y_i \neq 0 \}$ $\phi_i : U_i \rightarrow \mathbb{A}^{n}$인 one-to-one map을 obvious하게 정의할 수 있다. 그러면 아래와 같은 조건을 만족한다. $\mathbb{P}^n = \phi_1^{-1}(\mathbb{A}^n) \cup ... \cup \phi_{n+1}^{-1}(\mathbb{A}^n)$ projective algebraic set $V$가 주어졌을 때, 이를 affine space에서 바라본다면, $\phi_i(V \cap U_i)$가 되고, $V - U_i$에 속하는 점들을 point at infinity라고 부른다. Elliptic Curve Cryptography에서 사용하는 그 point at infinity의 개념이 여기서 나온 것이다. affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\{f_1, …, f_m\} \subset \bar{K}[X_1, …, X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\{ f_1^{\ast}, …,f_m^{\ast} \} \subset \bar{K}[X_1, …, X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V’$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V’ \cap U_{n+1})$을 만족한다. 따라서 우리는 projective algebraic set $V \in \mathbb{P}^n$이 주어지면 이를 affine algebraic set으로 표현할 수 있고, 이는 곧 dehomogenization된 polynomial $\in \bar{K}[X_1, …,X_n]$으로 표현할 수 있다! Rational map and Morphism 두 개의 projective variety $V_1 \in \mathbb{P}^n$과 $V_2 \in \mathbb{P}^m$이 주어졌을 때, 아래와 같은 map을 생각하자. $\varphi : V_1 \rightarrow V_2$ where $\varphi(P) = [f_1(P), ..., f_{m+1}(P)]$ for $P \in V_1$, $f_i \in \bar{K}(V)$ 이렇게 정의된 mapping은 well-define되며, rational map이라고 부른다. rational map의 정의에 따르면, rational map $\varphi$가 모든 점 $P \in V_1$ 위에서 정의될 필요는 없다. 모든 점 $P \in V_1$ 위에서 정의된다면 이러한 rational map을 morphism이라고 부른다. 이런식으로 morphism을 정의하면 rational map은 variety topology(zariski topology)에 대한 continuous function이 된다! projective variety $V_1, V_2$에 대해 두 morphism $\psi : V_1 \rightarrow V_2$와 $\varphi : V_2 \rightarrow V_1$가 존재해서, $\psi \circ \varphi$와 $\varphi \circ \psi$가 identity가 되면 $V_1, V_2$는 isomorphic하다고 한다.</summary></entry><entry><title type="html">Grover Algorithm with a Single Query</title><link href="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html" rel="alternate" type="text/html" title="Grover Algorithm with a Single Query" /><published>2021-02-16T00:00:00+09:00</published><updated>2021-02-16T00:00:00+09:00</updated><id>/2021/02/16/Grover-Algorithm-with-a-Single-Query</id><content type="html" xml:base="/2021/02/16/Grover-Algorithm-with-a-Single-Query.html">&lt;ul&gt;
-  &lt;li&gt;해당 글은 1997년도 논문 &lt;a href=&quot;https://arxiv.org/pdf/quant-ph/9708005.pdf&quot;&gt;Quantum Database Searching by a Single Query&lt;/a&gt;를 정리한 것이다.&lt;/li&gt;
-  &lt;li&gt;주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.&lt;/li&gt;
-&lt;/ul&gt;
+<h2 id="dimension-of-a-curve">Dimension of a curve</h2>
 
-&lt;!--more--&gt;
-&lt;h2 id=&quot;기존-grover-algorithm&quot;&gt;기존 Grover Algorithm&lt;/h2&gt;
+<p>Variety $V$의 dimension은 function field $K(V)$를 field extension of $K$라고 생각했을 때, 해당 extension의 transcendence degree를 말한다. transcendence degree는 algebraic 하게 generate되지 않는 extension field 위의 원소들의 dimension을 뜻한다. transcendence degree가 $n$이면, algebraic basis의 개수는 $n$개가 된다.</p>
 
-&lt;p&gt;임의의 함수 $f:\mathbb{Z}_n  \rightarrow \{0,1\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^{n/2})$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.&lt;/p&gt;
+<p>Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 transcendence degree가 1이라는 의미이다. algebraic basis는 한 개이고, 이를 $t \in K(C) \setminus K$라고 하자. 그러면 $K(C)$는 $K(t)$에 대한 algebraic field extension(finite field extension)이다.</p>
 
-&lt;center&gt;
-$\newcommand{\ket}[1]{\left| #1 \right&amp;gt;}$
-$O_{f}^{0}\ket{x}\ket{0} = \ket{x}\ket{f(x)}$&lt;/center&gt;
+<h2 id="any-proper-closed-subvariety-of-a-curve-is-a-point">Any proper closed subvariety of a curve is a point</h2>
 
-&lt;p&gt;얻어진 quantum state에 두번째 레지스터로 control되는 controlled-phase $\pi$ shift gate를 $x$ 레지스터를 이루는 각각의 qubit에 적용하면 아래와 같은 새로운 Oracle $O_{f}^{1}$를 얻을 수 있다.&lt;/p&gt;
+<p>curve 위에서 어떤 proper closed subvariety(아직 zariski topology를 정리하지 않았으므로 여기서는 간단히 affine variety를 생각하자)는 항상 점 한개로 구성됨을 증명하자. 아래 두 개의 claim을 거쳐야 한다.</p>
 
-&lt;center&gt;$O_{f}^{1}\ket{x}\ket{0} = (-1)^{f(x)}\ket{x}\ket{f(x)}$&lt;/center&gt;
+<h5 id="claim-1-k가-algebraically-closed-이면-임의의-원소-x-in-kc-setminus-k에-대해-kc는-kx에-대한-algebraic-field-extension이다fulton-6-proposition-91">Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C) \setminus K$에 대해 $K(C)$는 $K(x)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1))</h5>
 
-&lt;p&gt;여기서 black box Oracle을 한 번 더 적용해서 두번째 레지스터를 초기화시켜주면 아래와 같은 원하는 Oracle $O_f$가 된다.&lt;/p&gt;
+<p><em>Proof)</em> algebraic basis를 $t \in K(C) \setminus K$라고 하자. 임의의 원소 $x \in K(C) \setminus K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 <font color="red">$K$가 algebraically closed</font>인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다.</p>
 
-&lt;center&gt;$O_f\ket{x} = (-1)^{f(x)}\ket{x}$&lt;/center&gt;
+<div style="text-align: right">□</div>
 
-&lt;blockquote&gt;
-  &lt;p&gt;이와 같은 방식으로 얻어낸 phase 변환 oracle은 엄밀히 따지면 함수 $f$에 대한 oracle에 두번씩 query를 날리게 되는 것은 아닌지 궁금하다. 두번째 레지스터를 초기화해주려면 $f$를 무조건 두 번 수행해주어야 하는 것 아닌가? 아니면 최적화 할 수 있는 방법이 있는 걸까?&lt;/p&gt;
-&lt;/blockquote&gt;
+<h5 id="claim-2-k가-algebraically-closed이고-ring-r이-존재해서-quotient-field-kc를-갖는다고-하면-r-위의-prime-ideal-i에-대해-항상-ri-cong-k이다fulton-6-proposition-93">Claim 2. $K$가 algebraically closed이고, Ring $R$이 존재해서 quotient field $K(C)$를 갖는다고 하면, $R$ 위의 prime ideal $I$에 대해 항상 $R/I \cong K$이다.(Fulton 6. Proposition 9(3))</h5>
 
-&lt;p&gt;물론 superposition이 아니라면 phase shift는 무시되겠지만, Grover algorithm에서는 다음과 같이 uniform superposition state를 oracle에 입력으로 넣는다. global phase는 무시한채 식을 쓰면,&lt;/p&gt;
+<p><em>Proof)</em> 귀류법으로 $R/I$ 상에서 $K$에 포함되지 않는 $x$가 존재한다고 가정하자. 그러면 <strong>Claim 1.</strong> 에 의해서 $K(C)$는 $K(x)$에 대한 algebraic field extension이다. 그러면 $y \in I$에 대해 minimal polynomial $f = \sum_{i} a_{i}(x)X^i \in K(x)[X]$가 존재해서 $\sum_{i} a_{i}(x) y^i = 0$을 만족한다. 
+$f$는 minimal polynomial이므로 $a_0(x) \neq 0$이다. quotient ring $R/I$ 상에서 $f(y) = a_0(x) = 0$이 된다. 이는 $x$가 $K$에 대해 algebraic하다는 의미로 모순이다. 따라서 이러한 $x$가 존재하지 않는다.</p>
 
-&lt;center&gt;$O_f(\sum_{x=0}^{2^n-1} \ket{x}) = \sum_{x=0}^{2^n-1} (-1)^{f(x)}\ket{x}$&lt;/center&gt;
+<div style="text-align: right">□</div>
 
-&lt;p&gt;이렇게 얻은 quantum state는 실제로 $f(w)=1$을 만족하는 $w \in \{0,1\}^n$ 한 개만 phase가 -1인 superposition state이다. 이 과정을 reflection 단계라고 부른다. 다음은 여기에 diffusion operator라는 것을 적용할 것이다. diffusion operator $U_s$는 아래와 같이 주어진다.&lt;/p&gt;
+<p>이제 <strong>Claim 2.</strong> 를 이용해 아래의 <strong>Proposition 3.</strong> 을 증명할 것이다.</p>
 
-&lt;center&gt;
-$\newcommand{\bra}[1]{\left&amp;lt; #1 \right|}$
-$U_s = 2\ket{s}\bra{s} - I_n$ where $\ket{s} = \frac{1}{\sqrt{2^n}}(\sum_{i=0}^{2^n-1} \ket{i})$&lt;/center&gt;
+<h5 id="proposition-3-k가-algebraically-closed-일-때-curve-위에-존재하는-모든-proper-closed-subvariety-점-하나로-구성된다fulton-6-proposition-104">Proposition 3. $K$가 algebraically closed 일 때, Curve 위에 존재하는 모든 proper closed subvariety 점 하나로 구성된다.(Fulton 6. Proposition 10(4))</h5>
 
-&lt;p&gt;Hilbert space $\mathbb{C}^{N}$에서 생각해보면, diffusion operator는 Hilbert space 위의 벡터 $\ket{s}$에 대한 대칭이동을 의미한다. 또한 oracle operator $O_f$를 적용하는 것은 $\ket{w}$로 생성되는 벡터 공간에 수직인 공간에 대한 대칭 이동을 의미한다. 따라서 이를 $\ket{w}$와 $\ket{s}$에 의해 생성되는 2차원 평면 상에서 그림을 그리면 아래와 같이 동작한다.&lt;/p&gt;
+<p><em>Proof)</em> Curve $C$에 대한 coordinate ring $K[C]$를 생각하자. curve 위의 closed subvariety $W \subset C$는 $K[C]$에 속하는 prime ideal $I \subset K[C]$에 대응된다. <strong>Claim 2.</strong> 에 의해 $K[C]/I \cong K$ 임을 알고 있다. 이는 subvariety W에 대한 coordinate ring $K[W]$와 isomorphic하다. 따라서 subvariety $W$는 Curve $C$ 위의 한 점이 된다.</p>
 
-&lt;center&gt;
-&lt;figure&gt;
-&lt;img src=&quot;/assets/20210216/20210216_1.png&quot; width=&quot;40%&quot; /&gt;
-&lt;figcaption&gt; 출처 : &lt;a href=&quot;https://en.wikipedia.org/wiki/Grover%27s_algorithm&quot;&gt;위키피디아 - &quot;Grover's algorithm&quot;&lt;/a&gt;&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;/center&gt;
+<div style="text-align: right">□</div>
 
-&lt;p&gt;위 그림과 같이 $\ket{v}$에 $O_f$와 $U_s$를 차례대로 적용하면, 반시계 방향으로 $\theta$ 만큼 1회 회전한다는 것을 알 수 있다. recursive하게 이를 $r$번 적용하면 총 $r\theta$ 만큼 회전하게 되어 우리가 원하는 $\ket{w}$ 벡터에 최대한 가까운 값을 얻기 위해서는 $\sin^2((r+\frac{1}{2})\theta)$ 값이 최대가 되는 $r$을 선택한다. $\sin(\frac{\theta}{2}) = \frac{1}{\sqrt{N}}$을 만족하므로, $r \approx \pi \sqrt{N}/4$ 일 때, $\ket{w}$에 가장 가깝다. 이로써 subexponential time 안에 해를 찾을 수 있음을 알 수 있다. 에러의 최대 크기는 $\ket{w}$와 $\theta$ 만큼 차이 날 때 인데, 이 때 $\ket{w}$에 projection한 크기는 대략 $\sqrt{\frac{N-2}{N}}$이므로 원하는 답이 나오지 않을 확률은 대략 $\frac{2}{N}$ 정도 됨을 알 수 있다. 이는 $\log N$에 대해 exponential하게 작아지는 값이므로 높은 확률로 해를 구할 수 있다.&lt;/p&gt;
+<h2 id="non-constant-morphism-of-curves-is-surjective">Non-constant morphism of curves is surjective</h2>
 
-&lt;h3 id=&quot;diffusion-operator&quot;&gt;Diffusion operator&lt;/h3&gt;
+<p>Morphism $\varphi: C_1 \rightarrow C_2$는 zariski topology 상에서 continuous하다. $C_2$는 curve이므로 <strong>Proposition 3.</strong> 에 의해 $C_2$ 위의 proper closed subvariety는 하나의 점으로 구성된다. morphism은 $C_1$ 위의 모든 점에서 define되며, $C_1$은 closed subvariety이므로 morphism $\varphi$의 image는 하나의 점이거나 Curve $C_2$ 전체가 된다. 따라서 constant이거나 surjective인 것이다!</p>
 
-&lt;p&gt;Diffusion operator는 $U_s = 2\ket{s}\bra{s} - I_n$인데 이를 어떻게 quantum circuit으로 구현할 수 있을까?&lt;/p&gt;
+<h2 id="degree-of-a-morphism">Degree of a morphism</h2>
 
-&lt;p&gt;$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\dagger}$를 만족하므로 사실 우리는 $2\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, …, \ket{2^n -1})$로 생각해보자.&lt;/p&gt;
+<p>non-constant morphism은 surjective이다. 또한 morphism $\varphi$에 대한 induced map $\tilde{\varphi}: K(C_2) \rightarrow K(C_1)$을 생각했을 때, $\tilde{\varphi}(K(C_2))$는 transcendence degree 1을 갖는다. 따라서 $K(C_1)$은 $\tilde{\varphi}(K(C_2))$에 대한 algebraic field extension이 되며, 아래와 같이 extension degree를 morphism의 degree로 정의할 수 있다.</p>
 
-&lt;p&gt;$\ket{0^n}$의 값을 제외한 나머지 basis들에 대해 phase를 $\pi$만큼 shift 시켜주는 것이다. global phase를 $-1$ 곱해주면 이는 $\ket{0^n}$만 $\pi$만큼 phase shift 시키고, 나머지는 가만히 냅두는 것과 같다. $C^{n-1}$-NOT gate를 이용하면 아래 그림과 같이 circuit을 구성하면 된다.&lt;/p&gt;
+<center>$deg(\varphi) = [K(C_1):\tilde{\varphi}(K(C_2))]$</center>
 
-&lt;center&gt;
-&lt;figure&gt;
-&lt;img src=&quot;/assets/20210216/20210216_2.png&quot; width=&quot;40%&quot; /&gt;
-&lt;figcaption&gt;4-qubit에서 Diffusion operator 구현&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;/center&gt;
+<p>해당 degree는 isogeny에서 group homomorphism의 degree 정의와 유사한 의미를 갖는다. group homomorphism에서는 kernel의 크기로 degree를 정하기 때문에 inseparable degree가 표현되지 않지만, 위와 같이 정의된 morphism의 degree는 inseparable degree를 반영한다.(inseparable degree를 가지려면 field $K$의 characteristic이 0보다 커야하며, 이에 대한 algebraic closure $\bar{\mathbb{F}}_p$를 생각한다.)</p>
 
-&lt;h2 id=&quot;grover-algorithm-with-an-arbitrary-phase&quot;&gt;Grover algorithm with an arbitrary phase&lt;/h2&gt;
+<h2 id="curves-on-a-finite-field">Curves on a finite field</h2>
 
-&lt;p&gt;앞서 설명한 Grover algorithm은 $U_s = 2\ket{s}\bra{s} - I_n$와 같은 diffusion operator를 사용한다. 위에서는 이를 평면 위에서 벡터의 회전으로 해석했지만, 이번에는 외분점 개념으로 생각해보자. 어렸을 때, 선분의 외분점 공식을 배운적이 있을 것이다. 실수 선분 위에 서로 다른 두 점 $a, b$가 주어졌을 때, 다음 그림과 같은 외분점 $c$ 구하려면 $c = \frac{mb - na}{m-n}$ 식을 이용해 구할 수 있다.&lt;/p&gt;
+<p>Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 <a href="https://math.stackexchange.com/questions/2969598/if-isogenous-elliptic-curves-have-equal-numbers-of-points-how-can-isogenies-hav">surjective가 아니게 되는 문제에 대한 의문</a>이 발생한다.</p>
 
-&lt;center&gt;
-&lt;img src=&quot;/assets/20210216/20210216_3.png&quot; width=&quot;40%&quot; /&gt;
-&lt;/center&gt;
+<blockquote>
+  <p>사실 이 문제가 머릿속에서 해결이 안되서 포스트로 정리해 본 것이었다. 하지만 생각보다 간단한 문제였던 것 같다..</p>
+</blockquote>
 
-&lt;p&gt;diffusion operator도 자세히 보면 외분점을 구하는 공식과 같다. quantum state $\ket{\psi} \propto \sum_{k=0}^{2^n -1}x_k\ket{k}$에 대해 diffusion operator를 적용해보면, 아래 공식을 만족한다.&lt;/p&gt;
+<p>이러한 오류가 발생하는 원인은 Finite field $\mathbb{F}_p$ 위에서 우리가 생각하는 일반적인 Curve들이 irreducible하지 않다는 것을 간과한 것이다. Finite field에서는 모든 algebraic set들이 finite 개수의 점을 갖는다. 각각의 점은 variety이기 때문에 variety의 유한 합으로 표현 가능하고, 당연히도 irreducible하지 않게 된다.</p>
 
-&lt;center&gt;$U_s\ket{\psi} = 2\ket{s}\bra{s}\ket{\psi} - \ket{\psi}$&lt;/center&gt;
+<p>variety는 한 점으로만 구성되며, 이러한 점은 coordinate ring이 $\mathbb{F}_p$와 같아져서 dimension이 0이기 때문에 curve가 존재하지 않는다고 볼 수 있다. curve 개념이 생기기 위해서는 field의 원소 개수가 무한해야하며, algebraic closure of finite field $\bar{\mathbb{F}}_p$ 위에서 생각해야할 것이다. 여기서는 curve가 존재하기 때문에 non-constant morphism of curves가 surjective임을 사용할 수 있다.
+또한 p-adic field $\mathbb{Q}_p$에서도 마찬가지로 사용할 수 있다.</p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html"><![CDATA[해당 글은 Fulton의 Algebraic Curves와 Silverman의 Arithmetic of Elliptic Curves를 정리한 것이다. Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 surjective가 아니게 되는 문제에 대한 의문을 해결한다. Dimension of a curve Variety $V$의 dimension은 function field $K(V)$를 field extension of $K$라고 생각했을 때, 해당 extension의 transcendence degree를 말한다. transcendence degree는 algebraic 하게 generate되지 않는 extension field 위의 원소들의 dimension을 뜻한다. transcendence degree가 $n$이면, algebraic basis의 개수는 $n$개가 된다. Curve $C$는 dimension이 1인 variety로 정의된다. 따라서 $K(C)$의 transcendence degree가 1이라는 의미이다. algebraic basis는 한 개이고, 이를 $t \in K(C) \setminus K$라고 하자. 그러면 $K(C)$는 $K(t)$에 대한 algebraic field extension(finite field extension)이다. Any proper closed subvariety of a curve is a point curve 위에서 어떤 proper closed subvariety(아직 zariski topology를 정리하지 않았으므로 여기서는 간단히 affine variety를 생각하자)는 항상 점 한개로 구성됨을 증명하자. 아래 두 개의 claim을 거쳐야 한다. Claim 1. $K$가 algebraically closed 이면, 임의의 원소 $x \in K(C) \setminus K$에 대해 $K(C)$는 $K(x)$에 대한 algebraic field extension이다.(Fulton 6. Proposition 9(1)) Proof) algebraic basis를 $t \in K(C) \setminus K$라고 하자. 임의의 원소 $x \in K(C) \setminus K$에 대하여 minimal polynomial $f = \sum_{i,j} a_{ij} t^i X^j \in K(t)[X]$가 존재해서 $\sum_{i,j} a_{ij} t^i x^j = 0$을 만족한다. 여기서 $K$가 algebraically closed인 경우, $x$는 $K$ 위의 algebraic number가 될 수 없다. 따라서 polynomial $f(t,x)$는 t에 대한 polynomial이 되어 $t$는 $x$로부터 algebraically 생성된다. □ Claim 2. $K$가 algebraically closed이고, Ring $R$이 존재해서 quotient field $K(C)$를 갖는다고 하면, $R$ 위의 prime ideal $I$에 대해 항상 $R/I \cong K$이다.(Fulton 6. Proposition 9(3)) Proof) 귀류법으로 $R/I$ 상에서 $K$에 포함되지 않는 $x$가 존재한다고 가정하자. 그러면 Claim 1. 에 의해서 $K(C)$는 $K(x)$에 대한 algebraic field extension이다. 그러면 $y \in I$에 대해 minimal polynomial $f = \sum_{i} a_{i}(x)X^i \in K(x)[X]$가 존재해서 $\sum_{i} a_{i}(x) y^i = 0$을 만족한다. $f$는 minimal polynomial이므로 $a_0(x) \neq 0$이다. quotient ring $R/I$ 상에서 $f(y) = a_0(x) = 0$이 된다. 이는 $x$가 $K$에 대해 algebraic하다는 의미로 모순이다. 따라서 이러한 $x$가 존재하지 않는다. □ 이제 Claim 2. 를 이용해 아래의 Proposition 3. 을 증명할 것이다. Proposition 3. $K$가 algebraically closed 일 때, Curve 위에 존재하는 모든 proper closed subvariety 점 하나로 구성된다.(Fulton 6. Proposition 10(4)) Proof) Curve $C$에 대한 coordinate ring $K[C]$를 생각하자. curve 위의 closed subvariety $W \subset C$는 $K[C]$에 속하는 prime ideal $I \subset K[C]$에 대응된다. Claim 2. 에 의해 $K[C]/I \cong K$ 임을 알고 있다. 이는 subvariety W에 대한 coordinate ring $K[W]$와 isomorphic하다. 따라서 subvariety $W$는 Curve $C$ 위의 한 점이 된다. □ Non-constant morphism of curves is surjective Morphism $\varphi: C_1 \rightarrow C_2$는 zariski topology 상에서 continuous하다. $C_2$는 curve이므로 Proposition 3. 에 의해 $C_2$ 위의 proper closed subvariety는 하나의 점으로 구성된다. morphism은 $C_1$ 위의 모든 점에서 define되며, $C_1$은 closed subvariety이므로 morphism $\varphi$의 image는 하나의 점이거나 Curve $C_2$ 전체가 된다. 따라서 constant이거나 surjective인 것이다! Degree of a morphism non-constant morphism은 surjective이다. 또한 morphism $\varphi$에 대한 induced map $\tilde{\varphi}: K(C_2) \rightarrow K(C_1)$을 생각했을 때, $\tilde{\varphi}(K(C_2))$는 transcendence degree 1을 갖는다. 따라서 $K(C_1)$은 $\tilde{\varphi}(K(C_2))$에 대한 algebraic field extension이 되며, 아래와 같이 extension degree를 morphism의 degree로 정의할 수 있다. $deg(\varphi) = [K(C_1):\tilde{\varphi}(K(C_2))]$ 해당 degree는 isogeny에서 group homomorphism의 degree 정의와 유사한 의미를 갖는다. group homomorphism에서는 kernel의 크기로 degree를 정하기 때문에 inseparable degree가 표현되지 않지만, 위와 같이 정의된 morphism의 degree는 inseparable degree를 반영한다.(inseparable degree를 가지려면 field $K$의 characteristic이 0보다 커야하며, 이에 대한 algebraic closure $\bar{\mathbb{F}}_p$를 생각한다.) Curves on a finite field Finite field $\mathbb{F}_p$ 위에서 정의된 두 Elliptic Curve $C_1, C_2$의 점 개수가 같으면 두 Curve는 isogenous 임이 알려져있다. degree가 1보다 큰 isogeny를 적용했을 때 점 개수가 줄어듦이 명확하고, 따라서 surjective가 아니게 되는 문제에 대한 의문이 발생한다. 사실 이 문제가 머릿속에서 해결이 안되서 포스트로 정리해 본 것이었다. 하지만 생각보다 간단한 문제였던 것 같다.. 이러한 오류가 발생하는 원인은 Finite field $\mathbb{F}_p$ 위에서 우리가 생각하는 일반적인 Curve들이 irreducible하지 않다는 것을 간과한 것이다. Finite field에서는 모든 algebraic set들이 finite 개수의 점을 갖는다. 각각의 점은 variety이기 때문에 variety의 유한 합으로 표현 가능하고, 당연히도 irreducible하지 않게 된다. variety는 한 점으로만 구성되며, 이러한 점은 coordinate ring이 $\mathbb{F}_p$와 같아져서 dimension이 0이기 때문에 curve가 존재하지 않는다고 볼 수 있다. curve 개념이 생기기 위해서는 field의 원소 개수가 무한해야하며, algebraic closure of finite field $\bar{\mathbb{F}}_p$ 위에서 생각해야할 것이다. 여기서는 curve가 존재하기 때문에 non-constant morphism of curves가 surjective임을 사용할 수 있다. 또한 p-adic field $\mathbb{Q}_p$에서도 마찬가지로 사용할 수 있다.]]></summary></entry><entry><title type="html">Variety and Morphism</title><link href="http://localhost:4000/2021/02/17/Variety-and-Morphism.html" rel="alternate" type="text/html" title="Variety and Morphism" /><published>2021-02-17T00:00:00+09:00</published><updated>2021-02-17T00:00:00+09:00</updated><id>http://localhost:4000/2021/02/17/Variety-and-Morphism</id><content type="html" xml:base="http://localhost:4000/2021/02/17/Variety-and-Morphism.html"><![CDATA[<ul>
+  <li>
+    <p>해당 글은 Silverman의 <a href="https://www.springer.com/gp/book/9780387094939">Arithmetic of Elliptic Curves</a>의 Chapter 1을 정리한 것이다.</p>
+  </li>
+  <li>
+    <p>Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $x,y$가 아니라 $x_1, x_2, …, x_n$으로 많다면 정수해를 어떻게 찾을 수 있을까? 그리고 그들은 어떤 특징을 가질까?</p>
+  </li>
+  <li>
+    <p>다항식을 통해 얻을 수 있는 점들의 집합은 대수적으로 어떤 특성을 갖는지 분석하는 것이 대수기하학이다. 이것의 기본이 되는 기념이 algebraic set, variety라고 할 수 있다.</p>
+  </li>
+  <li>Notation
+    <ul>
+      <li>$K$ : field</li>
+      <li>$\bar{K}$ : algebraic closure of $K$</li>
+      <li>$G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$</li>
+    </ul>
+  </li>
+  <li>
+    <p>$K[X_1, X_2, … , X_n]$는 간단히 $K[X]$로 표기하도록 하겠다.</p>
+  </li>
+  <li>Affine Space
+    <ul>
+      <li>$\mathbb{A}^n = \{(y_1, y_2, …, y_n) : y_i \in \bar{K} \ \textrm{for} \ 1 \leq i \leq n\}$</li>
+      <li>$\mathbb{A}^n(K) = \{(y_1, y_2, …, y_n) : y_i \in K \ \textrm{for} \ 1 \leq i \leq n\}$</li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;여기서 basis $\ket{k}$의 크기를 구하면 아래와 같다.&lt;/p&gt;
+<h2 id="algebraic-set">Algebraic set</h2>
 
-&lt;center&gt;$\bra{k}U_s\ket{\psi} = 2\bra{k}\ket{s}\bra{s}\ket{\psi} - \bra{k}\ket{\psi} = \frac{2}{N}(\sum_{i=0}^{2^n -1} x_i) - x_k$&lt;/center&gt;
+<p>$\bar{K}[X]$ 상의 ideal $I \subset \bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다.</p>
 
-&lt;p&gt;$M = \frac{1}{N}(\sum_{i=0}^{2^n -1} x_i)$라고 하면, 식은 아래와 같다.&lt;/p&gt;
+<center>$V_I = \{ P \in \mathbb{A}^n : f(P) = 0 \ \textrm{for} \ \forall f \in I \}$</center>
 
-&lt;center&gt;$2 \cdot M - x_k$&lt;/center&gt;
+<p>algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$가 만일 $K[X]$에 들어있는 함수들로 generate 된다면, $V$는 $K$ 위에서 정의되었다고 하며 이를 $V/K$라고 표기한다. $V(K)$는 $V$에 속하는 점들 중에서 $K$ 위에서 정의된 점들을 말하며 아래와 같이 정의된다.</p>
 
-&lt;p&gt;이는 점 $M$과 $x_k$가 주어졌을 때, $2:1$ 외분점을 뜻한다. $x_k$가 1일 때와 -1 일 때 $M$에 대한 외분점이 달라지기 때문에 원하는 basis에 대한 amplitude를 키울 수 있게되는 것이다. 여기서 잠시 생각해보면, 외분점을 잘 조절해서 $x_k = 1$ 일 때, $(l+1) \cdot M - l \cdot 1 \approx 0$이 되도록 할 수 있지 않을까? 이러면 $O(\sqrt{N})$번 iteration을 돌릴 필요 없이 단 한 번의 oracle query만으로 해를 구할 수 있게 된다. 위 식을 만족하기 위해서는 $l = \frac{M}{1-M}$을 만족해야 한다. 가장 처음 iteration에서 $x_w = -1$이고 나머지는 다 1이므로 사실 $M = \frac{2^n -2}{2^n}$이다. 그러면 $l = 2^{n-1} -1$이다.&lt;/p&gt;
+<center>$V(K) = V \cap \mathbb{A}^n(K)$</center>
 
-&lt;p&gt;diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이라도 변경해볼 수 있을지 생각해보자. 기존의 diffusion circuit에서 아래와 같은 circuit으로 변경하면 비율을 $m:n = (1-e^{i\beta}) : 1$로 줄일 수 있다.&lt;/p&gt;
+<p>또한 $I(K) = I(V) \cap K[X] \subset \bar{K}[X]$로 정의한다. 정의에 따르면 $V/K$에 대해 아래와 같은 식을 도출 할 수 있다.</p>
 
-&lt;center&gt;
-&lt;figure&gt;
-&lt;img src=&quot;/assets/20210216/20210216_4.png&quot; width=&quot;40%&quot; /&gt;
-&lt;figcaption&gt;4-qubit에서 $\beta$-phase diffusion transform 구현&lt;/figcaption&gt;
-&lt;/figure&gt;
-&lt;/center&gt;
+<center>$I(V) = I(K)\bar{K}[X]$ &nbsp;&nbsp;if $V$ is defined over $K$</center>
 
-&lt;p&gt;이를 논문에서는 $\beta$-phase diffusion transform이라고 한다. 하지만 $e^{i\beta} = -\frac{1}{l}$이 되려면, $M = \frac{2^n -2}{2^n}$에 대해서는 한 번의 query로 해를 찾을 수 있는 $\beta$가 존재하지 않는다.&lt;/p&gt;
+<h3 id="variety">Variety</h3>
 
-&lt;p&gt;이 부분을 보완하기 위해 $M$ 값을 바꾸는 방법을 사용할 것이다. oracle $O_f$ 대신에 phase $\gamma$만큼 변화시키는 $\gamma$-phase oracle을 이용하면 $M$ 값이 변화한다. $\gamma$-phase oracle을 적용하면 얻을 수 있는 quantum state는 아래와 같다.&lt;/p&gt;
+<p>variety란, algebraic set $V$에 대해 $I(V) \subset \bar{K}[X]$가 <strong><font color="red">prime ideal이면 $V$를 variety라고 한다.</font></strong></p>
 
-&lt;center&gt;$U_{\gamma}\ket{\psi} = \sum_{x=0}^{2^n-1} (e^{i\gamma})^{f(x)}\ket{x}$&lt;/center&gt;
+<p>$\bar{K}$는 field이므로 noetherian이다. <a href="https://en.wikipedia.org/wiki/Hilbert%27s_basis_theorem">Hilbert basis theorem</a>에 의해 $\bar{K}[X]$도 따라서 noetherian이다. 따라서 $\bar{K}[X]$에 속하는 ideal들은 prime ideal의 곱으로 unique하게 표현할 수 있다. 이와 마찬가지로 algebraic set $V$는 variety들의 union으로 아래와 같이 유일하게 표현된다.</p>
 
-&lt;p&gt;여기서 $M$ 값은 $\frac{2^n -1 + e^{i\gamma}}{2^n}$이다. 이러면 $l = \frac{2^n -1 +e^{i\gamma}}{1-e^{i\gamma}}$이 되어야 한 번의 query로 해를 구할 수 있다. 그러면 $\beta$-phase diffusion transform을 사용한다고 했을 때, $e^{i\beta} = -\frac{1-e^{i\gamma}}{2^n -1 +e^{i\gamma}}$를 만족해야한다. 근데 이 식도 자세히 보면, 좌변의 norm은 1인데 비해, 우변의 norm은 $n$이 커질수록 exponential하게 작아짐을 알 수 있다. 이러면 $n$ 값이 조금만 커도 해당 식을 만족하는 $0 \leq \beta, \gamma &amp;lt; 2\pi$가 존재하지 않는다.&lt;/p&gt;
+<center>$V = V_1 \cup V_2 \cup ... \cup V_n$ where $V_i$ is variety</center>
 
-&lt;p&gt;여기서 $f(x)=1$인 해의 개수가 오직 한 개라는 조건의 한계점을 느낄 수 있다. 만약 해의 개수가 $r$개라면, 식이 어떻게 변화할지 생각해보자. $M$은 아래와 같이 바뀐다.&lt;/p&gt;
+<p>ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \{f : f^m \in J \ \textrm{for some} \ m \in \mathbb{Z}^+ \cup \{ 0 \}\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다.</p>
 
-&lt;center&gt;$M = \frac{2^n - r + r \cdot e^{i\gamma}}{2^n}$&lt;/center&gt;
+<h3 id="coordinate-ring-and-function-field">Coordinate ring and function field</h3>
 
-&lt;p&gt;그러면 한 번의 query로 해를 찾을 수 있는 $\beta$값은 아래 식으로 구할 수 있다.&lt;/p&gt;
+<p>algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고 하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다.</p>
 
-&lt;center&gt;$e^{i\beta} = -\frac{r - r \cdot e^{i\gamma}}{2^n -r + r \cdot e^{i\gamma}} = -\frac{1 - e^{i\gamma}}{\frac{2^n}{r} -1 + e^{i\gamma}}$&lt;/center&gt;
+<p>만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in \bar{K}[V]$와 $\sigma \in G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다.</p>
 
-&lt;p&gt;식을 다시 $f(x)=1$을 만족하는 해의 비율인 $x = \frac{r}{2^n}$ 값에 대해 정리하면 아래와 같다.&lt;/p&gt;
+<p>$\dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 <a href="https://en.wikipedia.org/wiki/Transcendence_degree">transcendence degree</a>를 말한다. 예를 들어, $V : f(x_1, …, x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left&lt; f \right&gt;$는 algebraic basis가 $n-1$개 이므로 $\dim(V) = n-1$임을 알 수 있다.</p>
 
-&lt;center&gt;$x = \frac{1}{e^{i(\gamma - \beta)} -e^{-i\beta} -e^{i\gamma} + 1} = \frac{1}{(1-e^{i\gamma})(1-e^{-i\beta})}$&lt;/center&gt;
+<p><strong><font color="red">function field $\bar{K}(V)$의 원소는 맵핑 $f: V \rightarrow \bar{K}$로 obvious하게 대응됨을 알 수 있다.</font></strong> 이게 굉장히 재미있는 부분인데, algebraic set $V$에 있는 점 각각을 $\bar{K}$로 임의로 맵핑하는 것은 사실 $\bar{K}(V)$에 속하지 않을 수도 있다. $\bar{K}(V)$는 polynomial 특성(?)을 가지는 맵핑 $V \rightarrow \bar{K}$에 관한 정보를 담고 있다고 볼 수 있다.</p>
 
-&lt;p&gt;$\newcommand{\norm}[1]{\left| #1 \right|}$
-$x$는 0 이상 1 이하 실수이므로, 이를 만족하기 위해서는 $\gamma = \beta$이어야 한다. 이런 경우, $x = \norm{\frac{1}{(1-e^{i\gamma})}}^2 \geq \frac{1}{4}$이다. 따라서 $f(x)=1$을 만족하는 해의 개수가 최소 ${2^n -2}$개는 되어야 한 번의 query로 해를 찾을 수 있다. 이 때, $\beta = \gamma = \cos^{-1}(1-\frac{1}{2x})$이다.&lt;/p&gt;
+<center>
+<figure>
+<img src="/assets/20210217/20210217_1.png" width="70%" />
+<figcaption>
+$\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시<br />$f: C \rightarrow \mathbb{R}$ where $C : Y=X^3 - 4X^2 + X + 6 \subset \mathbb{R}^2$
+</figcaption>
+</figure>
+</center>
 
-&lt;h3 id=&quot;알고리즘의-적용&quot;&gt;알고리즘의 적용&lt;/h3&gt;
+<h2 id="projective-space">Projective space</h2>
 
-&lt;p&gt;&lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt; 논문 21페이지로 잠시 돌아가면, CSIDH에 대한 oracle을 만들기 위해 Elliptic curve 위의 $l$-order point $P$를 구할 때, curve 위의 랜덤한 점 $P$를 uniform superposition state로 만들어 해당 점의 order가 $l$인 점 $P$를 구하는 Grover algorithm의 입력으로 넣어주는 상황을 생각해보자. 이 때, curve위의 임의의 점 중에서 order가 $l$인 점의 비율은 대략 $\frac{l-1}{l}$이다. 이는 어떤 $l$ 값에 대해서도 비율이 $1/4$를 넘으므로 한 번의 query로 Grover algorithm을 적용할 수 있는 상황이된다.&lt;/p&gt;
+<p>우리가 위에서 사용했던 $\mathbb{A}^n$은 Affine space라고 부른다. Projective space $\mathbb{P}^n$은 아래와 같이 정의된다.</p>
 
-&lt;p&gt;여기서 눈여겨 볼 점은 한 번의 query로 Grover algorithm을 수행하기 위해서는 phase shift gate를 구현해야한다는 것이다. 이는 &lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt; 논문 22페이지에 아래와 같이 언급되어 있다.&lt;/p&gt;
+<center>$\mathbb{P}^n = \mathbb{A}^{n+1}/\sim$</center>
 
-&lt;blockquote&gt;
-  &lt;p&gt;For a phase shift gate synthesized from Clifford+T gates, we estimate from [&lt;a href=&quot;https://arxiv.org/pdf/1206.5236.pdf&quot;&gt;28&lt;/a&gt;] that it can be approximated up to an error of $2^{-50}$ using around $2^{14}$ T-gates, which is negligible compared to the cost of the exponentiation in the test function&lt;/p&gt;
-&lt;/blockquote&gt;
+<p>relation $\sim$는 $(y_1, …, y_{n+1}) \sim (y_1^{\prime}, …, y_{n+1}^{\prime})$이면 $(y_1, …, y_{n+1}) = (\lambda y_1^{\prime}, …, \lambda y_{n+1}^{\prime})$ for some $\lambda \in \bar{K}$를 의미한다.</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;논문 [&lt;a href=&quot;https://arxiv.org/pdf/1206.5236.pdf&quot;&gt;28&lt;/a&gt;]은 읽어보는게 좋을 것 같다!&lt;/em&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 $n$차 다항식과 $m$차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.(<a href="https://en.wikipedia.org/wiki/B%C3%A9zout%27s_theorem">Bezout’s theorem</a>) 이와 같은 특성을 사용하게 위해 projective space를 사용한다.</p>
+</blockquote>
 
-&lt;p&gt;논문에서처럼 phase shift gate는 한 번 수행할 때마다 $2^{-50}$으로 매우 작은 실패 확률을 가지고 있고, Grover algorithm with a single query에서는 phase shift gate를 polynomial 횟수(대략 $n$번)만 사용하므로 에러는 무시할만한 수준으로 보인다.&lt;/p&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html">해당 글은 1997년도 논문 Quantum Database Searching by a Single Query를 정리한 것이다. 주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.</summary></entry><entry><title type="html">Quantum algorithm for Hidden Shift Problem#2</title><link href="/2021/02/15/Quantum-Algorithm-for-HSP-2.html" rel="alternate" type="text/html" title="Quantum algorithm for Hidden Shift Problem#2" /><published>2021-02-15T00:00:00+09:00</published><updated>2021-02-15T00:00:00+09:00</updated><id>/2021/02/15/Quantum-Algorithm-for-HSP-2</id><content type="html" xml:base="/2021/02/15/Quantum-Algorithm-for-HSP-2.html">&lt;ul&gt;
-  &lt;li&gt;해당 글은 &lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt;논문을 정리한 것이다.&lt;/li&gt;
-  &lt;li&gt;Regev의 알고리즘은 2008년도 &lt;a href=&quot;https://arxiv.org/pdf/quant-ph/0406151.pdf&quot;&gt;A Subexponential Time Algorithm for the DHSP with Polynomial Space&lt;/a&gt; 논문을 참조&lt;/li&gt;
-  &lt;li&gt;Quantum algorithm for HSP 2편&lt;/li&gt;
-&lt;/ul&gt;
+<p>projective algebraic set $V$는 homogeneous 함수들로 generate되는 ideal $I \in \bar{K}[X_1, …, X_{n+1}]$로부터 정의되며, $I(V)$ 또한 homogeneous 함수들로 generate되는 ideal을 말한다. 아래와 같은 subset을 이용하면 projective set $\mathbb{P}^n$과 affine set $\mathbb{A}^n$을 연결할 수 있다.</p>
 
-&lt;!--more--&gt;
+<center>$U_i = \{ [y_1/y_i, ..., 1, ..., y_{n+1}/y_i] \in \mathbb{P}^n : y_i \neq 0 \}$</center>
 
-&lt;h2 id=&quot;regevs-algorithm-with-polynomial-quantum-space&quot;&gt;Regev’s algorithm with polynomial quantum space&lt;/h2&gt;
+<p>$\phi_i : U_i \rightarrow \mathbb{A}^{n}$인 one-to-one map을 obvious하게 정의할 수 있다. 그러면 아래와 같은 조건을 만족한다.</p>
 
-&lt;p&gt;Kuperberg가 처음 제안했던 알고리즘은 subexponential만큼의 quantum space를 필요로 한다는 단점이 있다. Kuperberg의 combination 방법은 $\frac{1}{2}$ 확률로 실패하기 때문에 $k$개의 labeled state를 결합한다면, 성공 확률은 $\frac{1}{2^{k-1}}$로 줄어든다. 따라서 두개씩만 골라서 2-valuation을 높일 수 있어야하기 때문에 저장공간을 많이 필요로 한다.&lt;/p&gt;
+<center>$\mathbb{P}^n = \phi_1^{-1}(\mathbb{A}^n) \cup ... \cup \phi_{n+1}^{-1}(\mathbb{A}^n)$</center>
 
-&lt;p&gt;Regev는 이러한 단점을 보완하여 여러개의 labeled state를 결합할 수 있는 양자 알고리즘을 제안했다. 물론 Regev의 결합 방법도 실패 확률이 존재하지만, 이는 결합하려는 labeled state의 개수와는 상관 없이 constant 확률을 가지므로 quantum space를 절약할 수 있다.&lt;/p&gt;
+<p>projective algebraic set $V$가 주어졌을 때, 이를 affine space에서 바라본다면, $\phi_i(V \cap U_i)$가 되고, $V - U_i$에 속하는 점들을 point at infinity라고 부른다.</p>
 
-&lt;p&gt;Regev의 combination 연산은 $l+4$ 개의 labeled state를 입력으로 받아서 $l$ 개의 lsb가 0인 새로운 labeled state를 만든다.&lt;/p&gt;
+<blockquote>
+  <p>Elliptic Curve Cryptography에서 사용하는 그 point at infinity의 개념이 여기서 나온 것이다.</p>
+</blockquote>
 
-&lt;p&gt;$\newcommand{\ket}[1]{\left| #1 \right&amp;gt;}$
-$\newcommand{\bra}[1]{\left&amp;lt; #1 \right|}$
+<p>affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\{f_1, …, f_m\} \subset \bar{K}[X_1, …, X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\{ f_1^{\ast}, …,f_m^{\ast} \} \subset \bar{K}[X_1, …, X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V’$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V’ \cap U_{n+1})$을 만족한다.</p>
+
+<p>따라서 우리는 projective algebraic set $V \in \mathbb{P}^n$이 주어지면 이를 affine algebraic set으로 표현할 수 있고, 이는 곧 dehomogenization된 polynomial $\in \bar{K}[X_1, …,X_n]$으로 표현할 수 있다!</p>
+
+<h2 id="rational-map-and-morphism">Rational map and Morphism</h2>
+
+<p>두 개의 projective variety $V_1 \in \mathbb{P}^n$과 $V_2 \in \mathbb{P}^m$이 주어졌을 때, 아래와 같은 map을 생각하자.</p>
+
+<center>$\varphi : V_1 \rightarrow V_2$ where $\varphi(P) = [f_1(P), ..., f_{m+1}(P)]$ for $P \in V_1$, $f_i \in \bar{K}(V)$</center>
+
+<p>이렇게 정의된 mapping은 well-define되며, rational map이라고 부른다. rational map의 정의에 따르면, rational map $\varphi$가 모든 점 $P \in V_1$ 위에서 정의될 필요는 없다. 모든 점 $P \in V_1$ 위에서 정의된다면 이러한 rational map을 morphism이라고 부른다.</p>
+
+<blockquote>
+  <p>이런식으로 morphism을 정의하면 rational map은 variety topology(<a href="https://en.wikipedia.org/wiki/Zariski_topology">zariski topology</a>)에 대한 continuous function이 된다!</p>
+</blockquote>
+
+<p>projective variety $V_1, V_2$에 대해 두 morphism $\psi : V_1 \rightarrow V_2$와 $\varphi : V_2 \rightarrow V_1$가 존재해서, $\psi \circ \varphi$와 $\varphi \circ \psi$가 identity가 되면 $V_1, V_2$는 isomorphic하다고 한다.</p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html"><![CDATA[해당 글은 Silverman의 Arithmetic of Elliptic Curves의 Chapter 1을 정리한 것이다. Diopantine equation은 $ax + by = c$를 만족하는 정수해 $x, y$를 찾는 것을 말한다. 만약 2차 다항식이거나 변수가 $x,y$가 아니라 $x_1, x_2, …, x_n$으로 많다면 정수해를 어떻게 찾을 수 있을까? 그리고 그들은 어떤 특징을 가질까? 다항식을 통해 얻을 수 있는 점들의 집합은 대수적으로 어떤 특성을 갖는지 분석하는 것이 대수기하학이다. 이것의 기본이 되는 기념이 algebraic set, variety라고 할 수 있다. Notation $K$ : field $\bar{K}$ : algebraic closure of $K$ $G_{\bar{K}/K}$ : Galois group of $\bar{K}/K$ $K[X_1, X_2, … , X_n]$는 간단히 $K[X]$로 표기하도록 하겠다. Affine Space $\mathbb{A}^n = \{(y_1, y_2, …, y_n) : y_i \in \bar{K} \ \textrm{for} \ 1 \leq i \leq n\}$ $\mathbb{A}^n(K) = \{(y_1, y_2, …, y_n) : y_i \in K \ \textrm{for} \ 1 \leq i \leq n\}$ Algebraic set $\bar{K}[X]$ 상의 ideal $I \subset \bar{K}[X]$가 주어졌을 때, algebraic set $V_I$는 아래와 같이 정의된다. $V_I = \{ P \in \mathbb{A}^n : f(P) = 0 \ \textrm{for} \ \forall f \in I \}$ algebraic set $V_I$는 일반적으로 $V$로 생략해서 표기한다. $I(V)$가 만일 $K[X]$에 들어있는 함수들로 generate 된다면, $V$는 $K$ 위에서 정의되었다고 하며 이를 $V/K$라고 표기한다. $V(K)$는 $V$에 속하는 점들 중에서 $K$ 위에서 정의된 점들을 말하며 아래와 같이 정의된다. $V(K) = V \cap \mathbb{A}^n(K)$ 또한 $I(K) = I(V) \cap K[X] \subset \bar{K}[X]$로 정의한다. 정의에 따르면 $V/K$에 대해 아래와 같은 식을 도출 할 수 있다. $I(V) = I(K)\bar{K}[X]$ &nbsp;&nbsp;if $V$ is defined over $K$ Variety variety란, algebraic set $V$에 대해 $I(V) \subset \bar{K}[X]$가 prime ideal이면 $V$를 variety라고 한다. $\bar{K}$는 field이므로 noetherian이다. Hilbert basis theorem에 의해 $\bar{K}[X]$도 따라서 noetherian이다. 따라서 $\bar{K}[X]$에 속하는 ideal들은 prime ideal의 곱으로 unique하게 표현할 수 있다. 이와 마찬가지로 algebraic set $V$는 variety들의 union으로 아래와 같이 유일하게 표현된다. $V = V_1 \cup V_2 \cup ... \cup V_n$ where $V_i$ is variety ideal $J$가 주어졌을 때, $I(V(J))$은 사실 $Rad(J) = \{f : f^m \in J \ \textrm{for some} \ m \in \mathbb{Z}^+ \cup \{ 0 \}\}$와 같다. 따라서 위와 같이 variety의 union에서는 제곱식이 표현이 안되는 것이다. Coordinate ring and function field algebraic set $V$가 주어지면 $\bar{K}[X]/I(V)$를 Coordinate ring이라고 하고, $\bar{K}[V]$로 표기한다. $V$가 variety이면, $I(V)$가 prime ideal이고, $\bar{K}[V]$는 integral domain이 되며, quotient field(field of fraction)을 정의할 수 있다. 이를 $\bar{K}(V)$로 표기하고, function field라고 부른다. 만약에 variety $V$가 $K$ 위에서 정의되었다면, Galois group $G_{\bar{K}/K}$에 의해 $I(V)$는 $I(V)$로 그대로 맵핑된다. 따라서 $\bar{K}[V], \bar{K}(V)$에 있는 원소에 대해서 Galois group은 obvious하게 동작한다. 이 말은 $f \in \bar{K}[V]$와 $\sigma \in G_{\bar{K}/K}$에 대해 $f^{\sigma}$는 $I(V)$를 신경쓰지 않고, group action을 수행해도 된다는 의미이다. $\dim(V)$는 $\bar{K}[V]$의 $\bar{K}$ 위에서 transcendence degree를 말한다. 예를 들어, $V : f(x_1, …, x_n) = 0$ 일 때, $f$가 non-constant function이면, $\bar{K}[X]/ \left&lt; f \right&gt;$는 algebraic basis가 $n-1$개 이므로 $\dim(V) = n-1$임을 알 수 있다. function field $\bar{K}(V)$의 원소는 맵핑 $f: V \rightarrow \bar{K}$로 obvious하게 대응됨을 알 수 있다. 이게 굉장히 재미있는 부분인데, algebraic set $V$에 있는 점 각각을 $\bar{K}$로 임의로 맵핑하는 것은 사실 $\bar{K}(V)$에 속하지 않을 수도 있다. $\bar{K}(V)$는 polynomial 특성(?)을 가지는 맵핑 $V \rightarrow \bar{K}$에 관한 정보를 담고 있다고 볼 수 있다. $\mathbb{R}^2$ 위의 algebraic set에 대한 function field의 예시$f: C \rightarrow \mathbb{R}$ where $C : Y=X^3 - 4X^2 + X + 6 \subset \mathbb{R}^2$ Projective space 우리가 위에서 사용했던 $\mathbb{A}^n$은 Affine space라고 부른다. Projective space $\mathbb{P}^n$은 아래와 같이 정의된다. $\mathbb{P}^n = \mathbb{A}^{n+1}/\sim$ relation $\sim$는 $(y_1, …, y_{n+1}) \sim (y_1^{\prime}, …, y_{n+1}^{\prime})$이면 $(y_1, …, y_{n+1}) = (\lambda y_1^{\prime}, …, \lambda y_{n+1}^{\prime})$ for some $\lambda \in \bar{K}$를 의미한다. projective space를 사용하면 평행인 직선도 결국 point at infinity에서 만남을 알 수 있다. 그러면 rough하게 $n$차 다항식과 $m$차 다항식이 둘다 nonsingular인 경우에 prjective space 위에서 $nm$개의 점에서 만남을 추론할 수 있다.(Bezout’s theorem) 이와 같은 특성을 사용하게 위해 projective space를 사용한다. projective algebraic set $V$는 homogeneous 함수들로 generate되는 ideal $I \in \bar{K}[X_1, …, X_{n+1}]$로부터 정의되며, $I(V)$ 또한 homogeneous 함수들로 generate되는 ideal을 말한다. 아래와 같은 subset을 이용하면 projective set $\mathbb{P}^n$과 affine set $\mathbb{A}^n$을 연결할 수 있다. $U_i = \{ [y_1/y_i, ..., 1, ..., y_{n+1}/y_i] \in \mathbb{P}^n : y_i \neq 0 \}$ $\phi_i : U_i \rightarrow \mathbb{A}^{n}$인 one-to-one map을 obvious하게 정의할 수 있다. 그러면 아래와 같은 조건을 만족한다. $\mathbb{P}^n = \phi_1^{-1}(\mathbb{A}^n) \cup ... \cup \phi_{n+1}^{-1}(\mathbb{A}^n)$ projective algebraic set $V$가 주어졌을 때, 이를 affine space에서 바라본다면, $\phi_i(V \cap U_i)$가 되고, $V - U_i$에 속하는 점들을 point at infinity라고 부른다. Elliptic Curve Cryptography에서 사용하는 그 point at infinity의 개념이 여기서 나온 것이다. affine algebraic set $V$이 주어지면 $I(V)$를 찾을 수 있고, 이 것의 generator set $\{f_1, …, f_m\} \subset \bar{K}[X_1, …, X_n]$을 찾을 수 있다.($\bar{K}[X]$는 noetherian이므로 finitely generate된다.) 해당 generator들을 homogenization 시키면, $\{ f_1^{\ast}, …,f_m^{\ast} \} \subset \bar{K}[X_1, …, X_{n+1}]$가 되고, 이들을 통해 generate되는 ideal로 만들어지는 projective algebraic set $V’$을 생각할 수 있다. 이렇게 만들어진 projective algebraic set은 $V = \phi_{n+1}(V’ \cap U_{n+1})$을 만족한다. 따라서 우리는 projective algebraic set $V \in \mathbb{P}^n$이 주어지면 이를 affine algebraic set으로 표현할 수 있고, 이는 곧 dehomogenization된 polynomial $\in \bar{K}[X_1, …,X_n]$으로 표현할 수 있다! Rational map and Morphism 두 개의 projective variety $V_1 \in \mathbb{P}^n$과 $V_2 \in \mathbb{P}^m$이 주어졌을 때, 아래와 같은 map을 생각하자. $\varphi : V_1 \rightarrow V_2$ where $\varphi(P) = [f_1(P), ..., f_{m+1}(P)]$ for $P \in V_1$, $f_i \in \bar{K}(V)$ 이렇게 정의된 mapping은 well-define되며, rational map이라고 부른다. rational map의 정의에 따르면, rational map $\varphi$가 모든 점 $P \in V_1$ 위에서 정의될 필요는 없다. 모든 점 $P \in V_1$ 위에서 정의된다면 이러한 rational map을 morphism이라고 부른다. 이런식으로 morphism을 정의하면 rational map은 variety topology(zariski topology)에 대한 continuous function이 된다! projective variety $V_1, V_2$에 대해 두 morphism $\psi : V_1 \rightarrow V_2$와 $\varphi : V_2 \rightarrow V_1$가 존재해서, $\psi \circ \varphi$와 $\varphi \circ \psi$가 identity가 되면 $V_1, V_2$는 isomorphic하다고 한다.]]></summary></entry><entry><title type="html">Grover Algorithm with a Single Query</title><link href="http://localhost:4000/2021/02/16/Grover-Algorithm-with-a-Single-Query.html" rel="alternate" type="text/html" title="Grover Algorithm with a Single Query" /><published>2021-02-16T00:00:00+09:00</published><updated>2021-02-16T00:00:00+09:00</updated><id>http://localhost:4000/2021/02/16/Grover-Algorithm-with-a-Single-Query</id><content type="html" xml:base="http://localhost:4000/2021/02/16/Grover-Algorithm-with-a-Single-Query.html"><![CDATA[<ul>
+  <li>해당 글은 1997년도 논문 <a href="https://arxiv.org/pdf/quant-ph/9708005.pdf">Quantum Database Searching by a Single Query</a>를 정리한 것이다.</li>
+  <li>주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.</li>
+</ul>
+
+<!--more-->
+<h2 id="기존-grover-algorithm">기존 Grover Algorithm</h2>
+
+<p>임의의 함수 $f:\mathbb{Z}_n  \rightarrow \{0,1\}$이 주어졌을 때, $f(x)=1$을 만족하는 $x$가 단 한개만 존재하면, $O(2^{n/2})$ 만큼의 query로 $x$를 찾을 수 있다. 함수 $f$에 대한 blackbox quantum Oracle $O_{f}^{0}$는 다음과 같이 작동한다.</p>
+
+<center>
+$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
+$O_{f}^{0}\ket{x}\ket{0} = \ket{x}\ket{f(x)}$</center>
+
+<p>얻어진 quantum state에 두번째 레지스터로 control되는 controlled-phase $\pi$ shift gate를 $x$ 레지스터를 이루는 각각의 qubit에 적용하면 아래와 같은 새로운 Oracle $O_{f}^{1}$를 얻을 수 있다.</p>
+
+<center>$O_{f}^{1}\ket{x}\ket{0} = (-1)^{f(x)}\ket{x}\ket{f(x)}$</center>
+
+<p>여기서 black box Oracle을 한 번 더 적용해서 두번째 레지스터를 초기화시켜주면 아래와 같은 원하는 Oracle $O_f$가 된다.</p>
+
+<center>$O_f\ket{x} = (-1)^{f(x)}\ket{x}$</center>
+
+<blockquote>
+  <p>이와 같은 방식으로 얻어낸 phase 변환 oracle은 엄밀히 따지면 함수 $f$에 대한 oracle에 두번씩 query를 날리게 되는 것은 아닌지 궁금하다. 두번째 레지스터를 초기화해주려면 $f$를 무조건 두 번 수행해주어야 하는 것 아닌가? 아니면 최적화 할 수 있는 방법이 있는 걸까?</p>
+</blockquote>
+
+<p>물론 superposition이 아니라면 phase shift는 무시되겠지만, Grover algorithm에서는 다음과 같이 uniform superposition state를 oracle에 입력으로 넣는다. global phase는 무시한채 식을 쓰면,</p>
+
+<center>$O_f(\sum_{x=0}^{2^n-1} \ket{x}) = \sum_{x=0}^{2^n-1} (-1)^{f(x)}\ket{x}$</center>
+
+<p>이렇게 얻은 quantum state는 실제로 $f(w)=1$을 만족하는 $w \in \{0,1\}^n$ 한 개만 phase가 -1인 superposition state이다. 이 과정을 reflection 단계라고 부른다. 다음은 여기에 diffusion operator라는 것을 적용할 것이다. diffusion operator $U_s$는 아래와 같이 주어진다.</p>
+
+<center>
+$\newcommand{\bra}[1]{\left&lt; #1 \right|}$
+$U_s = 2\ket{s}\bra{s} - I_n$ where $\ket{s} = \frac{1}{\sqrt{2^n}}(\sum_{i=0}^{2^n-1} \ket{i})$</center>
+
+<p>Hilbert space $\mathbb{C}^{N}$에서 생각해보면, diffusion operator는 Hilbert space 위의 벡터 $\ket{s}$에 대한 대칭이동을 의미한다. 또한 oracle operator $O_f$를 적용하는 것은 $\ket{w}$로 생성되는 벡터 공간에 수직인 공간에 대한 대칭 이동을 의미한다. 따라서 이를 $\ket{w}$와 $\ket{s}$에 의해 생성되는 2차원 평면 상에서 그림을 그리면 아래와 같이 동작한다.</p>
+
+<center>
+<figure>
+<img src="/assets/20210216/20210216_1.png" width="40%" />
+<figcaption> 출처 : <a href="https://en.wikipedia.org/wiki/Grover%27s_algorithm">위키피디아 - "Grover's algorithm"</a></figcaption>
+</figure>
+</center>
+
+<p>위 그림과 같이 $\ket{v}$에 $O_f$와 $U_s$를 차례대로 적용하면, 반시계 방향으로 $\theta$ 만큼 1회 회전한다는 것을 알 수 있다. recursive하게 이를 $r$번 적용하면 총 $r\theta$ 만큼 회전하게 되어 우리가 원하는 $\ket{w}$ 벡터에 최대한 가까운 값을 얻기 위해서는 $\sin^2((r+\frac{1}{2})\theta)$ 값이 최대가 되는 $r$을 선택한다. $\sin(\frac{\theta}{2}) = \frac{1}{\sqrt{N}}$을 만족하므로, $r \approx \pi \sqrt{N}/4$ 일 때, $\ket{w}$에 가장 가깝다. 이로써 subexponential time 안에 해를 찾을 수 있음을 알 수 있다. 에러의 최대 크기는 $\ket{w}$와 $\theta$ 만큼 차이 날 때 인데, 이 때 $\ket{w}$에 projection한 크기는 대략 $\sqrt{\frac{N-2}{N}}$이므로 원하는 답이 나오지 않을 확률은 대략 $\frac{2}{N}$ 정도 됨을 알 수 있다. 이는 $\log N$에 대해 exponential하게 작아지는 값이므로 높은 확률로 해를 구할 수 있다.</p>
+
+<h3 id="diffusion-operator">Diffusion operator</h3>
+
+<p>Diffusion operator는 $U_s = 2\ket{s}\bra{s} - I_n$인데 이를 어떻게 quantum circuit으로 구현할 수 있을까?</p>
+
+<p>$U_s = H(2\ket{0^n}\bra{0^n}-I_n)H^{\dagger}$를 만족하므로 사실 우리는 $2\ket{0^n}\bra{0^n} - I_n$을 구현할 수 있기만 하면 된다. 주어진 Unitary Operator에 대응하는 circuit을 구현할 때 가장 간단한 방법은 basis vector에 대해서만 원하는 값이 나오도록 circuit을 구성하면 된다. 그러면 모든 quantum 입력에 대해 unitary operator와 동일하게 되기 때문이다. basis vector를 trivial한 basis vector $(\ket{0}, \ket{1}, …, \ket{2^n -1})$로 생각해보자.</p>
+
+<p>$\ket{0^n}$의 값을 제외한 나머지 basis들에 대해 phase를 $\pi$만큼 shift 시켜주는 것이다. global phase를 $-1$ 곱해주면 이는 $\ket{0^n}$만 $\pi$만큼 phase shift 시키고, 나머지는 가만히 냅두는 것과 같다. $C^{n-1}$-NOT gate를 이용하면 아래 그림과 같이 circuit을 구성하면 된다.</p>
+
+<center>
+<figure>
+<img src="/assets/20210216/20210216_2.png" width="40%" />
+<figcaption>4-qubit에서 Diffusion operator 구현</figcaption>
+</figure>
+</center>
+
+<h2 id="grover-algorithm-with-an-arbitrary-phase">Grover algorithm with an arbitrary phase</h2>
+
+<p>앞서 설명한 Grover algorithm은 $U_s = 2\ket{s}\bra{s} - I_n$와 같은 diffusion operator를 사용한다. 위에서는 이를 평면 위에서 벡터의 회전으로 해석했지만, 이번에는 외분점 개념으로 생각해보자. 어렸을 때, 선분의 외분점 공식을 배운적이 있을 것이다. 실수 선분 위에 서로 다른 두 점 $a, b$가 주어졌을 때, 다음 그림과 같은 외분점 $c$ 구하려면 $c = \frac{mb - na}{m-n}$ 식을 이용해 구할 수 있다.</p>
+
+<center>
+<img src="/assets/20210216/20210216_3.png" width="40%" />
+</center>
+
+<p>diffusion operator도 자세히 보면 외분점을 구하는 공식과 같다. quantum state $\ket{\psi} \propto \sum_{k=0}^{2^n -1}x_k\ket{k}$에 대해 diffusion operator를 적용해보면, 아래 공식을 만족한다.</p>
+
+<center>$U_s\ket{\psi} = 2\ket{s}\bra{s}\ket{\psi} - \ket{\psi}$</center>
+
+<p>여기서 basis $\ket{k}$의 크기를 구하면 아래와 같다.</p>
+
+<center>$\bra{k}U_s\ket{\psi} = 2\bra{k}\ket{s}\bra{s}\ket{\psi} - \bra{k}\ket{\psi} = \frac{2}{N}(\sum_{i=0}^{2^n -1} x_i) - x_k$</center>
+
+<p>$M = \frac{1}{N}(\sum_{i=0}^{2^n -1} x_i)$라고 하면, 식은 아래와 같다.</p>
+
+<center>$2 \cdot M - x_k$</center>
+
+<p>이는 점 $M$과 $x_k$가 주어졌을 때, $2:1$ 외분점을 뜻한다. $x_k$가 1일 때와 -1 일 때 $M$에 대한 외분점이 달라지기 때문에 원하는 basis에 대한 amplitude를 키울 수 있게되는 것이다. 여기서 잠시 생각해보면, 외분점을 잘 조절해서 $x_k = 1$ 일 때, $(l+1) \cdot M - l \cdot 1 \approx 0$이 되도록 할 수 있지 않을까? 이러면 $O(\sqrt{N})$번 iteration을 돌릴 필요 없이 단 한 번의 oracle query만으로 해를 구할 수 있게 된다. 위 식을 만족하기 위해서는 $l = \frac{M}{1-M}$을 만족해야 한다. 가장 처음 iteration에서 $x_w = -1$이고 나머지는 다 1이므로 사실 $M = \frac{2^n -2}{2^n}$이다. 그러면 $l = 2^{n-1} -1$이다.</p>
+
+<p>diffusion operator를 어떤식으로 변경해야 외분점 비율을 조금이라도 변경해볼 수 있을지 생각해보자. 기존의 diffusion circuit에서 아래와 같은 circuit으로 변경하면 비율을 $m:n = (1-e^{i\beta}) : 1$로 줄일 수 있다.</p>
+
+<center>
+<figure>
+<img src="/assets/20210216/20210216_4.png" width="40%" />
+<figcaption>4-qubit에서 $\beta$-phase diffusion transform 구현</figcaption>
+</figure>
+</center>
+
+<p>이를 논문에서는 $\beta$-phase diffusion transform이라고 한다. 하지만 $e^{i\beta} = -\frac{1}{l}$이 되려면, $M = \frac{2^n -2}{2^n}$에 대해서는 한 번의 query로 해를 찾을 수 있는 $\beta$가 존재하지 않는다.</p>
+
+<p>이 부분을 보완하기 위해 $M$ 값을 바꾸는 방법을 사용할 것이다. oracle $O_f$ 대신에 phase $\gamma$만큼 변화시키는 $\gamma$-phase oracle을 이용하면 $M$ 값이 변화한다. $\gamma$-phase oracle을 적용하면 얻을 수 있는 quantum state는 아래와 같다.</p>
+
+<center>$U_{\gamma}\ket{\psi} = \sum_{x=0}^{2^n-1} (e^{i\gamma})^{f(x)}\ket{x}$</center>
+
+<p>여기서 $M$ 값은 $\frac{2^n -1 + e^{i\gamma}}{2^n}$이다. 이러면 $l = \frac{2^n -1 +e^{i\gamma}}{1-e^{i\gamma}}$이 되어야 한 번의 query로 해를 구할 수 있다. 그러면 $\beta$-phase diffusion transform을 사용한다고 했을 때, $e^{i\beta} = -\frac{1-e^{i\gamma}}{2^n -1 +e^{i\gamma}}$를 만족해야한다. 근데 이 식도 자세히 보면, 좌변의 norm은 1인데 비해, 우변의 norm은 $n$이 커질수록 exponential하게 작아짐을 알 수 있다. 이러면 $n$ 값이 조금만 커도 해당 식을 만족하는 $0 \leq \beta, \gamma &lt; 2\pi$가 존재하지 않는다.</p>
+
+<p>여기서 $f(x)=1$인 해의 개수가 오직 한 개라는 조건의 한계점을 느낄 수 있다. 만약 해의 개수가 $r$개라면, 식이 어떻게 변화할지 생각해보자. $M$은 아래와 같이 바뀐다.</p>
+
+<center>$M = \frac{2^n - r + r \cdot e^{i\gamma}}{2^n}$</center>
+
+<p>그러면 한 번의 query로 해를 찾을 수 있는 $\beta$값은 아래 식으로 구할 수 있다.</p>
+
+<center>$e^{i\beta} = -\frac{r - r \cdot e^{i\gamma}}{2^n -r + r \cdot e^{i\gamma}} = -\frac{1 - e^{i\gamma}}{\frac{2^n}{r} -1 + e^{i\gamma}}$</center>
+
+<p>식을 다시 $f(x)=1$을 만족하는 해의 비율인 $x = \frac{r}{2^n}$ 값에 대해 정리하면 아래와 같다.</p>
+
+<center>$x = \frac{1}{e^{i(\gamma - \beta)} -e^{-i\beta} -e^{i\gamma} + 1} = \frac{1}{(1-e^{i\gamma})(1-e^{-i\beta})}$</center>
+
+<p>$\newcommand{\norm}[1]{\left| #1 \right|}$
+$x$는 0 이상 1 이하 실수이므로, 이를 만족하기 위해서는 $\gamma = \beta$이어야 한다. 이런 경우, $x = \norm{\frac{1}{(1-e^{i\gamma})}}^2 \geq \frac{1}{4}$이다. 따라서 $f(x)=1$을 만족하는 해의 개수가 최소 ${2^n -2}$개는 되어야 한 번의 query로 해를 찾을 수 있다. 이 때, $\beta = \gamma = \cos^{-1}(1-\frac{1}{2x})$이다.</p>
+
+<h3 id="알고리즘의-적용">알고리즘의 적용</h3>
+
+<p><a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a> 논문 21페이지로 잠시 돌아가면, CSIDH에 대한 oracle을 만들기 위해 Elliptic curve 위의 $l$-order point $P$를 구할 때, curve 위의 랜덤한 점 $P$를 uniform superposition state로 만들어 해당 점의 order가 $l$인 점 $P$를 구하는 Grover algorithm의 입력으로 넣어주는 상황을 생각해보자. 이 때, curve위의 임의의 점 중에서 order가 $l$인 점의 비율은 대략 $\frac{l-1}{l}$이다. 이는 어떤 $l$ 값에 대해서도 비율이 $1/4$를 넘으므로 한 번의 query로 Grover algorithm을 적용할 수 있는 상황이된다.</p>
+
+<p>여기서 눈여겨 볼 점은 한 번의 query로 Grover algorithm을 수행하기 위해서는 phase shift gate를 구현해야한다는 것이다. 이는 <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a> 논문 22페이지에 아래와 같이 언급되어 있다.</p>
+
+<blockquote>
+  <p>For a phase shift gate synthesized from Clifford+T gates, we estimate from [<a href="https://arxiv.org/pdf/1206.5236.pdf">28</a>] that it can be approximated up to an error of $2^{-50}$ using around $2^{14}$ T-gates, which is negligible compared to the cost of the exponentiation in the test function</p>
+</blockquote>
+
+<blockquote>
+  <p><em>논문 [<a href="https://arxiv.org/pdf/1206.5236.pdf">28</a>]은 읽어보는게 좋을 것 같다!</em></p>
+</blockquote>
+
+<p>논문에서처럼 phase shift gate는 한 번 수행할 때마다 $2^{-50}$으로 매우 작은 실패 확률을 가지고 있고, Grover algorithm with a single query에서는 phase shift gate를 polynomial 횟수(대략 $n$번)만 사용하므로 에러는 무시할만한 수준으로 보인다.</p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html"><![CDATA[해당 글은 1997년도 논문 Quantum Database Searching by a Single Query를 정리한 것이다. 주어진 함수 $f:\mathbb{Z}_n \rightarrow \{0,1\}$에서 $f(x)=1$을 만족하는 해의 비율이 충분히 클 때, 한 번의 쿼리로 Grover algorithm을 수행할 수 있다.]]></summary></entry><entry><title type="html">Quantum algorithm for Hidden Shift Problem#2</title><link href="http://localhost:4000/2021/02/15/Quantum-Algorithm-for-HSP-2.html" rel="alternate" type="text/html" title="Quantum algorithm for Hidden Shift Problem#2" /><published>2021-02-15T00:00:00+09:00</published><updated>2021-02-15T00:00:00+09:00</updated><id>http://localhost:4000/2021/02/15/Quantum-Algorithm-for-HSP-2</id><content type="html" xml:base="http://localhost:4000/2021/02/15/Quantum-Algorithm-for-HSP-2.html"><![CDATA[<ul>
+  <li>해당 글은 <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a>논문을 정리한 것이다.</li>
+  <li>Regev의 알고리즘은 2008년도 <a href="https://arxiv.org/pdf/quant-ph/0406151.pdf">A Subexponential Time Algorithm for the DHSP with Polynomial Space</a> 논문을 참조</li>
+  <li>Quantum algorithm for HSP 2편</li>
+</ul>
+
+<!--more-->
+
+<h2 id="regevs-algorithm-with-polynomial-quantum-space">Regev’s algorithm with polynomial quantum space</h2>
+
+<p>Kuperberg가 처음 제안했던 알고리즘은 subexponential만큼의 quantum space를 필요로 한다는 단점이 있다. Kuperberg의 combination 방법은 $\frac{1}{2}$ 확률로 실패하기 때문에 $k$개의 labeled state를 결합한다면, 성공 확률은 $\frac{1}{2^{k-1}}$로 줄어든다. 따라서 두개씩만 골라서 2-valuation을 높일 수 있어야하기 때문에 저장공간을 많이 필요로 한다.</p>
+
+<p>Regev는 이러한 단점을 보완하여 여러개의 labeled state를 결합할 수 있는 양자 알고리즘을 제안했다. 물론 Regev의 결합 방법도 실패 확률이 존재하지만, 이는 결합하려는 labeled state의 개수와는 상관 없이 constant 확률을 가지므로 quantum space를 절약할 수 있다.</p>
+
+<p>Regev의 combination 연산은 $l+4$ 개의 labeled state를 입력으로 받아서 $l$ 개의 lsb가 0인 새로운 labeled state를 만든다.</p>
+
+<p>$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
+$\newcommand{\bra}[1]{\left&lt; #1 \right|}$
 $\newcommand{\norm}[1]{\left| #1 \right|}$
-$\newcommand{\inner}[1]{\left&amp;lt; #1 \right&amp;gt;}$
+$\newcommand{\inner}[1]{\left&lt; #1 \right&gt;}$
 $\newcommand{\ceil}[1]{\lceil #1 \rceil}$
-$\newcommand{\floor}[1]{\lfloor #1 \rfloor}$&lt;/p&gt;
+$\newcommand{\floor}[1]{\lfloor #1 \rfloor}$</p>
 
-&lt;h3 id=&quot;combination-step&quot;&gt;Combination step&lt;/h3&gt;
+<h3 id="combination-step">Combination step</h3>
 
-&lt;p&gt;아래와 같은 $l+4$ 개의 labeled state가 주어졌다고 가정하자.&lt;/p&gt;
+<p>아래와 같은 $l+4$ 개의 labeled state가 주어졌다고 가정하자.</p>
 
-&lt;center&gt;$\ket{0} + \chi(\frac{y_j}{N})\ket{1}, j=1,...,l+4$&lt;/center&gt;
+<center>$\ket{0} + \chi(\frac{y_j}{N})\ket{1}, j=1,...,l+4$</center>
 
-&lt;p&gt;이를 모두 tensor product하면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>이를 모두 tensor product하면 아래와 같은 quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_0} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$&lt;br /&gt; where $\vec{y} = (y_1, y_2, ..., y_{l+4})$&lt;/center&gt;
+<center>$\ket{\psi_0} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$<br /> where $\vec{y} = (y_1, y_2, ..., y_{l+4})$</center>
 
-&lt;p&gt;여기서 첫번째 레지스터에 $\ket{\vec{v}}\ket{0} \rightarrow \ket{\vec{v}}\ket{(\inner{\vec{v}, \vec{y}} \mod 2^l)}$연산을 적용하면, 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>여기서 첫번째 레지스터에 $\ket{\vec{v}}\ket{0} \rightarrow \ket{\vec{v}}\ket{(\inner{\vec{v}, \vec{y}} \mod 2^l)}$연산을 적용하면, 아래와 같은 quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_1} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}\ket{\inner{\vec{v}, \vec{y}} \mod 2^l}$&lt;/center&gt;
+<center>$\ket{\psi_1} = \sum_{\vec{v} \in \{0,1\}^{l+4}} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}\ket{\inner{\vec{v}, \vec{y}} \mod 2^l}$</center>
 
-&lt;p&gt;여기서 두번째 레지스터를 측정하면 label $V$를 얻고, 아래와 같은 quantum state를 얻는다.&lt;/p&gt;
+<p>여기서 두번째 레지스터를 측정하면 label $V$를 얻고, 아래와 같은 quantum state를 얻는다.</p>
 
-&lt;center&gt;$\ket{\psi_2} = \sum_{\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$&lt;/center&gt;
+<center>$\ket{\psi_2} = \sum_{\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l} \chi(\frac{\inner{\vec{v}, \vec{y}}}{N})\ket{\vec{v}}$</center>
 
-&lt;p&gt;$\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{v}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{v} \in \{0,1\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 2^4$이다.&lt;/p&gt;
+<p>$\inner{\vec{v}, \vec{y}} \equiv V \mod 2^l$를 만족하는 $\vec{v}$는 subset sum 문제를 classical하게 풀어서 모든 solution을 구할 수 있다.(이 부분에서 kuperberg의 subexponential한 저장공간을 classical 연산으로 해결한다고 볼 수 있다.) 이는 brute-force 방법으로 $O(2^l)$만큼의 시간복잡도를 가진다. $V$ 값은 총 $2^l$개 이고, $\vec{v} \in \{0,1\}^{l+4}$의 값은 총 $2^{l+4}$개 이므로, 평균적인 해의 개수는 $m = 2^4$이다.</p>
 
-&lt;p&gt;이 solution들을 $\vec{v}_1, … , \vec{v}_m \in \{0,1\}^{l+4}$라고 하자. 그러면 $\vec{v}_1, \vec{v}_2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{v}_1, … , \vec{v}_m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{2^4} = \frac{1}{8}$이며, 아래와 같은 quantum state를 얻는다.&lt;/p&gt;
+<p>이 solution들을 $\vec{v}_1, … , \vec{v}_m \in \{0,1\}^{l+4}$라고 하자. 그러면 $\vec{v}_1, \vec{v}_2$로 span되는 subspace에 대한 projective measurement를 수행할 수 있다. basis $\vec{v}_1, … , \vec{v}_m$에 대해서 amplitude의 크기가 1로 같으므로, 원하는 state를 얻을 확률은 $\frac{2}{m} = \frac{2}{2^4} = \frac{1}{8}$이며, 아래와 같은 quantum state를 얻는다.</p>
 
-&lt;center&gt;$\ket{0} + \chi(\frac{\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}}}{N})\ket{1}$&lt;/center&gt;
+<center>$\ket{0} + \chi(\frac{\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}}}{N})\ket{1}$</center>
 
-&lt;p&gt;$\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}} \equiv 0 \mod 2^l$이 보장되므로, 2-variation은 $l$ 이상인 새로운 labeled quantum state를 얻는다.&lt;/p&gt;
+<p>$\inner{(\vec{v}_2 - \vec{v}_1), \vec{y}} \equiv 0 \mod 2^l$이 보장되므로, 2-variation은 $l$ 이상인 새로운 labeled quantum state를 얻는다.</p>
 
-&lt;h3 id=&quot;time-complexity-of-regevs-algorithm&quot;&gt;Time Complexity of Regev’s algorithm&lt;/h3&gt;
+<h3 id="time-complexity-of-regevs-algorithm">Time Complexity of Regev’s algorithm</h3>
 
-&lt;p&gt;$n = \ceil{\log N}$이라고 할 때, $l = O(\sqrt{n \log n})$으로 잡으면, &lt;strong&gt;&lt;font color=&quot;red&quot;&gt;$k = O(\sqrt{n/\log n})$에 대해 $lk = O(n)$만큼의 저장공간만 필요로 한다는 것을 알 수 있다.&lt;/font&gt;&lt;/strong&gt; 이 때, classical한 연산의 시간복잡도는 $O(2^l) = 2^{O(\sqrt{n \log n})}$이다. 또한, 필요한 labeled quantum state의 수(=필요한 query의 수)는 $l^k = 2^{O(\sqrt{n \log n})}$이다. Kuperberg의 query 수랑 비교했을 때 약간 더 많음을 알 수 있다.&lt;/p&gt;
+<p>$n = \ceil{\log N}$이라고 할 때, $l = O(\sqrt{n \log n})$으로 잡으면, <strong><font color="red">$k = O(\sqrt{n/\log n})$에 대해 $lk = O(n)$만큼의 저장공간만 필요로 한다는 것을 알 수 있다.</font></strong> 이 때, classical한 연산의 시간복잡도는 $O(2^l) = 2^{O(\sqrt{n \log n})}$이다. 또한, 필요한 labeled quantum state의 수(=필요한 query의 수)는 $l^k = 2^{O(\sqrt{n \log n})}$이다. Kuperberg의 query 수랑 비교했을 때 약간 더 많음을 알 수 있다.</p>
 
-&lt;p&gt;만약에 $l = n$으로 잡으면, $k = 1$이 되어, 필요한 query 개수는 $n$개가 된다. 이러면 polynomial query 안에 문제를 해결할 수 있게된다. 하지만 여기서 함정은 classical한 연산을 $O(2^n) = O(N)$만큼 해야한다는 점이다. 이는 단순히 Hidden Shift 문제를 classical하게 해결하는 것과 같다.&lt;/p&gt;
+<p>만약에 $l = n$으로 잡으면, $k = 1$이 되어, 필요한 query 개수는 $n$개가 된다. 이러면 polynomial query 안에 문제를 해결할 수 있게된다. 하지만 여기서 함정은 classical한 연산을 $O(2^n) = O(N)$만큼 해야한다는 점이다. 이는 단순히 Hidden Shift 문제를 classical하게 해결하는 것과 같다.</p>
 
-&lt;p&gt;논문에서는 이 문제를 최적화된 classical 알고리즘을 적용해 $\tilde{O}(2^{0.291 \log_2(N)})$으로 해결함으로써 CSIDH-512가 NIST 기준에 맞지 않게됨을 보이고있다. &lt;strong&gt;&lt;font color=&quot;red&quot;&gt;이 의미는 결국 Classical한 측면에서 Hidden Shift Problem을 Subset Sum Problem으로 quantum reduction시켰다는 것이다.&lt;/font&gt;&lt;/strong&gt; Subset Sum에 대한 최적화된 해결방법이 있으므로 이를 통해 Hidden Shift Problem를 우회적으로 짧은 시간 안에 해결하게 된다.&lt;/p&gt;
+<p>논문에서는 이 문제를 최적화된 classical 알고리즘을 적용해 $\tilde{O}(2^{0.291 \log_2(N)})$으로 해결함으로써 CSIDH-512가 NIST 기준에 맞지 않게됨을 보이고있다. <strong><font color="red">이 의미는 결국 Classical한 측면에서 Hidden Shift Problem을 Subset Sum Problem으로 quantum reduction시켰다는 것이다.</font></strong> Subset Sum에 대한 최적화된 해결방법이 있으므로 이를 통해 Hidden Shift Problem를 우회적으로 짧은 시간 안에 해결하게 된다.</p>
 
-&lt;p&gt;CSIDH-512의 경우에 Class Group의 크기가 대략 $N \approx \sqrt{p} = 2^{256}$이며, $l = 256$에 대한 Regev algorithm을 적용하면 $2^{19}$만큼의 quantum query가 필요하며, $2^{86}$만큼의 classical time과 memory가 필요하다는 결론이 나온다.&lt;/p&gt;
+<p>CSIDH-512의 경우에 Class Group의 크기가 대략 $N \approx \sqrt{p} = 2^{256}$이며, $l = 256$에 대한 Regev algorithm을 적용하면 $2^{19}$만큼의 quantum query가 필요하며, $2^{86}$만큼의 classical time과 memory가 필요하다는 결론이 나온다.</p>
 
-&lt;h2 id=&quot;kuperbergs-second-algorithmcollimation-sieve&quot;&gt;Kuperberg’s second algorithm(Collimation Sieve)&lt;/h2&gt;
+<h2 id="kuperbergs-second-algorithmcollimation-sieve">Kuperberg’s second algorithm(Collimation Sieve)</h2>
 
-&lt;blockquote&gt;
-  &lt;p&gt;이 알고리즘은 2010년도 &lt;a href=&quot;https://arxiv.org/pdf/1112.3333.pdf&quot;&gt;Another subexp quantum algorithm for DHSP&lt;/a&gt;를 참조
-이 알고리즘은 Collimation Sieve라고 불림(Collimation은 방향이 다른 빛을 평행하게 한방향으로 만들어주는 것이라고 함)&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>이 알고리즘은 2010년도 <a href="https://arxiv.org/pdf/1112.3333.pdf">Another subexp quantum algorithm for DHSP</a>를 참조
+이 알고리즘은 Collimation Sieve라고 불림(Collimation은 방향이 다른 빛을 평행하게 한방향으로 만들어주는 것이라고 함)</p>
+</blockquote>
 
-&lt;p&gt;Kuperberg의 두번째 알고리즘도 여러 개의 labeled quantum state를 한번에 combination하는 방법을 사용한다. 다만 방식이 조금 다르다. labeled quantum state의 list를 만들어 list끼리 combination 해서 lsb를 지우는 방법을 사용한다. 이 알고리즘도 combination 과정에서 classical algorithm이 사용된다. 여기서는 subset sum 문제를 풀지 않고, 두 개의 list에서 matching을 찾는 문제를 풀어야한다. 이 또한 exponential 수준의 classical time을 필요로한다.&lt;/p&gt;
+<p>Kuperberg의 두번째 알고리즘도 여러 개의 labeled quantum state를 한번에 combination하는 방법을 사용한다. 다만 방식이 조금 다르다. labeled quantum state의 list를 만들어 list끼리 combination 해서 lsb를 지우는 방법을 사용한다. 이 알고리즘도 combination 과정에서 classical algorithm이 사용된다. 여기서는 subset sum 문제를 풀지 않고, 두 개의 list에서 matching을 찾는 문제를 풀어야한다. 이 또한 exponential 수준의 classical time을 필요로한다.</p>
 
-&lt;p&gt;Collimation Sieve나 Regev의 알고리즘이나 중요한 철학은 classical 자원을 어떻게 최대한으로 이용해서 quantum space 또는 quantum time을 줄일 것이냐 하는 것이다. Regev의 알고리즘은 quantum space를 polynomial하게 줄였다.&lt;/p&gt;
+<p>Collimation Sieve나 Regev의 알고리즘이나 중요한 철학은 classical 자원을 어떻게 최대한으로 이용해서 quantum space 또는 quantum time을 줄일 것이냐 하는 것이다. Regev의 알고리즘은 quantum space를 polynomial하게 줄였다.</p>
 
-&lt;p&gt;Kuperberg가 Collimation Sieve를 제시하면서 주장하는 것은 classical 자원을 활용해서 quantum time도 polynomial하게 줄일 수 있다는 것이다. 물론 quantum space도 여전히 polynomial하게 유지할 수 있다.&lt;/p&gt;
+<p>Kuperberg가 Collimation Sieve를 제시하면서 주장하는 것은 classical 자원을 활용해서 quantum time도 polynomial하게 줄일 수 있다는 것이다. 물론 quantum space도 여전히 polynomial하게 유지할 수 있다.</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;그런데 여기서 개인적인 의문점은 앞서 설명한 것처럼 Regev의 알고리즘도 classical한 자원을 exponential하게 활용해서 quantum time을 polynomial하게 줄일 수 있음을 보였다. 따라서 Collimation Sieve가 Regev의 알고리즘보다 어떤 점이 더 좋은건지 아직은 이해가 잘 가지 않는다..&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>그런데 여기서 개인적인 의문점은 앞서 설명한 것처럼 Regev의 알고리즘도 classical한 자원을 exponential하게 활용해서 quantum time을 polynomial하게 줄일 수 있음을 보였다. 따라서 Collimation Sieve가 Regev의 알고리즘보다 어떤 점이 더 좋은건지 아직은 이해가 잘 가지 않는다..</p>
+</blockquote>
 
-&lt;p&gt;Collimation Sieve는 아래와 같은 list state를 사용한다.&lt;/p&gt;
+<p>Collimation Sieve는 아래와 같은 list state를 사용한다.</p>
 
-&lt;center&gt;$\ket{\psi} \propto \sum_{i=0}^{M-1} \chi(\frac{y_i}{N})\ket{i}$&lt;/center&gt;
+<center>$\ket{\psi} \propto \sum_{i=0}^{M-1} \chi(\frac{y_i}{N})\ket{i}$</center>
 
-&lt;p&gt;list의 크기 $M$은 제한이 없으며, combination 과정을 거치기 전 초기 list state는 $M = 2^l$로 $l$개의 labeled state를 tensor product하여 아래와 같이 생성한다.&lt;/p&gt;
+<p>list의 크기 $M$은 제한이 없으며, combination 과정을 거치기 전 초기 list state는 $M = 2^l$로 $l$개의 labeled state를 tensor product하여 아래와 같이 생성한다.</p>
 
-&lt;center&gt;$\ket{\psi_{\rm{list}}} = \ket{\psi_{y_1}} \otimes \ket{\psi_{y_2}} \otimes ... \otimes \ket{\psi_{y_l}} \propto \sum_{\vec{x} \in \{0,1\}^l} \chi(\frac{\inner{\vec{x}, \vec{y}}}{N})\ket{\vec{x}}$ where $\vec{y} = (y_1, y_2, ..., y_l)$&lt;/center&gt;
+<center>$\ket{\psi_{\rm{list}}} = \ket{\psi_{y_1}} \otimes \ket{\psi_{y_2}} \otimes ... \otimes \ket{\psi_{y_l}} \propto \sum_{\vec{x} \in \{0,1\}^l} \chi(\frac{\inner{\vec{x}, \vec{y}}}{N})\ket{\vec{x}}$ where $\vec{y} = (y_1, y_2, ..., y_l)$</center>
 
-&lt;p&gt;여기까지는 Regev의 알고리즘과 형태가 비슷하다. 하지만 이는 combination의 중간 결과물이 아니라 입력 또는 출력될 quantum state의 형태라는 것을 알아두길 바란다. list state $\sum_{i=0}^{M} \chi(\frac{y_i}{N})\ket{i}$의 height $h$는 모든 $0 \leq i &amp;lt; M$에 대해서 $y_i &amp;lt; 2^h$를 만족하는 가장 작은 $h$를 의미한다. 우리의 목표는 점점 작은 height을 가지는 list state를 만들어서 height가 1인 list state를 얻었을 때, shift 값 $s$의 한비트 정보를 담고있는 labeled state를 얻는 것이다.&lt;/p&gt;
+<p>여기까지는 Regev의 알고리즘과 형태가 비슷하다. 하지만 이는 combination의 중간 결과물이 아니라 입력 또는 출력될 quantum state의 형태라는 것을 알아두길 바란다. list state $\sum_{i=0}^{M} \chi(\frac{y_i}{N})\ket{i}$의 height $h$는 모든 $0 \leq i &lt; M$에 대해서 $y_i &lt; 2^h$를 만족하는 가장 작은 $h$를 의미한다. 우리의 목표는 점점 작은 height을 가지는 list state를 만들어서 height가 1인 list state를 얻었을 때, shift 값 $s$의 한비트 정보를 담고있는 labeled state를 얻는 것이다.</p>
 
-&lt;h3 id=&quot;combination-step-of-collimation-sieve2-list-merging&quot;&gt;Combination Step of Collimation Sieve(2-list merging)&lt;/h3&gt;
+<h3 id="combination-step-of-collimation-sieve2-list-merging">Combination Step of Collimation Sieve(2-list merging)</h3>
 
-&lt;p&gt;height이 $h$로 같고, 사이즈도 $M$으로 같은 list state 두 개가 아래와 같이 주어졌다고 해보자.&lt;/p&gt;
+<p>height이 $h$로 같고, 사이즈도 $M$으로 같은 list state 두 개가 아래와 같이 주어졌다고 해보자.</p>
 
-&lt;center&gt;$\ket{\psi_0} \propto \sum_{i=0}^{M-1} \chi(\frac{u_i}{N})\ket{i}$&lt;br /&gt;
-$\ket{\psi_1} \propto \sum_{i=0}^{M-1} \chi(\frac{v_i}{N})\ket{i}$&lt;/center&gt;
+<center>$\ket{\psi_0} \propto \sum_{i=0}^{M-1} \chi(\frac{u_i}{N})\ket{i}$<br />
+$\ket{\psi_1} \propto \sum_{i=0}^{M-1} \chi(\frac{v_i}{N})\ket{i}$</center>
 
-&lt;p&gt;이 둘을 tensor product하면 아래와 같이 합쳐진다.&lt;/p&gt;
+<p>이 둘을 tensor product하면 아래와 같이 합쳐진다.</p>
 
-&lt;center&gt;$\ket{\psi_{1}} \propto \sum_{0 \leq i,j &amp;lt; M-1} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$&lt;/center&gt;
+<center>$\ket{\psi_{1}} \propto \sum_{0 \leq i,j &lt; M-1} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$</center>
 
-&lt;p&gt;여기서 Regev 알고리즘과 비슷하게 $\ket{i}\ket{j}\ket{0} \rightarrow \ket{i}\ket{j}\ket{\floor{(u_i + v_j)/{2^{(h-r)}}}}$ 연산을 적용하고 세번째 레지스터를 측정해서 label $V$와 아래와 같은 quantum state를 얻는다.&lt;/p&gt;
+<p>여기서 Regev 알고리즘과 비슷하게 $\ket{i}\ket{j}\ket{0} \rightarrow \ket{i}\ket{j}\ket{\floor{(u_i + v_j)/{2^{(h-r)}}}}$ 연산을 적용하고 세번째 레지스터를 측정해서 label $V$와 아래와 같은 quantum state를 얻는다.</p>
 
-&lt;center&gt;$\ket{\psi_{2}} \propto \sum_{\floor{(u_i + v_j)/{2^{(h-r)}}} = V} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$&lt;/center&gt;
+<center>$\ket{\psi_{2}} \propto \sum_{\floor{(u_i + v_j)/{2^{(h-r)}}} = V} \chi(\frac{u_i + v_j}{N})\ket{i}\ket{j}$</center>
 
-&lt;p&gt;여기서 classical하게 $\floor{(u_i + v_j)/{2^r}} = V$를 만족하는 모든 $(u_i, v_j)$쌍을 찾는다. 이 과정은 $O(M)$만큼 걸린다. 찾은 쌍들의 개수가 총 $M’$개라고 할 때, 찾아놓은 모든 $(u_i, v_j)$ 값들을 이용해 $\ket{0}, …, \ket{M’-1}$로 basis를 변화시켜주면 아래와 같은 새로운 list state를 얻을 수 있다.&lt;/p&gt;
+<p>여기서 classical하게 $\floor{(u_i + v_j)/{2^r}} = V$를 만족하는 모든 $(u_i, v_j)$쌍을 찾는다. 이 과정은 $O(M)$만큼 걸린다. 찾은 쌍들의 개수가 총 $M’$개라고 할 때, 찾아놓은 모든 $(u_i, v_j)$ 값들을 이용해 $\ket{0}, …, \ket{M’-1}$로 basis를 변화시켜주면 아래와 같은 새로운 list state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_{new}} \propto \sum_{i=0}^{M'-1} \chi(\frac{w_i}{N})\ket{i}$ where $\floor{w_i/{2^{(h-r)}}} = V$&lt;/center&gt;
+<center>$\ket{\psi_{new}} \propto \sum_{i=0}^{M'-1} \chi(\frac{w_i}{N})\ket{i}$ where $\floor{w_i/{2^{(h-r)}}} = V$</center>
 
-&lt;p&gt;global phase는 무시되므로 새롭게 얻은 list state $\ket{\psi_{new}}$의 heigth은 $h-r$이 된다. 여기서 $r$값은 $\ket{\psi_{new}}$의 사이즈 $M’$에 따라 정해진다. $V$ 값의 경우의 수는 $2^r$개 이고, 좌변의 $(u_i, v_j)$ 쌍의 개수는 총 $M^2$개 이므로 평균적으로 해의 개수는 $M’ = \frac{M^2}{2^r}$이라고 할 수 있다. $M = 2^l$이라고 하면, $r = l$일 때, 새로 얻은 list state의 사이즈가 대략 $M’ = M$이 되도록 할 수 있다.&lt;/p&gt;
+<p>global phase는 무시되므로 새롭게 얻은 list state $\ket{\psi_{new}}$의 heigth은 $h-r$이 된다. 여기서 $r$값은 $\ket{\psi_{new}}$의 사이즈 $M’$에 따라 정해진다. $V$ 값의 경우의 수는 $2^r$개 이고, 좌변의 $(u_i, v_j)$ 쌍의 개수는 총 $M^2$개 이므로 평균적으로 해의 개수는 $M’ = \frac{M^2}{2^r}$이라고 할 수 있다. $M = 2^l$이라고 하면, $r = l$일 때, 새로 얻은 list state의 사이즈가 대략 $M’ = M$이 되도록 할 수 있다.</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;$r$이 커짐에 따라서 출력되는 list state의 사이즈는 exponential하게 줄어든다. 반대로 combination을 통해 더 많이 height을 줄이고 싶다면 입력으로 들어가는 list state의 사이즈는 exponential하게 커져야함을 알 수 있다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>$r$이 커짐에 따라서 출력되는 list state의 사이즈는 exponential하게 줄어든다. 반대로 combination을 통해 더 많이 height을 줄이고 싶다면 입력으로 들어가는 list state의 사이즈는 exponential하게 커져야함을 알 수 있다.</p>
+</blockquote>
 
-&lt;p&gt;$r$을 크게하고 싶어서 욕심을 부리다보면 출력 사이즈 $M’$가 점점 작아져 다음단계에 충분한 $r$을 뽑아내지 못한다. 따라서 적당한 크기의 $r$을 선택해서 출력 사이즈 $M’$이 점점 커지도록 하면 $r$도 커지고, $M’$도 커지면서 효과적으로 알고리즘을 수행할 수 있다. 따라서 논문에서는 $r = l-1$로 선택해서 $M’ = 2M$으로 출력 사이즈가 입력 사이즈의 두배가 되도록 만든다. 그러면 다음 단계에서는 $r$값도 1이 커지고, $M’$ 또한 계속 두배로 증가한다. Time complexity를 계산할 때 이 방법을 사용하도록 하겠다.&lt;/p&gt;
+<p>$r$을 크게하고 싶어서 욕심을 부리다보면 출력 사이즈 $M’$가 점점 작아져 다음단계에 충분한 $r$을 뽑아내지 못한다. 따라서 적당한 크기의 $r$을 선택해서 출력 사이즈 $M’$이 점점 커지도록 하면 $r$도 커지고, $M’$도 커지면서 효과적으로 알고리즘을 수행할 수 있다. 따라서 논문에서는 $r = l-1$로 선택해서 $M’ = 2M$으로 출력 사이즈가 입력 사이즈의 두배가 되도록 만든다. 그러면 다음 단계에서는 $r$값도 1이 커지고, $M’$ 또한 계속 두배로 증가한다. Time complexity를 계산할 때 이 방법을 사용하도록 하겠다.</p>
 
-&lt;p&gt;해당 combination은 두 개의 list state만을 입력으로 받지만, &lt;a href=&quot;https://arxiv.org/pdf/1112.3333.pdf&quot;&gt;Kuperberg 논문&lt;/a&gt;을 보면 여러개의 list state를 한 번에 합치는 방법도 사용한다. 하지만 해당 포스트에서는 &lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt;논문에서 고려한 2-list merging 방법만을 고려하도록 하겠다.&lt;/p&gt;
+<p>해당 combination은 두 개의 list state만을 입력으로 받지만, <a href="https://arxiv.org/pdf/1112.3333.pdf">Kuperberg 논문</a>을 보면 여러개의 list state를 한 번에 합치는 방법도 사용한다. 하지만 해당 포스트에서는 <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a>논문에서 고려한 2-list merging 방법만을 고려하도록 하겠다.</p>
 
-&lt;h3 id=&quot;time-complexity-and-tradeoffs&quot;&gt;Time Complexity and Tradeoffs&lt;/h3&gt;
+<h3 id="time-complexity-and-tradeoffs">Time Complexity and Tradeoffs</h3>
 
-&lt;p&gt;앞서 설명한 2-list merging을 사용해서 원하는 labeled state를 얻으려면 binary tree 구조로 combination을 수행해야한다. binary tree의 depth에 따라서 전체 time complexity, memory complexity 등이 결정될 것이다. 우리가 원하는 것은 height이 1인 list state이므로 time complexity $2^t$, quantum memory complexity $2^m$, quantum query $2^q$에 대한 아래와 같은 그래프를 그릴 수 있다.&lt;/p&gt;
+<p>앞서 설명한 2-list merging을 사용해서 원하는 labeled state를 얻으려면 binary tree 구조로 combination을 수행해야한다. binary tree의 depth에 따라서 전체 time complexity, memory complexity 등이 결정될 것이다. 우리가 원하는 것은 height이 1인 list state이므로 time complexity $2^t$, quantum memory complexity $2^m$, quantum query $2^q$에 대한 아래와 같은 그래프를 그릴 수 있다.</p>
 
-&lt;center&gt;
-&lt;img src=&quot;/assets/20210215/20210215_1.png&quot; width=&quot;40%&quot; /&gt;
-&lt;figcaption&gt; 출처 : &lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt;&lt;/figcaption&gt;
-&lt;/center&gt;
+<center>
+<img src="/assets/20210215/20210215_1.png" width="40%" />
+<figcaption> 출처 : <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a></figcaption>
+</center>
 
-&lt;p&gt;그래프에서 tree level이 0일 때 초기 list state의 사이즈 $2^{l_0}$를 $m$으로 최대한 키울 수 없는 이유는 tree level 0에서는 leaf node의 개수가 총 $2^q$개인데, 2-list merging은 $O(2^{l_0})$만큼의 시간복잡도를 가지므로 level 0에서만 총 $O(2^{l_0 \cdot q})$만큼의 시간복잡도를 소모하기 때문이다. 앞서 시간복잡도는 $2^t$라는 설정이 있었으므로 $l_0 = t-q$가 최대 사이즈가 된다.&lt;/p&gt;
+<p>그래프에서 tree level이 0일 때 초기 list state의 사이즈 $2^{l_0}$를 $m$으로 최대한 키울 수 없는 이유는 tree level 0에서는 leaf node의 개수가 총 $2^q$개인데, 2-list merging은 $O(2^{l_0})$만큼의 시간복잡도를 가지므로 level 0에서만 총 $O(2^{l_0 \cdot q})$만큼의 시간복잡도를 소모하기 때문이다. 앞서 시간복잡도는 $2^t$라는 설정이 있었으므로 $l_0 = t-q$가 최대 사이즈가 된다.</p>
 
-&lt;p&gt;2-list merging을 수행할 때마다 list state의 사이즈에 log scale만큼 height가 줄어들기 때문에 각 tree level에서 줄어든 height을 모두 합하면(위 그래프에서 색칠한 부분) 아래와 같은 식을 만족해야함을 알 수 있다.&lt;/p&gt;
+<p>2-list merging을 수행할 때마다 list state의 사이즈에 log scale만큼 height가 줄어들기 때문에 각 tree level에서 줄어든 height을 모두 합하면(위 그래프에서 색칠한 부분) 아래와 같은 식을 만족해야함을 알 수 있다.</p>
 
-&lt;center&gt;$-\frac{1}{2}(t-m-q)^2 + mq = n$ where $\max(m,q) \leq t \leq m+q$&lt;/center&gt;
+<center>$-\frac{1}{2}(t-m-q)^2 + mq = n$ where $\max(m,q) \leq t \leq m+q$</center>
 
-&lt;p&gt;여기서 $t=q=m$을 적용하면 모든 complexity가 subexponential인 $\tilde{O}(2^{\sqrt{2n}})$가 됨을 알 수 있다. 논문에서 자세히 나오진 않았지만, 원래 Kuperberg가 주장했던 바에 의하면 quantum memory $2^m$은 polynomial하게 낮출 수 있어야한다. 아마 위의 식에서 $m$이 상수라고 생각하면 되는게 아닐까 생각해본다..&lt;/p&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다. Regev의 알고리즘은 2008년도 A Subexponential Time Algorithm for the DHSP with Polynomial Space 논문을 참조 Quantum algorithm for HSP 2편</summary></entry><entry><title type="html">Quantum algorithm for Hidden Shift Problem</title><link href="/2021/02/14/Quantum-Algorithm-for-HSP.html" rel="alternate" type="text/html" title="Quantum algorithm for Hidden Shift Problem" /><published>2021-02-14T00:00:00+09:00</published><updated>2021-02-14T00:00:00+09:00</updated><id>/2021/02/14/Quantum-Algorithm-for-HSP</id><content type="html" xml:base="/2021/02/14/Quantum-Algorithm-for-HSP.html">&lt;ul&gt;
-  &lt;li&gt;해당 글은 &lt;a href=&quot;https://eprint.iacr.org/2018/537.pdf&quot;&gt;Quantum Security Analysis of CSIDH&lt;/a&gt;논문을 정리한 것이다.&lt;/li&gt;
-  &lt;li&gt;3개의 대표적인 양자 알고리즘이 존재한다.&lt;/li&gt;
-  &lt;li&gt;kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.&lt;/li&gt;
-  &lt;li&gt;입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)&lt;/li&gt;
-&lt;/ul&gt;
+<p>여기서 $t=q=m$을 적용하면 모든 complexity가 subexponential인 $\tilde{O}(2^{\sqrt{2n}})$가 됨을 알 수 있다. 논문에서 자세히 나오진 않았지만, 원래 Kuperberg가 주장했던 바에 의하면 quantum memory $2^m$은 polynomial하게 낮출 수 있어야한다. 아마 위의 식에서 $m$이 상수라고 생각하면 되는게 아닐까 생각해본다..</p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html"><![CDATA[해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다. Regev의 알고리즘은 2008년도 A Subexponential Time Algorithm for the DHSP with Polynomial Space 논문을 참조 Quantum algorithm for HSP 2편]]></summary></entry><entry><title type="html">Quantum algorithm for Hidden Shift Problem</title><link href="http://localhost:4000/2021/02/14/Quantum-Algorithm-for-HSP.html" rel="alternate" type="text/html" title="Quantum algorithm for Hidden Shift Problem" /><published>2021-02-14T00:00:00+09:00</published><updated>2021-02-14T00:00:00+09:00</updated><id>http://localhost:4000/2021/02/14/Quantum-Algorithm-for-HSP</id><content type="html" xml:base="http://localhost:4000/2021/02/14/Quantum-Algorithm-for-HSP.html"><![CDATA[<ul>
+  <li>해당 글은 <a href="https://eprint.iacr.org/2018/537.pdf">Quantum Security Analysis of CSIDH</a>논문을 정리한 것이다.</li>
+  <li>3개의 대표적인 양자 알고리즘이 존재한다.</li>
+  <li>kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다.</li>
+  <li>입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)</li>
+</ul>
 
-&lt;!--more--&gt;
+<!--more-->
 
-&lt;h3 id=&quot;hidden-shift-problem&quot;&gt;Hidden Shift Problem&lt;/h3&gt;
+<h3 id="hidden-shift-problem">Hidden Shift Problem</h3>
 
-&lt;p&gt;Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, shift 값 $s$를 찾는 문제이다.&lt;/p&gt;
+<p>Hidden Shift Problem이란, group $G$와 집합 $A$에 대해서 함수 $f:G \rightarrow A$, $g:G \rightarrow A$가 존재해서 $f(x+s) = g(x)$를 만족할 때, shift 값 $s$를 찾는 문제이다.</p>
 
-&lt;p&gt;이 문제는 classical한 관점에서 봤을 때, collision을 찾는 문제와 같다. $n=|G|$라고 할 때, 걸리는 시간은 $\sqrt{n}$이 된다. 하지만 quantum 알고리즘으로는 subexponential하게 해결할 수 있다.&lt;/p&gt;
+<p>이 문제는 classical한 관점에서 봤을 때, collision을 찾는 문제와 같다. $n=|G|$라고 할 때, 걸리는 시간은 $\sqrt{n}$이 된다. 하지만 quantum 알고리즘으로는 subexponential하게 해결할 수 있다.</p>
 
-&lt;h3 id=&quot;kuperberg-알고리즘의-철학labeled-state&quot;&gt;kuperberg 알고리즘의 철학(labeled state)&lt;/h3&gt;
+<h3 id="kuperberg-알고리즘의-철학labeled-state">kuperberg 알고리즘의 철학(labeled state)</h3>
 
-&lt;p&gt;함수 $f$와 $g$가 주어졌을 때, uniform superposition state를 $f$, $g$ oracle에 입력해서 우리가 가장 간단히 얻을 수 있는 quantum state는 아래와 같다.&lt;/p&gt;
+<p>함수 $f$와 $g$가 주어졌을 때, uniform superposition state를 $f$, $g$ oracle에 입력해서 우리가 가장 간단히 얻을 수 있는 quantum state는 아래와 같다.</p>
 
-&lt;center&gt;$\newcommand{\ket}[1]{\left| #1 \right&amp;gt;}$
-$\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$&lt;/center&gt;
+<center>$\newcommand{\ket}[1]{\left| #1 \right&gt;}$
+$\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + \ket{1}\ket{g(x)})$</center>
 
-&lt;p&gt;두번째 레지스터는 $f$ 또는 $g$ 중에서 어떤 함수의 출력값인지 0 또는 1로 구분하기 위해 넣은 ancilla 값이다. 위와 같은 quantum state에서 세번째 레지스터를 측정해서 얻은 label이 $v$라고 할 때, $f(x_0 + s) = g(x_0) = v$를 만족하는 $x_0$에 대해서 아래의 quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>두번째 레지스터는 $f$ 또는 $g$ 중에서 어떤 함수의 출력값인지 0 또는 1로 구분하기 위해 넣은 ancilla 값이다. 위와 같은 quantum state에서 세번째 레지스터를 측정해서 얻은 label이 $v$라고 할 때, $f(x_0 + s) = g(x_0) = v$를 만족하는 $x_0$에 대해서 아래의 quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$&lt;/center&gt;
+<center>$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$</center>
 
-&lt;p&gt;여기서 두번째 레지스터에 Quantum Fourier Transform을 적용하면 아래의 quantum state를 얻는다.&lt;/p&gt;
+<p>여기서 두번째 레지스터에 Quantum Fourier Transform을 적용하면 아래의 quantum state를 얻는다.</p>
 
-&lt;center&gt;$\ket{\psi_2} = \frac{1}{\sqrt{2N}}\sum_{k=0}^{N-1} \ket{k}(\ket{0}+e^{2\pi ski/N}\ket{1})$&lt;/center&gt;
+<center>$\ket{\psi_2} = \frac{1}{\sqrt{2N}}\sum_{k=0}^{N-1} \ket{k}(\ket{0}+e^{2\pi ski/N}\ket{1})$</center>
 
-&lt;p&gt;여기서 다시 첫번째 레지스터를 측정하면 아래의 labeled quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>여기서 다시 첫번째 레지스터를 측정하면 아래의 labeled quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_l} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l}{N})\ket{1})$ where $\chi(x) = e^{2\pi sxi}$ &lt;/center&gt;
+<center>$\ket{\psi_l} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l}{N})\ket{1})$ where $\chi(x) = e^{2\pi sxi}$ </center>
 
-&lt;p&gt;labeled quantum state $\ket{\psi_l}$을 얻을 확률은 정확히 $\frac{1}{N}$이며, 한 개의 labeled quantum state를 얻기 위해서 $f$와 $g$ quantum oracle 각각에 대해 한번씩의 query가 필요하다.(총 두번의 query)&lt;/p&gt;
+<p>labeled quantum state $\ket{\psi_l}$을 얻을 확률은 정확히 $\frac{1}{N}$이며, 한 개의 labeled quantum state를 얻기 위해서 $f$와 $g$ quantum oracle 각각에 대해 한번씩의 query가 필요하다.(총 두번의 query)</p>
 
-&lt;p&gt;kuperberg 알고리즘은 이러한 labeled quantum state $\ket{\psi_l}$을 얻는 행위를 반복해서 충분히 많은 개수의 labeled quantum state를 모아놓고, 이들을 조합해서 아래의 labeled quantum state를 만드는 것이 목표이다.&lt;/p&gt;
+<p>kuperberg 알고리즘은 이러한 labeled quantum state $\ket{\psi_l}$을 얻는 행위를 반복해서 충분히 많은 개수의 labeled quantum state를 모아놓고, 이들을 조합해서 아래의 labeled quantum state를 만드는 것이 목표이다.</p>
 
-&lt;center&gt;${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$&lt;/center&gt;
+<center>${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$</center>
 
-&lt;p&gt;이와 같은 labeled quantum state를 얻으면, Quantum Fourier Transform을 역으로 적용해 shift 값 $s$를 얻을 수 있다.&lt;/p&gt;
+<p>이와 같은 labeled quantum state를 얻으면, Quantum Fourier Transform을 역으로 적용해 shift 값 $s$를 얻을 수 있다.</p>
 
-&lt;h3 id=&quot;combination-step&quot;&gt;Combination Step&lt;/h3&gt;
+<h3 id="combination-step">Combination Step</h3>
 
-&lt;p&gt;labeled quantum state $\ket{\psi_{l_1}}$과 $\ket{\psi_{l_2}}$가 주어졌을 때, 이 둘을 단순히 붙여놓으면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>labeled quantum state $\ket{\psi_{l_1}}$과 $\ket{\psi_{l_2}}$가 주어졌을 때, 이 둘을 단순히 붙여놓으면 아래와 같은 quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1 + l_2}{N})\ket{11})$&lt;/center&gt;
+<center>$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1 + l_2}{N})\ket{11})$</center>
 
-&lt;p&gt;여기서 첫번째와 두번째 qubit에 CNOT을 적용하면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>여기서 첫번째와 두번째 qubit에 CNOT을 적용하면 아래와 같은 quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1 + l_2}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1}{N})\ket{11})$&lt;/center&gt;
+<center>$\ket{\psi_{l_3}} = \frac{1}{2}(\ket{00} + \chi(\frac{l_1 + l_2}{N})\ket{10} + \chi(\frac{l_2}{N})\ket{01} + \chi(\frac{l_1}{N})\ket{11})$</center>
 
-&lt;p&gt;여기서 두번째 qubit을 측정하면 $\frac{1}{2}$확률로 label 0을 얻고, 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>여기서 두번째 qubit을 측정하면 $\frac{1}{2}$확률로 label 0을 얻고, 아래와 같은 quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l_1 + l_2}{N})\ket{1})$&lt;/center&gt;
+<center>$\ket{\psi_{l_1 + l_2}} = \frac{1}{\sqrt{2}}(\ket{0} + \chi(\frac{l_1 + l_2}{N})\ket{1})$</center>
 
-&lt;p&gt;이와 같은 방식으로 두개의 labeled quantum state를 이용해 combination된 새로운 labeled quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>이와 같은 방식으로 두개의 labeled quantum state를 이용해 combination된 새로운 labeled quantum state를 얻을 수 있다.</p>
 
-&lt;h3 id=&quot;kuperberg-algorithm&quot;&gt;kuperberg algorithm&lt;/h3&gt;
+<h3 id="kuperberg-algorithm">kuperberg algorithm</h3>
 
-&lt;p&gt;위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장 큰 $k$ 값을 말한다.&lt;/p&gt;
+<p>위와 같은 방식으로 얻은 labeled quantum state를 2-valuation 값에 따라 분류할 것이다. $x$의 2-valuation이란, $x$가 $2^k$로 나누어 떨어지는 가장 큰 $k$ 값을 말한다.</p>
 
-&lt;p&gt;$P_i = \{ \ket{\psi_x} | val_2(x) = i \}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\ket{\psi_{2^i}}}$들을 얻을 수 있다.&lt;/p&gt;
+<p>$P_i = \{ \ket{\psi_x} | val_2(x) = i \}$라고 하자. 그러면 아래와 같은 과정을 통해 원하는 labeled quantum state ${\ket{\psi_{2^i}}}$들을 얻을 수 있다.</p>
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;for 0 ≤ i ≤ n do 
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>for 0 ≤ i ≤ n do 
 	pop a element e from P_i, put (e,i) in R.
 	for (e,j) in R do:
 		if val_2(e - 2^j) = i then
@@ -521,90 +842,90 @@ $\ket{\psi_0} = \frac{1}{\sqrt{2N}}\sum_{x=0}^{N-1} \ket{x}(\ket{0}\ket{f(x)} + 
 	end while
 end for
 return Failure
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;$2^k + 1$개의 $n$-bit label이 uniform distribution으로부터 주어졌다고 가정하자. 그러면 비둘기 집의 원리에 의해 이중에서 $l_1 + l_2$의 2-valuation이 $k$ 이상이 되는 $l_1$, $l_2$가 적어도 1개 존재하며, 이 둘을 combination해서 2-valuation이 $k$ 이상이 되는 label 한개를 만들 수 있다. 따라서 만약에 $r \cdot 2^k$만큼의 $n$-bit label이 주어지면, 적어도 $\frac{(r-1)}{2} \cdot 2^k &amp;gt; \frac{r}{4} \cdot 2^k$만큼의 2-valuation이 $k$이상인 label을 얻을 수 있다.&lt;/p&gt;
+<p>$2^k + 1$개의 $n$-bit label이 uniform distribution으로부터 주어졌다고 가정하자. 그러면 비둘기 집의 원리에 의해 이중에서 $l_1 + l_2$의 2-valuation이 $k$ 이상이 되는 $l_1$, $l_2$가 적어도 1개 존재하며, 이 둘을 combination해서 2-valuation이 $k$ 이상이 되는 label 한개를 만들 수 있다. 따라서 만약에 $r \cdot 2^k$만큼의 $n$-bit label이 주어지면, 적어도 $\frac{(r-1)}{2} \cdot 2^k &gt; \frac{r}{4} \cdot 2^k$만큼의 2-valuation이 $k$이상인 label을 얻을 수 있다.</p>
 
-&lt;p&gt;그러면 가장 처음에 대략 $4^{\lceil \frac{n}{k} \rceil}2^k$만큼의 label을 뽑아놓으면 마지막에 2-valuation이 $n-1$인 label이 1개 이상 나온다는 것을 알 수 있다. $k = \sqrt{n}$으로 설정하면, 필요한 label의 개수는 총 $2^{3\sqrt{n}}$으로 subexponential하다. label의 개수는 곧 oracle query의 개수이므로 subexponential query만으로 문제를 해결 할 수 있음을 알 수 있다.&lt;/p&gt;
+<p>그러면 가장 처음에 대략 $4^{\lceil \frac{n}{k} \rceil}2^k$만큼의 label을 뽑아놓으면 마지막에 2-valuation이 $n-1$인 label이 1개 이상 나온다는 것을 알 수 있다. $k = \sqrt{n}$으로 설정하면, 필요한 label의 개수는 총 $2^{3\sqrt{n}}$으로 subexponential하다. label의 개수는 곧 oracle query의 개수이므로 subexponential query만으로 문제를 해결 할 수 있음을 알 수 있다.</p>
 
-&lt;p&gt;다만, 이를 위해서는 subexponential한 quantum memory가 필요하다는 것도 알 수 있다. 이는 상당한 자원을 필요로 한다.&lt;/p&gt;
+<p>다만, 이를 위해서는 subexponential한 quantum memory가 필요하다는 것도 알 수 있다. 이는 상당한 자원을 필요로 한다.</p>
 
-&lt;h3 id=&quot;approximate-qft&quot;&gt;Approximate QFT&lt;/h3&gt;
+<h3 id="approximate-qft">Approximate QFT</h3>
 
-&lt;p&gt;Group $G$의 크기를 $N$이라고 했을 때, 아래의 quantum state에 QFT를 적용한다.&lt;/p&gt;
+<p>Group $G$의 크기를 $N$이라고 했을 때, 아래의 quantum state에 QFT를 적용한다.</p>
 
-&lt;center&gt;$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$&lt;/center&gt;
+<center>$\ket{\psi_1} = \frac{1}{\sqrt{2}}(\ket{x_0 + s}\ket{0} + \ket{x_0}\ket{1})$</center>
 
-&lt;p&gt;여기서 $s \in \mathbb{Z}/N\mathbb{Z}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 $N$이 power of 2가 아닐 경우엔 $\mathbb{Z}/N\mathbb{Z}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 &lt;a href=&quot;https://arxiv.org/pdf/quant-ph/9511026.pdf&quot;&gt;kitaev&lt;/a&gt;와 &lt;a href=&quot;https://arxiv.org/pdf/quant-ph/0301093.pdf&quot;&gt;Mosca and Zalka&lt;/a&gt; 논문을 참조하자.&lt;/p&gt;
+<p>여기서 $s \in \mathbb{Z}/N\mathbb{Z}$ 이므로 임의의 $n \geq \log N$에 대해 일반적인 $2^n$-QFT를 적용하면 $N$이 power of 2가 아닐 경우엔 $\mathbb{Z}/N\mathbb{Z}$위의 덧셈을 구현하지 못한다. 따라서 정확히 $N$-QFT를 적용해주어야 정확한 $s$를 찾을 수 있으며, arbitrary order에 대한 approximate QFT는 <a href="https://arxiv.org/pdf/quant-ph/9511026.pdf">kitaev</a>와 <a href="https://arxiv.org/pdf/quant-ph/0301093.pdf">Mosca and Zalka</a> 논문을 참조하자.</p>
 
-&lt;p&gt;해당 포스트에서는 $N$-QFT를 이용해도 우리가 앞서 얻은 label들&lt;/p&gt;
+<p>해당 포스트에서는 $N$-QFT를 이용해도 우리가 앞서 얻은 label들</p>
 
-&lt;center&gt;${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$&lt;/center&gt;
+<center>${\ket{\psi_{0}}, \ket{\psi_{1}}, ..., \ket{\psi_{2^k}}, ..., \ket{\psi_{2^{n-1}}}}$</center>
 
-&lt;p&gt;을 통해서 얼마나 정확히 $s$값을 구해낼 수 있는가를 분석해볼 것이다. label을 생성할 때에는 $N$-QFT를 이용했지만, shift 값 $s$를 복구할 때에는 위 label들을 사용해야하기 때문에 $2^n$-QFT를 사용할 수 밖에 없다. 그러면 아래와 같은 quantum state를 얻을 수 있다.&lt;/p&gt;
+<p>을 통해서 얼마나 정확히 $s$값을 구해낼 수 있는가를 분석해볼 것이다. label을 생성할 때에는 $N$-QFT를 이용했지만, shift 값 $s$를 복구할 때에는 위 label들을 사용해야하기 때문에 $2^n$-QFT를 사용할 수 밖에 없다. 그러면 아래와 같은 quantum state를 얻을 수 있다.</p>
 
-&lt;center&gt;$\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$&lt;/center&gt;
+<center>$\ket{\psi} = \frac{1}{2^{n/2}} QFT \sum_{k=0}^{2^n-1} \chi(\frac{ks}{N})\ket{k} = \frac{1}{2^n} \sum_{t=0}^{2^n-1} (\sum_{k=0}^{2^n-1} \chi(k(\frac{s}{N}+\frac{t}{2^n})))\ket{t}$</center>
 
-&lt;p&gt;이를 측정했을 때, label $t$를 얻을 확률은 $\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$이 된다.&lt;/p&gt;
+<p>이를 측정했을 때, label $t$를 얻을 확률은 $\frac{1}{2^{2n}}(\frac{1-\chi(2^n(\frac{s}{N}+\frac{t}{2^n}))}{1-\chi(\frac{s}{N}+\frac{t}{2^n})})^2$이 된다.</p>
 
-&lt;p&gt;$\theta = \frac{s}{N}+\frac{t}{2^n}$라고 하면, $\theta = 0$인 $t$가 존재하면, 해당 $t$가 label로 측정될 확률은 1이되지만, N이 power of 2가 아닌 경우, 그런 $k$가 존재하지 않는다. $\theta \in [0, \frac{1}{2^{n+1}}]$인 경우, 확률값 $p(\theta) = \frac{1}{2^{2n}}(\frac{1-\chi(2^n\theta)}{1-\chi(\theta)})^2$는 단조 감소함을 알 수 있으며, $\theta = \frac{1}{2^{n+1}}$일 때, $p(\frac{1}{2^{n+1}}) \approx \frac{1}{2^{2n}}\frac{1/2}{(\pi\theta)^2} = \frac{2}{\pi^2}$값을 갖는다.&lt;/p&gt;
+<p>$\theta = \frac{s}{N}+\frac{t}{2^n}$라고 하면, $\theta = 0$인 $t$가 존재하면, 해당 $t$가 label로 측정될 확률은 1이되지만, N이 power of 2가 아닌 경우, 그런 $k$가 존재하지 않는다. $\theta \in [0, \frac{1}{2^{n+1}}]$인 경우, 확률값 $p(\theta) = \frac{1}{2^{2n}}(\frac{1-\chi(2^n\theta)}{1-\chi(\theta)})^2$는 단조 감소함을 알 수 있으며, $\theta = \frac{1}{2^{n+1}}$일 때, $p(\frac{1}{2^{n+1}}) \approx \frac{1}{2^{2n}}\frac{1/2}{(\pi\theta)^2} = \frac{2}{\pi^2}$값을 갖는다.</p>
 
-&lt;p&gt;따라서 $| \frac{s}{N} + \frac{t}{2^n} | \leq \frac{1}{2^{n+1}}$를 만족하는 $t$를 찾을 확률이 적어도 $\frac{2}{\pi^2}$가 된다. 이러한 $t$ 값을 찾으면, $n &amp;gt; \log_2(N)$일 때, 연분수를 이용해 정확한 $s$ 값을 찾을 수 있다.&lt;/p&gt;
+<p>따라서 $| \frac{s}{N} + \frac{t}{2^n} | \leq \frac{1}{2^{n+1}}$를 만족하는 $t$를 찾을 확률이 적어도 $\frac{2}{\pi^2}$가 된다. 이러한 $t$ 값을 찾으면, $n &gt; \log_2(N)$일 때, 연분수를 이용해 정확한 $s$ 값을 찾을 수 있다.</p>
 
-&lt;h3 id=&quot;regevs-algorithm-with-polynomial-quantum-space&quot;&gt;Regev’s algorithm with polynomial quantum space&lt;/h3&gt;
+<h3 id="regevs-algorithm-with-polynomial-quantum-space">Regev’s algorithm with polynomial quantum space</h3>
 
-&lt;p&gt;내용이 길어지는 관계로 다음 포스팅에..&lt;/p&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html">해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다. 3개의 대표적인 양자 알고리즘이 존재한다. kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다. 입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)</summary></entry><entry><title type="html">Elliptic Curve and Isogeny</title><link href="/2021/02/07/Elliptic-Curve-and-Isogeny.html" rel="alternate" type="text/html" title="Elliptic Curve and Isogeny" /><published>2021-02-07T00:00:00+09:00</published><updated>2021-02-07T00:00:00+09:00</updated><id>/2021/02/07/Elliptic-Curve-and-Isogeny</id><content type="html" xml:base="/2021/02/07/Elliptic-Curve-and-Isogeny.html">&lt;ul&gt;
-  &lt;li&gt;Isogeny는 Elliptic Curve 간의 group homomorphism을 말한다.&lt;/li&gt;
-  &lt;li&gt;$\mathbb{C}$ 위에서 정의된 Elliptic Curve들은 모두 isogenous할까?&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;$\bar{\mathbb{F}}_p$ 위에서 정의된 Elliptic Curve들은 $\mathbb{C}$위에서 정의된 Elliptic Curve들과 어떻게 다를까?&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Velu’s formula를 이용해 Isogeny를 연산할 수 있다.&lt;/li&gt;
-  &lt;li&gt;kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.&lt;/li&gt;
-&lt;/ul&gt;
+<p>내용이 길어지는 관계로 다음 포스팅에..</p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Quantum_Algorithm" /><summary type="html"><![CDATA[해당 글은 Quantum Security Analysis of CSIDH논문을 정리한 것이다. 3개의 대표적인 양자 알고리즘이 존재한다. kuperberg의 첫번째, 두번째 알고리즘과 Regev의 알고리즘이 존재한다. 입력으로 주어진 함수의 정의역 G가 commutative group 일 때만 해당 알고리즘을 적용할 수 있다.(finitely generate일 필요는 없다.)]]></summary></entry><entry><title type="html">Elliptic Curve and Isogeny</title><link href="http://localhost:4000/2021/02/07/Elliptic-Curve-and-Isogeny.html" rel="alternate" type="text/html" title="Elliptic Curve and Isogeny" /><published>2021-02-07T00:00:00+09:00</published><updated>2021-02-07T00:00:00+09:00</updated><id>http://localhost:4000/2021/02/07/Elliptic-Curve-and-Isogeny</id><content type="html" xml:base="http://localhost:4000/2021/02/07/Elliptic-Curve-and-Isogeny.html"><![CDATA[<ul>
+  <li>Isogeny는 Elliptic Curve 간의 group homomorphism을 말한다.</li>
+  <li>$\mathbb{C}$ 위에서 정의된 Elliptic Curve들은 모두 isogenous할까?</li>
+  <li>
+    <p>$\bar{\mathbb{F}}_p$ 위에서 정의된 Elliptic Curve들은 $\mathbb{C}$위에서 정의된 Elliptic Curve들과 어떻게 다를까?</p>
+  </li>
+  <li>Velu’s formula를 이용해 Isogeny를 연산할 수 있다.</li>
+  <li>kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.</li>
+</ul>
 
-&lt;!--more--&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html">Isogeny는 Elliptic Curve 간의 group homomorphism을 말한다. $\mathbb{C}$ 위에서 정의된 Elliptic Curve들은 모두 isogenous할까? $\bar{\mathbb{F}}_p$ 위에서 정의된 Elliptic Curve들은 $\mathbb{C}$위에서 정의된 Elliptic Curve들과 어떻게 다를까? Velu’s formula를 이용해 Isogeny를 연산할 수 있다. kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.</summary></entry><entry><title type="html">Montgomery Multiplication</title><link href="/2021/01/31/Montgomery-Multiplication.html" rel="alternate" type="text/html" title="Montgomery Multiplication" /><published>2021-01-31T00:00:00+09:00</published><updated>2021-01-31T00:00:00+09:00</updated><id>/2021/01/31/Montgomery-Multiplication</id><content type="html" xml:base="/2021/01/31/Montgomery-Multiplication.html">&lt;ul&gt;
-  &lt;li&gt;Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.&lt;/li&gt;
-  &lt;li&gt;$\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)&lt;/li&gt;
-&lt;/ul&gt;
+<!--more-->]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html"><![CDATA[Isogeny는 Elliptic Curve 간의 group homomorphism을 말한다. $\mathbb{C}$ 위에서 정의된 Elliptic Curve들은 모두 isogenous할까? $\bar{\mathbb{F}}_p$ 위에서 정의된 Elliptic Curve들은 $\mathbb{C}$위에서 정의된 Elliptic Curve들과 어떻게 다를까? Velu’s formula를 이용해 Isogeny를 연산할 수 있다. kernel polynomial을 이용해서도 Isogeny를 연산할 수 있다.]]></summary></entry><entry><title type="html">Montgomery Multiplication</title><link href="http://localhost:4000/2021/01/31/Montgomery-Multiplication.html" rel="alternate" type="text/html" title="Montgomery Multiplication" /><published>2021-01-31T00:00:00+09:00</published><updated>2021-01-31T00:00:00+09:00</updated><id>http://localhost:4000/2021/01/31/Montgomery-Multiplication</id><content type="html" xml:base="http://localhost:4000/2021/01/31/Montgomery-Multiplication.html"><![CDATA[<ul>
+  <li>Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다.</li>
+  <li>$\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)</li>
+</ul>
 
-&lt;!--more--&gt;
+<!--more-->
 
-&lt;h2 id=&quot;빠른-모듈러-곱의-철학&quot;&gt;빠른 모듈러 곱의 철학&lt;/h2&gt;
+<h2 id="빠른-모듈러-곱의-철학">빠른 모듈러 곱의 철학</h2>
 
-&lt;p&gt;소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다.
+<p>소수 $p$가 주어졌을 때, Modular Multiplication은 $a$와 $b$로부터 $a \cdot b \mod p$를 구하는 것을 말한다.
 단순한 방법으로 $a \cdot b$를 수행하고 이 값이 $p$보다 작아질 때까지 $p$를 빼주면 된다.
-조금 더 개선한 방법으로는 $0 \leq a \cdot b - k \cdot p &amp;lt; p$를 만족하는 k를 $[0,p)$ 구간에서 binary search 해주는 방법이 있겠다. 이는 대략 $O(\log p)$의 시간복잡도를 가진다.&lt;/p&gt;
+조금 더 개선한 방법으로는 $0 \leq a \cdot b - k \cdot p &lt; p$를 만족하는 k를 $[0,p)$ 구간에서 binary search 해주는 방법이 있겠다. 이는 대략 $O(\log p)$의 시간복잡도를 가진다.</p>
 
-&lt;p&gt;Modular 곱셈에서는 modular $p$를 해주는 연산이 가장 오래걸린다. modular 연산에 걸리는 시간을 효율적으로 줄이는게 Modular Multiplication 연산을 빠르게 수행할 수 있는 방법이다.&lt;/p&gt;
+<p>Modular 곱셈에서는 modular $p$를 해주는 연산이 가장 오래걸린다. modular 연산에 걸리는 시간을 효율적으로 줄이는게 Modular Multiplication 연산을 빠르게 수행할 수 있는 방법이다.</p>
 
-&lt;p&gt;그런데 이진수를 사용한다면, $p = 2^k$꼴인 $p$에 대해서는 modular 연산이 k개의 least significant bit를 남기고 지우는 행위와 같다는 것을 알 수 있다. 이는 AND 논리 연산으로 아주 간단히 구현할 수 있다. $p \&amp;amp; (2^k-1)$을 연산하면 되기 때문이다. 이러한 점에서 착안해 modular $p$연산을 modular $2^k$연산으로 변환하여 연산을 빠르게 수행하려는 것이 Montgomery Multiplication의 철학이다.&lt;/p&gt;
+<p>그런데 이진수를 사용한다면, $p = 2^k$꼴인 $p$에 대해서는 modular 연산이 k개의 least significant bit를 남기고 지우는 행위와 같다는 것을 알 수 있다. 이는 AND 논리 연산으로 아주 간단히 구현할 수 있다. $p \&amp; (2^k-1)$을 연산하면 되기 때문이다. 이러한 점에서 착안해 modular $p$연산을 modular $2^k$연산으로 변환하여 연산을 빠르게 수행하려는 것이 Montgomery Multiplication의 철학이다.</p>
 
-&lt;h2 id=&quot;montgomery-reduction&quot;&gt;Montgomery reduction&lt;/h2&gt;
+<h2 id="montgomery-reduction">Montgomery reduction</h2>
 
-&lt;p&gt;$a \cdot b$의 값을 $[0,p-1]$사이로 reduction 시킨다는 것은 수의 길이를 줄인다는 의미이다. 수의 길이를 줄이는 가장 빠른 방법은 당연히 right shift 연산을 통해 lsb를 버리는 방법이다. 그렇다면 right shift를 통해서 reduction 시킬 수 있는 상황이 존재할까?&lt;/p&gt;
+<p>$a \cdot b$의 값을 $[0,p-1]$사이로 reduction 시킨다는 것은 수의 길이를 줄인다는 의미이다. 수의 길이를 줄이는 가장 빠른 방법은 당연히 right shift 연산을 통해 lsb를 버리는 방법이다. 그렇다면 right shift를 통해서 reduction 시킬 수 있는 상황이 존재할까?</p>
 
-&lt;p&gt;right shift는 $2^k$로 나누는 연산이므로 $2^k$로 나누어서 $a \cdot b$를 얻을 수 있어야한다. 여기서 Montgomery form의 아이디어가 발생한다. 모듈러 곱 연산을 할 때마다 $2^k$로 나누는 연산을 해야만 하도록 만들기 위해서 우리는 $a$와 $b$로부터 $a \cdot b$를 얻는 것 대신에 $a \cdot 2^k$와 $b \cdot 2^k$로부터 $a \cdot b \cdot 2^k$를 얻도록 만들 것이다. 이러면 자연스럽게 $ a2^k \cdot b2^k$를 연산해준 다음 $2^k$를 다시 나누어줘야 한다. 이렇게 되면 이왕 $2^k$로 나눠주어야 하는 김에 right shift 연산으로 길이도 $\log p$로 줄여서 자연스럽게 $ab2^k$ 값이 $[0,p-1]$ 안에 들어오도록 만들 수 있다.&lt;/p&gt;
+<p>right shift는 $2^k$로 나누는 연산이므로 $2^k$로 나누어서 $a \cdot b$를 얻을 수 있어야한다. 여기서 Montgomery form의 아이디어가 발생한다. 모듈러 곱 연산을 할 때마다 $2^k$로 나누는 연산을 해야만 하도록 만들기 위해서 우리는 $a$와 $b$로부터 $a \cdot b$를 얻는 것 대신에 $a \cdot 2^k$와 $b \cdot 2^k$로부터 $a \cdot b \cdot 2^k$를 얻도록 만들 것이다. 이러면 자연스럽게 $ a2^k \cdot b2^k$를 연산해준 다음 $2^k$를 다시 나누어줘야 한다. 이렇게 되면 이왕 $2^k$로 나눠주어야 하는 김에 right shift 연산으로 길이도 $\log p$로 줄여서 자연스럽게 $ab2^k$ 값이 $[0,p-1]$ 안에 들어오도록 만들 수 있다.</p>
 
-&lt;p&gt;그래도 아직 충분하지 않다. 우리는 $T = (a2^k \mod p) \times (b2^k \mod p)$를 $R = 2^k$로 나누는 연산을 수행할 때, right shift 연산을 사용하고 싶은건데 $T$ 값은 밑에서 $k$ 비트 만큼이 모두 0이라는 보장이 없기 때문이다. $p$값을 적절히 더해줘서 $k$만큼의 lsb를 0으로 만들어주면 그제서야 right shift를 사용할 수 있다.&lt;/p&gt;
+<p>그래도 아직 충분하지 않다. 우리는 $T = (a2^k \mod p) \times (b2^k \mod p)$를 $R = 2^k$로 나누는 연산을 수행할 때, right shift 연산을 사용하고 싶은건데 $T$ 값은 밑에서 $k$ 비트 만큼이 모두 0이라는 보장이 없기 때문이다. $p$값을 적절히 더해줘서 $k$만큼의 lsb를 0으로 만들어주면 그제서야 right shift를 사용할 수 있다.</p>
 
-&lt;p&gt;$p$를 $n$번 더해줘야 $T$ 값을 우리가 원하는 형태로 만들 수 있다고 하면, $T + np \equiv 0 \mod R$ 식을 만족하는 $n$을 찾아야한다. 식을 다시쓰면,&lt;/p&gt;
+<p>$p$를 $n$번 더해줘야 $T$ 값을 우리가 원하는 형태로 만들 수 있다고 하면, $T + np \equiv 0 \mod R$ 식을 만족하는 $n$을 찾아야한다. 식을 다시쓰면,</p>
 
-&lt;center&gt;$n \equiv T \times (-1 \times p^{-1}) \mod R$&lt;/center&gt;
+<center>$n \equiv T \times (-1 \times p^{-1}) \mod R$</center>
 
-&lt;p&gt;이 된다. $p$는 고정되어 있으므로, $p’ = ((-1 \times p^{-1}) \mod R)$은 미리 계산해서 저장해두면, $Tp’ \mod R$만 계산하면 된다. 이 모듈러 곱은 AND 연산으로 간단히 수행될 것이다. $\lfloor (T + np)/R \rfloor$를 계산하면 크기 범위는 $[0, \lfloor (p-1)^2/R \rfloor + (p-1)]$이 될 것이다. $k = \lceil \log p \rceil$라고 하면, $R = 2^k \geq p-1$이므로, $\lfloor ((p-1)^2/R) \rfloor \leq (p-1)$가 된다. 정리하면, 아래와 같은 결론을 내릴 수 있다.&lt;/p&gt;
+<p>이 된다. $p$는 고정되어 있으므로, $p’ = ((-1 \times p^{-1}) \mod R)$은 미리 계산해서 저장해두면, $Tp’ \mod R$만 계산하면 된다. 이 모듈러 곱은 AND 연산으로 간단히 수행될 것이다. $\lfloor (T + np)/R \rfloor$를 계산하면 크기 범위는 $[0, \lfloor (p-1)^2/R \rfloor + (p-1)]$이 될 것이다. $k = \lceil \log p \rceil$라고 하면, $R = 2^k \geq p-1$이므로, $\lfloor ((p-1)^2/R) \rfloor \leq (p-1)$가 된다. 정리하면, 아래와 같은 결론을 내릴 수 있다.</p>
 
-&lt;center&gt;&lt;b&gt;$k \geq \lceil \log p \rceil$이면, $\lfloor (T + np)/R \rfloor$는 $[0, 2(p-1)]$ 범위 안에 들어온다.&lt;/b&gt;&lt;/center&gt;
+<center><b>$k \geq \lceil \log p \rceil$이면, $\lfloor (T + np)/R \rfloor$는 $[0, 2(p-1)]$ 범위 안에 들어온다.</b></center>
 
-&lt;p&gt;$k = \lceil \log p \rceil$일 때, $T \in [0, (p-1)^2]$을 입력 받아서 미리 계산해둔 $p’ = ((-1 \times p^{-1}) \mod R)$를 이용해서 $n = (T \times p’ \mod R)$을 계산하고, $T + np$를 $k$-right shift 해주면 $T$에 대한 montgomery reduction이 된다.&lt;/p&gt;
+<p>$k = \lceil \log p \rceil$일 때, $T \in [0, (p-1)^2]$을 입력 받아서 미리 계산해둔 $p’ = ((-1 \times p^{-1}) \mod R)$를 이용해서 $n = (T \times p’ \mod R)$을 계산하고, $T + np$를 $k$-right shift 해주면 $T$에 대한 montgomery reduction이 된다.</p>
 
-&lt;p&gt;montgomery reduction을 통해 modular reduction을 수행한다면 곱셈 한번과 덧셈 한번만큼의 연산만 필요하기 때문에 앞서 생각한 binary search보다는 훨씬 많은 연산을 줄인다는 것을 알 수 있다.&lt;/p&gt;
+<p>montgomery reduction을 통해 modular reduction을 수행한다면 곱셈 한번과 덧셈 한번만큼의 연산만 필요하기 때문에 앞서 생각한 binary search보다는 훨씬 많은 연산을 줄인다는 것을 알 수 있다.</p>
 
-&lt;p&gt;이를 pseudo code로 표현하면 아래와 같다.&lt;/p&gt;
+<p>이를 pseudo code로 표현하면 아래와 같다.</p>
 
-&lt;h3 id=&quot;montgomery-reduction-algorithm&quot;&gt;Montgomery reduction algorithm&lt;/h3&gt;
+<h3 id="montgomery-reduction-algorithm">Montgomery reduction algorithm</h3>
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;k = ceil(log p)
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k = ceil(log p)
 function REDC is
     input: Integers R=2^k and p with gcd(R, p) = 1,
            Integer p′ in [0, R − 1] such that NN′ ≡ −1 mod R,
@@ -619,43 +940,43 @@ function REDC is
         return t
     end if
 end function
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Montgomery_modular_multiplication&quot;&gt;wiki 참조&lt;/a&gt;&lt;/p&gt;
+</code></pre></div></div>
+<p><a href="https://en.wikipedia.org/wiki/Montgomery_modular_multiplication">wiki 참조</a></p>
 
-&lt;h2 id=&quot;multi-precision-reduction&quot;&gt;Multi-precision reduction&lt;/h2&gt;
+<h2 id="multi-precision-reduction">Multi-precision reduction</h2>
 
-&lt;p&gt;지금까지는 $R = 2^k$인 일반적인 경우를 생각했지만, 컴퓨터의 연산단위는 8-bit, 16-bit, 32-bit, 64-bit와 같이 고정되어 있다. 따라서 이에 맞게 연산을 해주는게 더 빠를 것이다. 대표적인 예로 8-bit인 경우, 8-bit 크기의 레지스터에서 곱셈 또는 덧셈 연산을 하면 자동적으로 $2^8$에 대한 모듈러 곱셈, 덧셈을 연산하게 된다.&lt;/p&gt;
+<p>지금까지는 $R = 2^k$인 일반적인 경우를 생각했지만, 컴퓨터의 연산단위는 8-bit, 16-bit, 32-bit, 64-bit와 같이 고정되어 있다. 따라서 이에 맞게 연산을 해주는게 더 빠를 것이다. 대표적인 예로 8-bit인 경우, 8-bit 크기의 레지스터에서 곱셈 또는 덧셈 연산을 하면 자동적으로 $2^8$에 대한 모듈러 곱셈, 덧셈을 연산하게 된다.</p>
 
-&lt;p&gt;그런데 앞에서 $k \geq \lceil \log p \rceil$ 조건이 있어야한다고 언급했는데 어떻게 $k$를 8, 16, 32, 64와 같은 값으로 줄일 수 있을까?&lt;/p&gt;
+<p>그런데 앞에서 $k \geq \lceil \log p \rceil$ 조건이 있어야한다고 언급했는데 어떻게 $k$를 8, 16, 32, 64와 같은 값으로 줄일 수 있을까?</p>
 
-&lt;p&gt;결국 우리가 구하고자 하는 값은 $\lfloor (T + np)/R \rfloor$이므로 레지스터 크기가 8일 때, $k = 8*l \geq \lceil \log p \rceil$꼴인 $k$를 선택해서 $2^8$로 나눠주는 연산을 $l$번 수행하면 된다. 아래와 같은 루틴을 수행한다.&lt;/p&gt;
+<p>결국 우리가 구하고자 하는 값은 $\lfloor (T + np)/R \rfloor$이므로 레지스터 크기가 8일 때, $k = 8*l \geq \lceil \log p \rceil$꼴인 $k$를 선택해서 $2^8$로 나눠주는 연산을 $l$번 수행하면 된다. 아래와 같은 루틴을 수행한다.</p>
 
-&lt;p&gt;1) $T+np \equiv 0 \mod 2^8$이 되는 $n \in [0, 2^8-1]$을 찾는다.&lt;br /&gt;
-2) $T+np$에 8-right shift를 취한다.&lt;br /&gt;
-3) 1), 2)를 $l-1$번 더 반복한다.&lt;/p&gt;
+<p>1) $T+np \equiv 0 \mod 2^8$이 되는 $n \in [0, 2^8-1]$을 찾는다.<br />
+2) $T+np$에 8-right shift를 취한다.<br />
+3) 1), 2)를 $l-1$번 더 반복한다.</p>
 
-&lt;p&gt;자세한 알고리즘은 아래와 같다.&lt;/p&gt;
+<p>자세한 알고리즘은 아래와 같다.</p>
 
-&lt;h3 id=&quot;multi-precision-reduction-algorithm&quot;&gt;Multi-precision reduction algorithm&lt;/h3&gt;
+<h3 id="multi-precision-reduction-algorithm">Multi-precision reduction algorithm</h3>
 
-&lt;p&gt;아래 알고리즘은 $k$-right shift를 마지막에 한 번에 수행하는 방식이다. 실제로 right shift를 수행하지 않고, 출력값을 복사할 때, $k$-bit 밀려서 복사하는 방식으로 수행한다. 따라서 연산량이 전혀 들지 않는다&lt;/p&gt;
+<p>아래 알고리즘은 $k$-right shift를 마지막에 한 번에 수행하는 방식이다. 실제로 right shift를 수행하지 않고, 출력값을 복사할 때, $k$-bit 밀려서 복사하는 방식으로 수행한다. 따라서 연산량이 전혀 들지 않는다</p>
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;B = 2^8 or 2^16 or 2^32
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>B = 2^8 or 2^16 or 2^32
 function MultiPrecisionREDC is
     Input: Integer p with gcd(B, p) = 1, stored as an array of m words,
            Integer R = B^r,     --thus, r = log_B(R)
            Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B),
-           Integer T in the range 0 ≤ T &amp;lt; Rp, stored as an array of r + m words.
+           Integer T in the range 0 ≤ T &lt; Rp, stored as an array of r + m words.
 
     Output: Integer S in [0, p − 1] such that TR^(−1) ≡ S (mod p), stored as an array of m words.
 
     Set T[r + m] = 0  (extra carry word)
-    for 0 ≤ i &amp;lt; r do
+    for 0 ≤ i &lt; r do
         --loop1- Make T divisible by Bi+1
 
         c ← 0
         n ← T[i] ⋅ p′ mod B
-        for 0 ≤ j &amp;lt; m do
+        for 0 ≤ j &lt; m do
             --loop2- Add the low word of n ⋅ p[j] and the carry from earlier, and find the new carry
 
             x ← T[i + j] + n ⋅ p[j] + c
@@ -681,35 +1002,35 @@ function MultiPrecisionREDC is
         return S
     end if
 end function
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;h3 id=&quot;multi-precision-multiplication-algorithm&quot;&gt;Multi-precision multiplication algorithm&lt;/h3&gt;
+<h3 id="multi-precision-multiplication-algorithm">Multi-precision multiplication algorithm</h3>
 
-&lt;p&gt;앞서 설명한 reduction을 이용해 실제 Montgomery 곱셈을 진행한다면 곱셈과 reduction을 하나로 합쳐야한다. 이 둘은 사실 따로 수행할 필요 없이 하나의 함수 안에 약간의 최적화로 수행할 수 있다.&lt;/p&gt;
+<p>앞서 설명한 reduction을 이용해 실제 Montgomery 곱셈을 진행한다면 곱셈과 reduction을 하나로 합쳐야한다. 이 둘은 사실 따로 수행할 필요 없이 하나의 함수 안에 약간의 최적화로 수행할 수 있다.</p>
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;B = 2^8 or 2^16 or 2^32
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>B = 2^8 or 2^16 or 2^32
 function MultiPrecisionREDC is
     Input: Integer p with gcd(B, p) = 1, stored as an array of m words,
            Integer R = B^r,     --thus, r = log_B(R)
            Integer p′ in [0, B − 1] such that pp′ ≡ −1 (mod B),
-           Integer A in the range 0 ≤ A &amp;lt; p, stored as an array of m words.
-           Integer B in the range 0 ≤ B &amp;lt; p, stored as an array of m words.
+           Integer A in the range 0 ≤ A &lt; p, stored as an array of m words.
+           Integer B in the range 0 ≤ B &lt; p, stored as an array of m words.
 
     Output: Integer S in [0, p − 1] such that ABR^(−1) ≡ S (mod p), stored as an array of m words.
 
     --initialize array T
-    for 0 ≤ i &amp;lt; r + m do
+    for 0 ≤ i &lt; r + m do
     	T[i] = 0
     end for
 
     Set T[r + m] = 0  (extra carry word)
 
-    for 0 ≤ i &amp;lt; r do
+    for 0 ≤ i &lt; r do
         --loop1- Make T divisible by Bi+1
 
         c ← 0
         n ← (T[i] + A[0] ⋅ B[i]) ⋅ p′ mod B
-        for 0 ≤ j &amp;lt; m do
+        for 0 ≤ j &lt; m do
             --loop2- Add n ⋅ p to T
 
             x ← T[i + j] + n ⋅ p[j] + c
@@ -719,7 +1040,7 @@ function MultiPrecisionREDC is
         T[i + m] ← T[i + m] + c
 
         c ← 0
-        for 0 ≤ j &amp;lt; m do
+        for 0 ≤ j &lt; m do
             --loop3- Add A ⋅ B[i] to T
 
             x ← T[i + j] + A[j] ⋅ B[i] + c
@@ -742,6 +1063,6 @@ function MultiPrecisionREDC is
         return S
     end if
 end function
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;&lt;a href=&quot;https://github.com/gusgkr0117/Montgomery-Multiplication&quot;&gt;visual studio c++ source code&lt;/a&gt;&lt;/p&gt;</content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html">Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다. $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)</summary></entry></feed>
+<p><a href="https://github.com/gusgkr0117/Montgomery-Multiplication">visual studio c++ source code</a></p>]]></content><author><name>manbo</name><email>gusgkr0117@korea.ac.kr</email></author><category term="Mathematics" /><summary type="html"><![CDATA[Montgomery Multiplication은 모듈러 곱을 효율적으로 수행하는 알고리즘이다. $\mathbb{F}_p$ 상에서 곱은 대부분의 공개키 기반 암호에서 사용한다.(e.g. ECC, isogeny, lattice, … etc)]]></summary></entry></feed>
