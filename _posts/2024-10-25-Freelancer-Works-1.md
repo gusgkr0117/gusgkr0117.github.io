@@ -4,6 +4,7 @@ subtitle: 5개월간 프리랜서로 일한 후기 #1
 tags: Freelancer Upwork
 use_math: true
 key: post_20241025
+published: false
 ---
 
 * 5개월간 개발자 프리랜서로 일하면서 느낀 장단점
