@@ -1,6 +1,6 @@
 ---
-title: Freelancer Experiences \#1
-subtitle: 5개월간 프리랜서로 일한 후기 \#1
+title: Freelancer Experiences 1
+subtitle: 5개월간 프리랜서로 일한 후기 1
 tags: Freelancer Upwork
 use_math: true
 key: post_20241025
