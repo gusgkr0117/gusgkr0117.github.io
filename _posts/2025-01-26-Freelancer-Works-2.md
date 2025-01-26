@@ -4,7 +4,7 @@ subtitle: 5개월간 프리랜서로 일한 후기 #2
 tags: Freelancer Upwork
 use_math: true
 key: post_20250126
-published: false
+published: true
 ---
 
 * 운도 좋았고 만족도가 가장 높았던 프리랜서 세번째 과제
