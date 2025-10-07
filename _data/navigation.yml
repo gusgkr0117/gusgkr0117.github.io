@@ -1,4 +1,6 @@
 header:
+  - title:  Posts
+    url:    /blog/
   - titles:
       # @start locale config
       en      : &EN       Archive
@@ -22,7 +24,7 @@ header:
       fr-FR   : *FR
       fr-LU   : *FR
       # @end locale config
-    url: /archive.html
+    url: /blog/archive.html
 
   - titles:
       # @start locale config
@@ -47,4 +49,4 @@ header:
       fr-FR   : *FR
       fr-LU   : *FR
       # @end locale config
-    url: /about.html
+    url: /blog/about.html
