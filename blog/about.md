@@ -20,7 +20,7 @@ comments: false
     * Mathematics : linear algebra, algebraic integers, algebraic geometry
 
 ### Careers
-* 2017.06 ~ 2019.12 : Agency for Depense Development, South Korea
+* 2017.06 ~ 2019.12 : Agency for Defense Development, South Korea
 * 2020.01 ~ 2024.06 : Defense Security Agency, South Korea
 * 2024.06 ~ present : School of Cybersecurity, Korea University, South Korea
 
