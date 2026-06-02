@@ -1,0 +1,1717 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Elliptic curve group and line bundles</title>
+  <link rel="stylesheet" href="components/lattice-torus-demo/lattice-torus-demo.css">
+  <link rel="stylesheet" href="components/circle-projective-demo/circle-projective-demo.css">
+  <link rel="stylesheet" href="components/mobius-line-bundle-demo/mobius-line-bundle-demo.css">
+  <link rel="stylesheet" href="components/complex-line-bundle-demo/complex-line-bundle-demo.css">
+  <link rel="stylesheet" href="components/theta-phase-demo/theta-phase-demo.css">
+  <link rel="stylesheet" href="components/very-ample-demo/very-ample-demo.css">
+  <link rel="stylesheet" href="components/theta-zero-sum-demo/theta-zero-sum-demo.css">
+  <style>
+    @font-face {
+      font-family: "Latin Modern Math Web";
+      src: url("fonts/latin-modern/latinmodern-math.otf") format("opentype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Computer Modern Web";
+      src: url("fonts/computer-modern/KaTeX_Main-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Computer Modern Web";
+      src: url("fonts/computer-modern/KaTeX_Main-Italic.woff2") format("woff2");
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Computer Modern Web";
+      src: url("fonts/computer-modern/KaTeX_Main-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Pretendard";
+      src: url("fonts/Pretendard-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Pretendard";
+      src: url("fonts/Pretendard-SemiBold.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Pretendard";
+      src: url("fonts/Pretendard-ExtraBold.woff2") format("woff2");
+      font-weight: 800;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #111111;
+      --accent: #9b002a;
+      --paper: #ffffff;
+      --math-font: "Latin Modern Math Web", "Latin Modern Math", "Latin Modern Roman", "Computer Modern Web", "Computer Modern Serif", "Computer Modern", "CMU Serif", "STIX Two Math", "Times New Roman", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1b1f22;
+      color: var(--ink);
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    }
+
+    main {
+      width: 100vw;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      counter-reset: slide-number;
+    }
+
+    .slide {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      padding: 15.6vh 8vw 7.2vh;
+      background: var(--paper);
+      border: 4px solid #1b1f22;
+      scroll-snap-align: start;
+      counter-increment: slide-number;
+    }
+
+    .title-slide {
+      counter-increment: none;
+    }
+
+    .slide::after {
+      content: counter(slide-number);
+      position: absolute;
+      right: clamp(18px, 2.2vw, 30px);
+      bottom: 0.55vh;
+      z-index: 2;
+      color: #ffffff;
+      font-size: clamp(12px, 1.1vw, 16px);
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .title-slide::after {
+      display: none;
+    }
+
+    .title-content {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 950px;
+      text-align: center;
+    }
+
+    .title-slide h1 {
+      max-width: 820px;
+      margin: 0 auto;
+      color: var(--accent);
+      font-size: clamp(34px, 4.6vw, 54px);
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .title-slide .name {
+      margin: 0;
+      padding-top: 10.2vh;
+      color: var(--ink);
+      font-size: clamp(15px, 1.8vw, 20px);
+      font-weight: 600;
+    }
+
+    .title-slide .meta {
+      margin-top: auto;
+      color: var(--ink);
+      font-size: clamp(15px, 1.8vw, 19px);
+      font-weight: 500;
+    }
+
+    .title-slide .date {
+      margin-top: 10.4vh;
+      font-size: clamp(12px, 1.4vw, 15px);
+    }
+
+    .content-slide {
+      align-items: stretch;
+      padding: 9.8vh 8.4vw 8.8vh;
+    }
+
+    .content-slide .content {
+      width: min(100%, 1080px);
+      margin: 0 auto;
+    }
+
+    .content-slide h2 {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(34px, 4.4vw, 56px);
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .content-slide h2::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 3px;
+      margin-top: clamp(18px, 2.4vh, 26px);
+      background: var(--accent);
+    }
+
+    .agenda {
+      display: grid;
+      gap: clamp(20px, 3vh, 30px);
+      margin: clamp(42px, 6.4vh, 64px) 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: agenda;
+    }
+
+    .agenda li {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      align-items: baseline;
+      column-gap: 26px;
+      counter-increment: agenda;
+      color: var(--ink);
+      font-size: clamp(25px, 3vw, 38px);
+      line-height: 1.22;
+      font-weight: 600;
+    }
+
+    .agenda li::before {
+      content: counter(agenda, decimal-leading-zero);
+      color: var(--accent);
+      font-size: clamp(17px, 1.7vw, 23px);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .definitions {
+      display: grid;
+      gap: clamp(18px, 2.6vh, 26px);
+      margin: clamp(34px, 5.2vh, 52px) 0 0;
+    }
+
+    .definition {
+      display: grid;
+      gap: 10px;
+      padding-left: 24px;
+      border-left: 5px solid var(--accent);
+    }
+
+    .definition h3 {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(20px, 2.2vw, 29px);
+      line-height: 1.18;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .definition p {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(18px, 2vw, 27px);
+      line-height: 1.34;
+      font-weight: 400;
+    }
+
+    .math-line {
+      display: block;
+      margin: 2px 0;
+      font-family: var(--math-font);
+      font-size: clamp(20px, 2.4vw, 31px);
+      line-height: 1.25;
+      font-weight: 400;
+      text-align: center;
+    }
+
+    .math {
+      font-family: var(--math-font);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    .explain-slide {
+      display: grid;
+      gap: clamp(22px, 3vh, 32px);
+      margin-top: clamp(34px, 5vh, 54px);
+      font-size: clamp(22px, 2.25vw, 32px);
+      line-height: 1.36;
+    }
+
+    .explain-slide p {
+      margin: 0;
+    }
+
+    .large-points {
+      display: grid;
+      gap: clamp(16px, 2.2vh, 24px);
+      margin: 0;
+      padding-left: 1.2em;
+      font-size: clamp(20px, 2.05vw, 29px);
+      line-height: 1.35;
+    }
+
+    .large-points li {
+      padding-left: 6px;
+    }
+
+    .definition-slide {
+      display: grid;
+      gap: clamp(14px, 2vh, 20px);
+      margin-top: clamp(30px, 4.5vh, 48px);
+    }
+
+    .compact-definition-slide {
+      gap: clamp(10px, 1.4vh, 14px);
+      margin-top: clamp(24px, 3.6vh, 36px);
+    }
+
+    .compact-definition-slide .definitions {
+      gap: clamp(12px, 1.8vh, 18px);
+      margin-top: 0;
+    }
+
+    .compact-definition-slide .definition {
+      gap: 7px;
+      padding-left: 20px;
+    }
+
+    .compact-definition-slide .definition h3 {
+      font-size: clamp(19px, 1.95vw, 26px);
+    }
+
+    .compact-definition-slide .definition p {
+      font-size: clamp(17px, 1.65vw, 23px);
+      line-height: 1.29;
+    }
+
+    .compact-definition-slide .equivalence-box {
+      margin-top: 0;
+      padding: clamp(12px, 1.5vh, 16px) clamp(16px, 2vw, 24px);
+    }
+
+    .equivalence-box {
+      display: grid;
+      gap: 10px;
+      margin-top: clamp(8px, 1.4vh, 16px);
+      padding: clamp(14px, 2vh, 20px) clamp(18px, 2.4vw, 28px);
+      border: 2px solid var(--accent);
+      font-size: clamp(18px, 1.75vw, 25px);
+      line-height: 1.34;
+      text-align: center;
+    }
+
+    .equivalence-box p {
+      margin: 0;
+    }
+
+    .question-slide {
+      display: grid;
+      gap: clamp(16px, 2.4vh, 24px);
+      margin-top: clamp(28px, 4.2vh, 46px);
+      font-size: clamp(18px, 1.75vw, 25px);
+      line-height: 1.34;
+    }
+
+    .question-slide p {
+      margin: 0;
+    }
+
+    .representation-box {
+      display: grid;
+      gap: 8px;
+      padding: clamp(14px, 2vh, 20px) clamp(18px, 2.4vw, 28px);
+      border-left: 5px solid var(--accent);
+      background: #fffdfb;
+    }
+
+    .main-question-box {
+      display: grid;
+      gap: 10px;
+      padding: clamp(16px, 2.2vh, 22px) clamp(20px, 2.8vw, 32px);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-size: clamp(21px, 2.05vw, 30px);
+      line-height: 1.28;
+      font-weight: 800;
+    }
+
+    .embedding-bridge {
+      display: grid;
+      gap: 8px;
+    }
+
+    .projective-example {
+      display: grid;
+      gap: clamp(18px, 2.6vh, 28px);
+      margin-top: clamp(34px, 5vh, 54px);
+      font-size: clamp(20px, 2vw, 29px);
+      line-height: 1.34;
+    }
+
+    .projective-example p {
+      margin: 0;
+    }
+
+    .projective-map-box {
+      display: grid;
+      gap: 8px;
+      padding: clamp(16px, 2.2vh, 22px) clamp(20px, 2.8vw, 32px);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .liouville-slide {
+      display: grid;
+      gap: clamp(18px, 2.5vh, 26px);
+      margin-top: clamp(30px, 4.6vh, 48px);
+      font-size: clamp(19px, 1.85vw, 27px);
+      line-height: 1.34;
+    }
+
+    .liouville-slide p {
+      margin: 0;
+    }
+
+    .theorem-box {
+      display: grid;
+      gap: 8px;
+      padding: clamp(14px, 2vh, 20px) clamp(18px, 2.4vw, 28px);
+      border-left: 5px solid var(--accent);
+      background: #fffdfb;
+    }
+
+    .line-bundle-transition {
+      display: grid;
+      gap: 8px;
+      padding: clamp(16px, 2.2vh, 22px) clamp(20px, 2.8vw, 32px);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .line-bundle-slide {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+      gap: clamp(26px, 3.6vw, 46px);
+      margin-top: clamp(30px, 4.6vh, 48px);
+      align-items: start;
+    }
+
+    .line-bundle-definition {
+      display: grid;
+      gap: clamp(14px, 2vh, 20px);
+      font-size: clamp(18px, 1.7vw, 25px);
+      line-height: 1.34;
+    }
+
+    .line-bundle-definition p {
+      margin: 0;
+    }
+
+    .mobius-panel {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .mobius-caption {
+      margin: 0;
+      font-size: clamp(16px, 1.45vw, 21px);
+      line-height: 1.32;
+    }
+
+    .formula-pager {
+      display: grid;
+      gap: clamp(8px, 1.15vh, 12px);
+      margin-top: clamp(18px, 2.7vh, 28px);
+    }
+
+    .formula-step {
+      padding-left: 18px;
+      border-left: 5px solid var(--accent);
+    }
+
+    .formula-step[open] {
+      max-height: min(46vh, 430px);
+      overflow-y: auto;
+      padding-right: 10px;
+      scrollbar-width: thin;
+    }
+
+    .formula-step summary {
+      cursor: pointer;
+      color: var(--accent);
+      font-size: clamp(17px, 1.75vw, 24px);
+      line-height: 1.16;
+      font-weight: 800;
+      list-style: none;
+    }
+
+    .formula-step summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .formula-step summary::before {
+      content: "+";
+      display: inline-grid;
+      place-items: center;
+      width: 1.22em;
+      height: 1.22em;
+      margin-right: 0.45em;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      font-size: 0.75em;
+      line-height: 1;
+    }
+
+    .formula-step[open] summary::before {
+      content: "-";
+    }
+
+    .formula-step p {
+      margin: 7px 0 0;
+      color: var(--ink);
+      font-size: clamp(15px, 1.48vw, 20px);
+      line-height: 1.24;
+    }
+
+    .formula-step .math-line {
+      margin-top: 6px;
+      font-size: clamp(16px, 1.65vw, 22px);
+      overflow-wrap: anywhere;
+    }
+
+    .conclusion-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(18px, 2.6vh, 28px);
+      margin-top: clamp(24px, 3.4vh, 36px);
+      align-items: start;
+    }
+
+    .conclusion-list,
+    .question-list {
+      display: grid;
+      gap: clamp(13px, 1.9vh, 19px);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .conclusion-list > li {
+      display: grid;
+      gap: 7px;
+      padding-left: 22px;
+      border-left: 5px solid var(--accent);
+      font-size: clamp(17px, 1.65vw, 23px);
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .conclusion-list ul {
+      display: grid;
+      gap: 5px;
+      margin: 0;
+      padding-left: 1.15em;
+      font-size: clamp(14px, 1.28vw, 18px);
+      line-height: 1.28;
+      font-weight: 500;
+    }
+
+    .question-panel {
+      display: grid;
+      gap: clamp(10px, 1.5vh, 15px);
+      padding: clamp(14px, 1.9vh, 20px) clamp(18px, 2.4vw, 26px);
+      border: 2px solid var(--accent);
+      background: #fffdfb;
+    }
+
+    .question-panel h3 {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(20px, 2vw, 28px);
+      line-height: 1.16;
+      font-weight: 800;
+    }
+
+    .question-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      color: var(--ink);
+      font-size: clamp(15px, 1.38vw, 20px);
+      line-height: 1.3;
+    }
+
+    .question-list li::before {
+      content: "Q.";
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .video-stage {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      margin-top: clamp(30px, 5vh, 52px);
+    }
+
+    .video-stage video {
+      display: block;
+      width: min(100%, 960px);
+      max-height: 62vh;
+      aspect-ratio: 16 / 9;
+      background: #000000;
+      border: 3px solid var(--accent);
+    }
+
+    .footer {
+      position: absolute;
+      right: 4px;
+      bottom: 0;
+      left: 4px;
+      height: 3.4vh;
+      min-height: 20px;
+      background: var(--accent);
+      z-index: 1;
+    }
+
+    .ink-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      touch-action: none;
+    }
+
+    body.ink-mode .ink-layer {
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    .ink-toolbar {
+      position: fixed;
+      right: clamp(14px, 2vw, 26px);
+      top: clamp(14px, 2vh, 24px);
+      z-index: 60;
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border: 2px solid var(--accent);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    }
+
+    .ink-toolbar button {
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 2px solid var(--accent);
+      background: #ffffff;
+      color: var(--accent);
+      font: 800 18px/1 "Pretendard", sans-serif;
+      cursor: pointer;
+    }
+
+    .ink-toolbar button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .ink-toolbar button:focus-visible {
+      outline: 3px solid #111111;
+      outline-offset: 2px;
+    }
+
+    @media print {
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      main {
+        overflow: visible;
+      }
+
+      main,
+      .slide {
+        width: 16in;
+        height: 9in;
+      }
+
+      .slide {
+        border: 0;
+      }
+
+      .footer {
+        right: 0;
+        left: 0;
+      }
+
+      .slide {
+        break-after: page;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main aria-label="Presentation">
+    <section class="slide title-slide" aria-label="Title slide">
+      <div class="title-content">
+        <h1>Elliptic curve group and line bundles</h1>
+        <p class="name">김현학</p>
+        <p class="meta">연구발표</p>
+        <p class="date">2026 / 06 / 04</p>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Contents">
+      <div class="content">
+        <h2>목차</h2>
+        <ol class="agenda">
+          <li>Elliptic curve over ℂ and complex torus</li>
+          <li>Line bundles</li>
+          <li>Theta functions</li>
+          <li>Projective embedding</li>
+        </ol>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Definition of Lattice">
+      <div class="content">
+        <h2>Definition of Elliptic Curve</h2>
+        <div class="definitions">
+          <article class="definition">
+            <h3>Definition 1. Lattice in ℂ</h3>
+            <p>
+              A lattice in ℂ is a discrete subgroup
+              <span class="math-line">Λ = ℤω<sub>1</sub> + ℤω<sub>2</sub></span>
+              where <span class="math">ω<sub>1</sub>, ω<sub>2</sub> ∈ ℂ</span> are linearly independent over ℝ.
+            </p>
+          </article>
+          <article class="definition">
+            <h3>Definition 2. Homothety</h3>
+            <p>
+              Two lattices Λ and Λ' in ℂ are homothetic if there exists
+              <span class="math">α ∈ ℂ<sup>×</sup></span> such that
+              <span class="math-line">Λ' = αΛ.</span>
+            </p>
+          </article>
+          <article class="definition">
+            <h3>Definition 3. Elliptic curve</h3>
+            <p>
+              An elliptic curve is <span class="math">ℂ / Λ</span> for some lattice
+              <span class="math">Λ ⊂ ℂ</span>.
+            </p>
+          </article>
+          <div class="explain-slide">
+          <p>
+            두 Elliptic curve <span class="math">E<sub>1</sub> = ℂ/Λ<sub>1</sub>, E<sub>2</sub> = ℂ/Λ<sub>2</sub></span>가 isomorphic하다는 것은</br>
+            <span class="math">Λ<sub>1</sub></span>과 <span class="math">Λ<sub>2</sub></span>가 homothety라는 것.
+          </p>
+        </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Lattice to Torus Interactive">
+      <div class="content">
+        <h2>Lattice To Complex Torus</h2>
+        <div class="slide3-carousel" data-slide3-carousel>
+          <button class="slide3-arrow slide3-arrow-left" type="button" data-slide3-prev aria-label="Show interactive lattice demo">‹</button>
+          <div class="slide3-track" data-slide3-track>
+            <div class="slide3-page">
+              <div class="interactive-lattice" data-lattice-demo data-initial-tau-re="0.5" data-initial-tau-im="1.3">
+                <div class="interactive-panel">
+                  <h3>Choose τ and generate Λ<sub>τ</sub></h3>
+                  <canvas
+                    data-lattice-canvas
+                    width="720"
+                    height="520"
+                    aria-label="Complex plane with lattice generated by 1 and tau"
+                  ></canvas>
+                  <div class="interactive-caption">
+                    <p class="tau-readout" data-tau-readout>τ = 0.50 + 1.30i</p>
+                    <p class="drag-hint">Drag the red point in the upper half-plane.</p>
+                  </div>
+                </div>
+                <div class="interactive-panel">
+                  <h3>Quotient by the lattice</h3>
+                  <canvas
+                    data-torus-canvas
+                    width="600"
+                    height="520"
+                    aria-label="Torus obtained by identifying the fundamental parallelogram"
+                  ></canvas>
+                  <div class="interactive-caption">
+                    <p>
+                      <span class="math">Λ<sub>τ</sub> = ℤ + ℤτ</span>,
+                      <span class="math">ℂ / Λ<sub>τ</sub></span>
+                    </p>
+                    <p class="drag-hint">The torus grid is the complex-plane grid pushed down to the quotient.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="slide3-page">
+              <div class="slide3-video-panel">
+                <video controls muted loop playsinline preload="metadata">
+                  <source src="videos/SmoothLatticeCylinderTorus2.mp4" type="video/mp4">
+                </video>
+              </div>
+            </div>
+          </div>
+          <button class="slide3-arrow slide3-arrow-right" type="button" data-slide3-next aria-label="Show lattice to torus video">›</button>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Meaning of Elliptic Curve Isomorphism">
+      <div class="content">
+        <h2>Elliptic Curve Isomorphism의 의미</h2>
+        <div class="explain-slide">
+          <p>
+            Elliptic curve를
+            <span class="math-line">E = ℂ / Λ</span>
+            로 보면, <span class="math">E</span>는 단순한 group이 아니라 complex manifold 구조를 가진 group이다.
+          </p>
+          <ul class="large-points">
+            <li>Group으로만 보면 두 elliptic curve <span class="math">E<sub>1</sub>, E<sub>2</sub></span>는 둘 다 torus 형태의 abelian group이다.</li>
+            <li>하지만 complex Lie group으로 보면 <span class="math">E<sub>1</sub>, E<sub>2</sub></span>가 항상 같은 것은 아니다.</li>
+            <li>차이는 group law 자체가 아니라 ℂ에서 내려오는 complex structure와 holomorphic structure에 있다.</li>
+          </ul>
+          <p>
+            따라서 elliptic curve의 isomorphism은 group operation뿐 아니라 complex manifold 구조까지 보존해야 한다.
+          </p>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Isomorphism Preserving Complex Structure">
+      <div class="content">
+        <h2>Complex Structure를 보존하는 Isomorphism</h2>
+        <div class="definition-slide compact-definition-slide">
+          <div class="definitions">
+            <div class="definition">
+              <h3>Definition 1. Complex manifold</h3>
+              <p>
+                A complex manifold of dimension <span class="math">n</span> is locally modeled on open subsets of
+                <span class="math">ℂ<sup>n</sup></span>, with coordinate changes given by holomorphic functions.
+              </p>
+            </div>
+            <div class="definition">
+              <h3>Definition 2. Holomorphic function</h3>
+              <p>
+                For open <span class="math">U ⊂ ℂ<sup>n</sup></span>, a function
+                <span class="math">f: U → ℂ</span> is holomorphic if it is complex differentiable locally in each variable.
+              </p>
+            </div>
+            <div class="definition">
+              <h3>Definition 3. Isomorphism of elliptic curves</h3>
+              <p>
+                For <span class="math">E<sub>i</sub> = ℂ / Λ<sub>i</sub></span>, an isomorphism
+                <span class="math">E<sub>1</sub> → E<sub>2</sub></span> is a bijective holomorphic group homomorphism whose inverse is also holomorphic.
+              </p>
+            </div>
+          </div>
+          <div class="equivalence-box">
+            <p>
+              In terms of lattices, <span class="math">E<sub>1</sub></span> and
+              <span class="math">E<sub>2</sub></span> are isomorphic as complex elliptic curves iff there exists
+              <span class="math">α ∈ ℂ<sup>×</sup></span> such that
+            </p>
+            <span class="math-line">Λ<sub>2</sub> = αΛ<sub>1</sub>.</span>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Main Question">
+      <div class="content">
+        <h2>Main Question</h2>
+        <div class="question-slide">
+          <div class="representation-box">
+            <p>
+              Elliptic curve <span class="math">E = ℂ / Λ</span>는 universal cover
+              <span class="math">ℂ</span> 위에서 lattice <span class="math">Λ</span>만큼 반복되는 점들을 하나로 identify해서 얻는다.
+            </p>
+            <span class="math-line">z, z + λ, z + λ' &nbsp;&nbsp; (λ, λ' ∈ Λ)</span>
+            <p>는 모두 같은 점을 나타낸다.</p>
+          </div>
+          <div class="main-question-box">
+            <p>각 point가 정확히 하나의 representation을 갖는 ambient space <span class="math">X</span>가 있을까?</p>
+            <p>그 공간 안에서 elliptic curve <span class="math">E</span>는 어떤 모습으로 나타날까?</p>
+          </div>
+          <div class="embedding-bridge">
+            <p>
+              우리가 시각적으로 떠올리는 <span class="math">ℝ<sup>3</sup></span> 안의 donut 모양 torus는
+              topological model일 뿐, complex structure를 보존하는 holomorphic embedding은 아니다.
+            </p>
+            <p>
+              따라서 목표는 <span class="math">E</span>를 projective space 안에 holomorphically embedding해서
+              algebraic geometry의 대상으로 보는 것이다.
+            </p>
+            <span class="math-line">E ↪ ℙ<sup>n</sup></span>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Projective Embedding Real Example">
+      <div class="content">
+        <h2>Projective Embedding: Real Example</h2>
+        <div class="projective-example">
+          <p>
+            Projective embedding은 여러 함수값을 projective coordinate로 묶어서 만든다.
+          </p>
+          <span class="math-line">p ↦ [f<sub>0</sub>(p):f<sub>1</sub>(p):⋯:f<sub>n</sub>(p)]</span>
+          <p>
+            Real circle 위의 점은 <span class="math">p(t) = (cos t, sin t)</span>로 쓸 수 있다.
+          </p>
+          <div class="projective-map-box">
+            <span class="math-line">f<sub>0</sub>(t)=1, &nbsp; f<sub>1</sub>(t)=cos t, &nbsp; f<sub>2</sub>(t)=sin t</span>
+            <span class="math-line">t ↦ [1:cos t:sin t] ∈ ℝℙ<sup>2</sup></span>
+          </div>
+          <p>
+            첫 좌표가 항상 <span class="math">1</span>이므로 affine chart에서는 원래 circle
+            <span class="math">(cos t, sin t)</span>를 그대로 보는 것과 같다.
+          </p>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Circle Coordinates Interactive">
+      <div class="content">
+        <h2>Real Circle Example</h2>
+        <div class="circle-demo" data-circle-projective-demo data-initial-t="0.85">
+          <div class="circle-demo-panel">
+            <h3>Choose a point on S<sup>1</sup></h3>
+            <canvas
+              data-circle-canvas
+              width="680"
+              height="520"
+              aria-label="Interactive real circle point"
+            ></canvas>
+            <div class="circle-readout">
+              <p class="circle-value" data-t-readout>t = 0.85</p>
+              <p class="circle-value" data-cos-readout>cos t = 0.66</p>
+              <p class="circle-value" data-sin-readout>sin t = 0.75</p>
+            </div>
+          </div>
+          <div class="circle-demo-panel">
+            <h3>Coordinate functions</h3>
+            <canvas
+              data-graph-canvas
+              width="720"
+              height="520"
+              aria-label="Graphs of cosine and sine at the selected point"
+            ></canvas>
+            <div class="circle-projective-box">
+              <p>Projective coordinate</p>
+              <p class="circle-value" data-point-readout>[1 : 0.66 : 0.75]</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Why Line Bundles">
+      <div class="content">
+        <h2>Why Line Bundles?</h2>
+        <div class="liouville-slide">
+          <div class="theorem-box">
+            <p><strong>Theorem. Liouville</strong></p>
+            <p>Every bounded entire function <span class="math">f: ℂ → ℂ</span> is constant.</p>
+          </div>
+          <p>
+            Since an elliptic curve <span class="math">E = ℂ / Λ</span> is compact,
+            a holomorphic function <span class="math">f: E → ℂ</span> pulls back to a bounded entire function on <span class="math">ℂ</span>.
+          </p>
+          <p>
+            By Liouville, it must be constant. Thus ordinary holomorphic functions on <span class="math">E</span> are not rich enough
+            to construct a projective embedding.
+          </p>
+          <div class="line-bundle-transition">
+            <p>To get more holomorphic objects, replace functions by sections of line bundles.</p>
+            <span class="math-line">s ∈ H<sup>0</sup>(E,L)</span>
+          </div>
+          <p>
+            Sections behave like holomorphic functions locally, but they can transform nontrivially between charts.
+          </p>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Definition of Line Bundle">
+      <div class="content">
+        <h2>Definition of Line Bundle</h2>
+        <div class="line-bundle-slide">
+          <div class="line-bundle-definition">
+            <article class="definition">
+              <h3>Definition. Line bundle</h3>
+              <p>
+                A line bundle over a space <span class="math">X</span> is a map
+                <span class="math">π: L → X</span> such that each fiber
+                <span class="math">L<sub>x</sub> = π<sup>-1</sup>(x)</span> is a one-dimensional vector space.
+              </p>
+            </article>
+            <p>
+              Locally, it looks like a product
+              <span class="math">U × ℝ</span> or <span class="math">U × ℂ</span>.
+            </p>
+            <p>
+              The key point is local triviality: locally product-like, globally possibly twisted.
+            </p>
+            <div class="line-bundle-transition">
+              <p>Example: the Möbius strip is a real line bundle over <span class="math">S<sup>1</sup></span>.</p>
+            </div>
+          </div>
+          <div class="mobius-panel">
+            <div class="mobius-demo" data-mobius-line-bundle-demo data-initial-t="0.9">
+              <canvas
+                data-mobius-canvas
+                width="760"
+                height="520"
+                aria-label="Interactive Mobius strip line bundle over the circle"
+              ></canvas>
+              <div class="mobius-readout">
+                <p class="mobius-value" data-mobius-angle>base angle t = 0.90</p>
+              </div>
+            </div>
+            <p class="mobius-caption">
+              Each point of <span class="math">S<sup>1</sup></span> has a line attached to it,
+              but after going once around the circle, the line returns with a twist.
+            </p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Complex Line Bundle on a Torus">
+      <div class="content">
+        <h2>Complex Line Bundle on a Torus</h2>
+        <div class="complex-line-demo" data-complex-line-bundle-demo data-tau-re="0.45" data-tau-im="1.25">
+          <div class="complex-line-visual">
+            <canvas
+              data-complex-line-canvas
+              width="820"
+              height="540"
+              aria-label="Complex torus and unfolded parallelogram with transition edge phases"
+            ></canvas>
+            <div class="phase-formula">
+              <span class="math-line">(z,r) ∼ (z + 1, r)</span>
+              <span class="math-line">(z,r) ∼ (z + τ, e<sup>-πiτ - 2πiz</sup>r)</span>
+            </div>
+          </div>
+          <div class="complex-line-info">
+            <p>
+              Let <span class="math">E = ℂ / (ℤ + ℤτ)</span>.
+              A complex line bundle can be described by identifying fibers over lattice-equivalent points.
+            </p>
+            <p>
+              The scalar <span class="math">e<sup>-πiτ - 2πiz</sup></span> is a transition factor:
+              it tells us how the fiber coordinate <span class="math">r</span> changes when moving by the period <span class="math">τ</span>.
+            </p>
+            <p>
+              On the unfolded parallelogram, the lower edge <span class="math">0 → 1</span> has phase <span class="math">0</span>,
+              while the upper edge <span class="math">τ → 1+τ</span> is colored by this transition factor.
+            </p>
+            <div class="phase-readout">
+              <p data-complex-line-tau>τ = 0.45 + 1.25i</p>
+              <p data-complex-line-point>z = 0.00 + 0.00i</p>
+              <p data-complex-line-phase>arg factor = 0.00</p>
+            </div>
+            <div class="tau-controls" aria-label="Tau controls">
+              <div class="tau-control">
+                <label for="complex-tau-re">Re τ</label>
+                <input id="complex-tau-re" data-tau-re-input type="range" min="-1.2" max="1.2" step="0.01" value="0.45">
+                <output data-tau-re-output for="complex-tau-re">0.45</output>
+              </div>
+              <div class="tau-control">
+                <label for="complex-tau-im">Im τ</label>
+                <input id="complex-tau-im" data-tau-im-input type="range" min="0.45" max="2.2" step="0.01" value="1.25">
+                <output data-tau-im-output for="complex-tau-im">1.25</output>
+              </div>
+            </div>
+            <p class="phase-hint">
+              Adjust τ to change the top-edge transition. Drag either picture to move the selected point, or shift-drag to rotate.
+            </p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Theta Function as a Section">
+      <div class="content">
+        <h2>Theta Function as a Section</h2>
+        <div class="theta-demo" data-theta-phase-demo data-tau-re="0.45" data-tau-im="1.25" data-terms="8">
+          <canvas
+            data-theta-canvas
+            width="820"
+            height="540"
+            aria-label="Complex plane colored by phase of theta function"
+          ></canvas>
+          <div class="theta-info">
+            <p>
+              For the line bundle from the previous slide, a typical holomorphic section is given by a theta function.
+            </p>
+            <div class="theta-formula">
+              <span class="math-line theta-equation">
+                ϑ(z, τ) = ∑<sub>n∈ℤ</sub> exp(πin<sup>2</sup>τ + 2πinz)
+              </span>
+            </div>
+            <p>
+              This is not an ordinary function on the quotient torus. It transforms in a controlled way under lattice translations,
+              matching the transition rule of the line bundle.
+            </p>
+            <p>
+              Here we ignore the size of <span class="math">ϑ(z,τ)</span> and color the complex plane by its phase.
+            </p>
+            <div class="theta-readout">
+              <p data-theta-tau>τ = 0.45 + 1.25i</p>
+              <p data-theta-terms>partial sum: n = -8,...,8</p>
+            </div>
+            <div class="theta-controls" aria-label="Theta tau controls">
+              <div class="theta-control">
+                <label for="theta-tau-re">Re τ</label>
+                <input id="theta-tau-re" data-theta-tau-re-input type="range" min="-1.2" max="1.2" step="0.01" value="0.45">
+                <output data-theta-tau-re-output for="theta-tau-re">0.45</output>
+              </div>
+              <div class="theta-control">
+                <label for="theta-tau-im">Im τ</label>
+                <input id="theta-tau-im" data-theta-tau-im-input type="range" min="0.45" max="2.2" step="0.01" value="1.25">
+                <output data-theta-tau-im-output for="theta-tau-im">1.25</output>
+              </div>
+            </div>
+            <p class="theta-hint">
+              Color represents <span class="math">arg ϑ(z,τ)</span>. Adjust <span class="math">τ</span> to change the lattice and theta phase.
+            </p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Ample Line Bundle">
+      <div class="content">
+        <h2>Ample Line Bundle</h2>
+        <div class="definition-slide">
+          <article class="definition">
+            <h3>Definition 1. Globally generated</h3>
+            <p>
+              A line bundle <span class="math">L</span> on <span class="math">X</span> is globally generated if for every
+              <span class="math">x ∈ X</span>, there exists <span class="math">s ∈ H<sup>0</sup>(X,L)</span> such that
+              <span class="math">s(x) ≠ 0</span>.
+            </p>
+          </article>
+          <article class="definition">
+            <h3>Definition 2. Very ample line bundle</h3>
+            <p>
+              <span class="math">L</span> is very ample if its global sections define an embedding
+              <span class="math-line">X ↪ ℙ(H<sup>0</sup>(X,L)<sup>∨</sup>).</span>
+            </p>
+          </article>
+          <article class="definition">
+            <h3>Definition 3. Ample line bundle</h3>
+            <p>
+              <span class="math">L</span> is ample if some positive tensor power
+              <span class="math">L<sup>⊗m</sup></span> is very ample.
+            </p>
+          </article>
+          <div class="equivalence-box">
+            <p>
+              For an elliptic curve, a line bundle of degree <span class="math">3</span> is very ample and gives an embedding into
+              <span class="math">ℙ<sup>2</sup></span>.
+            </p>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Very Ample Line Bundle Example">
+      <div class="content">
+        <h2>Very Ample Line Bundle Example</h2>
+        <div class="very-ample-demo" data-very-ample-demo data-tau-re="0.45" data-tau-im="1.25">
+          <div class="very-ample-panel">
+            <h3>Degree 3 line bundle</h3>
+            <canvas
+              data-bundle-canvas
+              width="660"
+              height="520"
+              aria-label="Degree three line bundle over a complex torus with selected point"
+            ></canvas>
+            <div class="very-ample-readout">
+              <p>τ = 0.45 + 1.25i</p>
+              <p data-va-point>z = 0.00 + 0.00i</p>
+            </div>
+            <div class="theta-basis-note">
+              <p>s<sub>k</sub>(z)=Σ<sub>n∈ℤ</sub> exp(3πi(n+k/3)<sup>2</sup>τ + 6πi(n+k/3)z)</p>
+              <p>k = 0, 1, 2</p>
+            </div>
+          </div>
+          <div class="very-ample-panel">
+            <h3>Three theta section basis</h3>
+            <canvas
+              data-sections-canvas
+              width="760"
+              height="520"
+              aria-label="Three theta section phase plots"
+            ></canvas>
+            <div class="projective-coordinate">
+              <p data-va-values>s0(z), s1(z), s2(z)</p>
+              <p>Projective coordinate</p>
+              <p data-va-coordinate>[s0(z) : s1(z) : s2(z)]</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Theta Relations and Weierstrass Form">
+      <div class="content">
+        <h2>Theta Relations Give a Plane Cubic</h2>
+        <div class="definition-slide">
+          <article class="definition">
+            <h3>Projective coordinates</h3>
+            <p>
+              Let <span class="math">[X<sub>0</sub>:X<sub>1</sub>:X<sub>2</sub>] = [s<sub>0</sub>(z):s<sub>1</sub>(z):s<sub>2</sub>(z)]</span>.
+              The degree <span class="math">3</span> theta sections define an embedding
+              <span class="math">φ<sub>L</sub>:E ↪ ℙ<sup>2</sup></span>.
+              Since <span class="math">deg L = 3</span>, the image is a plane cubic.
+            </p>
+          </article>
+          <article class="definition">
+            <h3>Where the relation comes from</h3>
+            <p>
+              The coordinate functions satisfy one homogeneous cubic relation:
+              <span class="math-line">F<sub>τ</sub>(X<sub>0</sub>,X<sub>1</sub>,X<sub>2</sub>) = 0.</span>
+              Products such as <span class="math">s<sub>i</sub>s<sub>j</sub>s<sub>k</sub></span> are degree
+              <span class="math">9</span> theta sections, and theta addition formulas give linear relations among them.
+            </p>
+          </article>
+          <article class="definition">
+            <h3>Hesse form</h3>
+            <p>
+              With a symmetric theta basis, the cubic relation can be written as
+              <span class="math-line">X<sub>0</sub><sup>3</sup> + X<sub>1</sub><sup>3</sup> + X<sub>2</sub><sup>3</sup> - 3λ(τ)X<sub>0</sub>X<sub>1</sub>X<sub>2</sub> = 0.</span>
+              Here <span class="math">λ(τ)</span> is determined by theta constants.
+            </p>
+          </article>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Cubic Equation from Theta Functions">
+      <div class="content">
+        <h2>Cubic Equation from Theta Functions</h2>
+        <div class="formula-pager">
+          <details class="formula-step" open>
+            <summary>1. Three theta sections</summary>
+            <p>
+              Start with the degree <span class="math">3</span> theta basis
+              <span class="math-line">s<sub>k</sub>(z)=Σ<sub>n∈ℤ</sub> exp(3πi(n+k/3)<sup>2</sup>τ + 6πi(n+k/3)z), &nbsp; k=0,1,2.</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>2. Make projective coordinates</summary>
+            <p>
+              These sections define
+              <span class="math-line">[X<sub>0</sub>:X<sub>1</sub>:X<sub>2</sub>] = [s<sub>0</sub>(z):s<sub>1</sub>(z):s<sub>2</sub>(z)].</span>
+              So a cubic equation for the image is a relation among cubic monomials in the
+              <span class="math">X<sub>i</sub></span>.
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>3. Count dimensions</summary>
+            <p>
+              There are <span class="math">10</span> cubic monomials:
+              <span class="math-line">X<sub>0</sub><sup>3</sup>, X<sub>0</sub><sup>2</sup>X<sub>1</sub>, …, X<sub>2</sub><sup>3</sup>.</span>
+              But they are degree <span class="math">9</span> theta sections, and
+              <span class="math-line">dim H<sup>0</sup>(E,L<sup>⊗3</sup>) = 9.</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>4. One relation remains</summary>
+            <p>
+              Hence the <span class="math">10</span> expressions satisfy one relation:
+              <span class="math-line">Σ<sub>i+j+k=3</sub> a<sub>ijk</sub>(τ)X<sub>0</sub><sup>i</sup>X<sub>1</sub><sup>j</sup>X<sub>2</sub><sup>k</sup> = 0.</span>
+              A symmetric theta basis means the <span class="math">3</span>-torsion symmetries act by
+              <span class="math-line">(X<sub>0</sub>,X<sub>1</sub>,X<sub>2</sub>) ↦ (X<sub>1</sub>,X<sub>2</sub>,X<sub>0</sub>)</span>
+              and
+              <span class="math-line">(X<sub>0</sub>,X<sub>1</sub>,X<sub>2</sub>) ↦ (X<sub>0</sub>,ζX<sub>1</sub>,ζ<sup>2</sup>X<sub>2</sub>), &nbsp; ζ<sup>3</sup>=1.</span>
+              The relation must be invariant under these actions. The diagonal action leaves only
+              <span class="math-line">X<sub>0</sub><sup>3</sup>, X<sub>1</sub><sup>3</sup>, X<sub>2</sub><sup>3</sup>, X<sub>0</sub>X<sub>1</sub>X<sub>2</sub>,</span>
+              and the cyclic action makes the three pure-cube coefficients equal:
+              <span class="math-line">A(τ)(X<sub>0</sub><sup>3</sup> + X<sub>1</sub><sup>3</sup> + X<sub>2</sub><sup>3</sup>) + B(τ)X<sub>0</sub>X<sub>1</sub>X<sub>2</sub> = 0.</span>
+              After rescaling, this becomes
+              <span class="math-line">X<sub>0</sub><sup>3</sup> + X<sub>1</sub><sup>3</sup> + X<sub>2</sub><sup>3</sup> - 3λ(τ)X<sub>0</sub>X<sub>1</sub>X<sub>2</sub> = 0.</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>5. Coefficient from theta constants</summary>
+            <p>
+              The coefficient is determined by theta constants. Evaluating at <span class="math">z=0</span> gives
+              <span class="math-line">λ(τ)= {s<sub>0</sub>(0)<sup>3</sup> + s<sub>1</sub>(0)<sup>3</sup> + s<sub>2</sub>(0)<sup>3</sup>}/{3s<sub>0</sub>(0)s<sub>1</sub>(0)s<sub>2</sub>(0)}.</span>
+            </p>
+          </details>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="From Cubic Equation to Weierstrass Form">
+      <div class="content">
+        <h2>From Cubic Equation to Weierstrass Form</h2>
+        <div class="formula-pager">
+          <details class="formula-step" open>
+            <summary>1. Start from the Hesse cubic</summary>
+            <p>
+              From theta functions we obtained
+              <span class="math-line">C<sub>λ</sub>: X<sub>0</sub><sup>3</sup> + X<sub>1</sub><sup>3</sup> + X<sub>2</sub><sup>3</sup> - 3λX<sub>0</sub>X<sub>1</sub>X<sub>2</sub> = 0.</span>
+              Here <span class="math">λ=λ(τ)</span>.
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>2. Choose the origin and tangent</summary>
+            <p>
+              Take a flex point as the group origin:
+              <span class="math-line">O=[1:-1:0].</span>
+              Its tangent line is
+              <span class="math-line">X<sub>0</sub> + X<sub>1</sub> + λX<sub>2</sub> = 0.</span>
+              We want this tangent line to become the line at infinity.
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>3. Move tangent to infinity</summary>
+            <p>
+              Use new coordinates
+              <span class="math-line">X=X<sub>2</sub>, &nbsp; Y=X<sub>0</sub>, &nbsp; Z=X<sub>0</sub>+X<sub>1</sub>+λX<sub>2</sub>.</span>
+              Then
+              <span class="math-line">O=[0:1:0], &nbsp;&nbsp; {Z=0} is the tangent line at O.</span>
+              Equivalently,
+              <span class="math-line">X<sub>0</sub>=Y, &nbsp; X<sub>2</sub>=X, &nbsp; X<sub>1</sub>=Z-Y-λX.</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>4. Substitute into the cubic</summary>
+            <p>
+              Substitution gives a cubic in <span class="math">X,Y,Z</span>:
+              <span class="math-line">Y<sup>3</sup> + (Z-Y-λX)<sup>3</sup> + X<sup>3</sup> - 3λYX(Z-Y-λX)=0.</span>
+              Since <span class="math">O=[0:1:0]</span> is at infinity and <span class="math">Z=0</span> is tangent there,
+              it can be rearranged as
+              <span class="math-line">Y<sup>2</sup>Z + a<sub>1</sub>XYZ + a<sub>3</sub>YZ<sup>2</sup> = X<sup>3</sup> + a<sub>2</sub>X<sup>2</sup>Z + a<sub>4</sub>XZ<sup>2</sup> + a<sub>6</sub>Z<sup>3</sup>.</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>5. Complete square and cube</summary>
+            <p>
+              On <span class="math">Z=1</span>, write
+              <span class="math-line">y<sup>2</sup> + a<sub>1</sub>xy + a<sub>3</sub>y = x<sup>3</sup> + a<sub>2</sub>x<sup>2</sup> + a<sub>4</sub>x + a<sub>6</sub>.</span>
+              Complete the square:
+              <span class="math-line">y<sup>′</sup> = y + (a<sub>1</sub>x+a<sub>3</sub>)/2.</span>
+              Then shift <span class="math">x</span> to remove the <span class="math">x<sup>2</sup></span> term:
+              <span class="math-line">x<sup>′</sup> = x + (a<sub>2</sub>+a<sub>1</sub><sup>2</sup>/4)/3.</span>
+              This gives <span class="math">(y<sup>′</sup>)<sup>2</sup>=(x<sup>′</sup>)<sup>3</sup>+A(τ)x<sup>′</sup>+B(τ)</span>.
+              After homogenizing and rescaling <span class="math">Y</span>,
+              <span class="math-line">Y<sup>2</sup>Z = 4X<sup>3</sup> - g<sub>2</sub>(τ)XZ<sup>2</sup> - g<sub>3</sub>(τ)Z<sup>3</sup>.</span>
+              The coefficients come from <span class="math">λ(τ)</span>, hence from theta constants.
+            </p>
+          </details>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Group Operation from the Weierstrass Equation">
+      <div class="content">
+        <h2>Addition After Projective Embedding</h2>
+        <div class="formula-pager">
+          <details class="formula-step" open>
+            <summary>1. Addition before embedding</summary>
+            <p>
+              On the complex torus, the group operation is just
+              <span class="math-line">z<sub>1</sub> + z<sub>2</sub> &nbsp; mod Λ.</span>
+              The embedding sends a point to theta values:
+              <span class="math-line">φ(z)=[s<sub>0</sub>(z):s<sub>1</sub>(z):s<sub>2</sub>(z)].</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>2. A line becomes a theta section</summary>
+            <p>
+              A line in <span class="math">ℙ<sup>2</sup></span> has equation
+              <span class="math-line">aX<sub>0</sub>+bX<sub>1</sub>+cX<sub>2</sub>=0.</span>
+              Pulling it back by <span class="math">φ</span> gives
+              <span class="math-line">F(z)=as<sub>0</sub>(z)+bs<sub>1</sub>(z)+cs<sub>2</sub>(z).</span>
+              So a projective line is the same as one linear combination of the three theta sections.
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>3. Passing through two points</summary>
+            <p>
+              Let <span class="math">P=φ(z<sub>1</sub>)</span> and <span class="math">Q=φ(z<sub>2</sub>)</span>.
+              If the line passes through <span class="math">P,Q</span>, then
+              <span class="math-line">F(z<sub>1</sub>)=0, &nbsp;&nbsp; F(z<sub>2</sub>)=0.</span>
+              Since <span class="math">F</span> is a section of the degree <span class="math">3</span> line bundle, it has one more zero:
+              <span class="math-line">z<sub>1</sub>, &nbsp; z<sub>2</sub>, &nbsp; z<sub>3</sub>.</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>4. Theta zeros remember addition</summary>
+            <p>
+              Use an auxiliary degree <span class="math">1</span> theta factor <span class="math">ϑ</span>, not one of the degree
+              <span class="math">3</span> basis sections. It satisfies
+              <span class="math-line">ϑ(z+τ) = -e<sup>-πiτ-2πiz</sup>ϑ(z).</span>
+              If the zeros are <span class="math">z<sub>1</sub>,z<sub>2</sub>,z<sub>3</sub></span>, then locally
+              <span class="math-line">F(z) ∼ ϑ(z-z<sub>1</sub>)ϑ(z-z<sub>2</sub>)ϑ(z-z<sub>3</sub>).</span>
+              Under <span class="math">z↦z+τ</span>, this product picks up
+              <span class="math-line">e<sup>-3πiτ-6πiz</sup> · e<sup>2πi(z<sub>1</sub>+z<sub>2</sub>+z<sub>3</sub>)</sup>.</span>
+              But the degree <span class="math">3</span> basis sections satisfy
+              <span class="math-line">s<sub>k</sub>(z+τ)=e<sup>-3πiτ-6πiz</sup>s<sub>k</sub>(z).</span>
+              Hence every <span class="math">F=a<sub>0</sub>s<sub>0</sub>+a<sub>1</sub>s<sub>1</sub>+a<sub>2</sub>s<sub>2</sub></span>
+              has this same factor, so the extra term must be fixed.
+              With the origin normalized, this gives
+              <span class="math-line">z<sub>1</sub>+z<sub>2</sub>+z<sub>3</sub>=0 &nbsp; in &nbsp; ℂ/Λ,</span>
+              hence
+              <span class="math-line">z<sub>3</sub>=-(z<sub>1</sub>+z<sub>2</sub>).</span>
+            </p>
+          </details>
+          <details class="formula-step">
+            <summary>5. Chord rule appears</summary>
+            <p>
+              The point <span class="math">φ(z<sub>3</sub>)</span> is exactly the third intersection of the line with the cubic.
+              Therefore
+              <span class="math-line">φ(z<sub>1</sub>+z<sub>2</sub>) = inverse of the third intersection.</span>
+              In Weierstrass coordinates, inverse is the visible reflection
+              <span class="math-line">(x,y) ↦ (x,-y).</span>
+            </p>
+          </details>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Zero Sum of a Theta Section">
+      <div class="content">
+        <h2>Zero Sum of a Theta Section</h2>
+        <div class="theta-zero-demo" data-theta-zero-sum-demo data-tau-re="0.45" data-tau-im="1.25">
+          <div class="theta-zero-visual">
+            <canvas
+              data-theta-zero-canvas
+              width="820"
+              height="560"
+              aria-label="Phase plot of a degree three theta section with three zeros"
+            ></canvas>
+            <div class="theta-zero-readout">
+              <p data-zero-points>z1, z2, z3</p>
+              <p data-zero-sum>z1+z2+z3 = 0 mod Lambda</p>
+            </div>
+          </div>
+          <div class="theta-zero-info">
+            <p>
+              Choose a linear combination of the three degree <span class="math">3</span> theta basis sections.
+              Changing the coefficients changes the projective line.
+            </p>
+            <div class="theta-zero-formula">
+              <p>F(z)=a<sub>0</sub>s<sub>0</sub>(z)+a<sub>1</sub>s<sub>1</sub>(z)+a<sub>2</sub>s<sub>2</sub>(z)</p>
+              <p>a<sub>k</sub>=r<sub>k</sub>e<sup>iπp<sub>k</sub></sup></p>
+            </div>
+            <div class="theta-zero-controls" aria-label="Theta coefficient controls">
+              <div class="theta-zero-control">
+                <span>a<sub>0</sub></span>
+                <input data-coeff-control="0-amp" type="range" min="0" max="1.6" step="0.01" value="1">
+                <output data-coeff-output="0-amp">1.00</output>
+                <input data-coeff-control="0-phase" type="range" min="-1" max="1" step="0.01" value="0">
+                <output data-coeff-output="0-phase">0.00</output>
+              </div>
+              <div class="theta-zero-control">
+                <span>a<sub>1</sub></span>
+                <input data-coeff-control="1-amp" type="range" min="0" max="1.6" step="0.01" value="0.82">
+                <output data-coeff-output="1-amp">0.82</output>
+                <input data-coeff-control="1-phase" type="range" min="-1" max="1" step="0.01" value="0.34">
+                <output data-coeff-output="1-phase">0.34</output>
+              </div>
+              <div class="theta-zero-control">
+                <span>a<sub>2</sub></span>
+                <input data-coeff-control="2-amp" type="range" min="0" max="1.6" step="0.01" value="0.72">
+                <output data-coeff-output="2-amp">0.72</output>
+                <input data-coeff-control="2-phase" type="range" min="-1" max="1" step="0.01" value="-0.26">
+                <output data-coeff-output="2-phase">-0.26</output>
+              </div>
+            </div>
+            <p>
+              The canvas colors the complex plane by <span class="math">arg F(z)</span>.
+              Red circles are numerical zeros of this section.
+              The blue diamond marks their raw sum in <span class="math">ℂ/Λ</span>.
+            </p>
+            <!-- <p>
+              This is the theta-function version of the chord rule:
+              the three points cut out by a projective line have a fixed raw sum, normalized to zero by the chosen origin.
+            </p> -->
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+    <section class="slide content-slide" aria-label="Conclusion">
+      <div class="content">
+        <h2>Conclusion</h2>
+        <div class="conclusion-grid">
+          <ul class="conclusion-list">
+            <li>
+              Complex elliptic curve는 line bundle의 section들을 통해 projective embedding할 수 있다.
+              <ul>
+                <li>Embedding된 object는 Weierstrass equation으로 표현된다.</li>
+                <li>Projective space에서 irreducible equation으로 표현되는 점들의 집합을 <em>projective variety</em>라고 부른다.</li>
+                <li>Projective variety 중 group structure를 가지는 것이 <em> Abelian variety</em>이다.</li>
+              </ul>
+            </li>
+            <li>
+              Projective embedding 위의 group operation은 section의 zero들이 만족하는 관계로 나타난다.
+              <ul>
+                <li>Degree <span class="math">3</span> line bundle의 section은 세 개의 zero를 갖는다.</li>
+                <li>앞서 본 예시에서 세 zero의 합은 <span class="math">ℂ/Λ</span> 안에서 고정된다.</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="question-panel">
+            <h3>Next Questions</h3>
+            <ul class="question-list">
+              <li>Complex field가 아닌 다른 field, 예를 들어 finite field 위에서도  Abelian variety가 있는가?</li>
+              <li>Abelian variety가 주어졌을 때 line bundle은 어떻게 정의되는가? (hint: sheaf)</li>
+              <li>Abelian variety 위의 group operation은 line bundle과 항상 관련되는가? (pairing and polarization)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <footer class="footer" aria-hidden="true"></footer>
+    </section>
+  </main>
+  <canvas class="ink-layer" data-ink-layer aria-hidden="true"></canvas>
+  <div class="ink-toolbar" aria-label="Annotation controls">
+    <button type="button" data-ink-toggle aria-pressed="false" title="필기 모드">✎</button>
+    <button type="button" data-ink-clear title="필기 지우기">⌫</button>
+  </div>
+  <script>
+    document.querySelectorAll(".formula-pager").forEach((pager) => {
+      pager.querySelectorAll(".formula-step").forEach((step) => {
+        step.addEventListener("toggle", () => {
+          if (!step.open) {
+            return;
+          }
+
+          pager.querySelectorAll(".formula-step").forEach((other) => {
+            if (other !== step) {
+              other.open = false;
+            }
+          });
+        });
+      });
+    });
+
+    (() => {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      let currentIndex = 0;
+      let snapping = false;
+
+      function nearestSlideIndex() {
+        const scrollTop = window.scrollY;
+        let nearest = 0;
+        let distance = Infinity;
+        slides.forEach((slide, index) => {
+          const nextDistance = Math.abs(slide.offsetTop - scrollTop);
+          if (nextDistance < distance) {
+            nearest = index;
+            distance = nextDistance;
+          }
+        });
+        return nearest;
+      }
+
+      function snapTo(index) {
+        currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+        snapping = true;
+        slides[currentIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+        window.setTimeout(() => {
+          snapping = false;
+        }, 650);
+      }
+
+      window.addEventListener("wheel", (event) => {
+        if (Math.abs(event.deltaY) < 8) {
+          return;
+        }
+
+        event.preventDefault();
+        if (snapping) {
+          return;
+        }
+
+        currentIndex = nearestSlideIndex();
+        snapTo(currentIndex + (event.deltaY > 0 ? 1 : -1));
+      }, { passive: false });
+
+      window.addEventListener("keydown", (event) => {
+        if (!["ArrowDown", "PageDown", "ArrowUp", "PageUp", " "].includes(event.key)) {
+          return;
+        }
+
+        event.preventDefault();
+        currentIndex = nearestSlideIndex();
+        const direction = event.key === "ArrowUp" || event.key === "PageUp" ? -1 : 1;
+        snapTo(currentIndex + direction);
+      });
+
+      window.addEventListener("resize", () => {
+        currentIndex = nearestSlideIndex();
+      });
+    })();
+
+    (() => {
+      const canvas = document.querySelector("[data-ink-layer]");
+      const toggle = document.querySelector("[data-ink-toggle]");
+      const clear = document.querySelector("[data-ink-clear]");
+      if (!canvas || !toggle || !clear) {
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
+      let drawing = false;
+      let lastPoint = null;
+
+      function resizeCanvas() {
+        const scale = window.devicePixelRatio || 1;
+        const image = ctx.getImageData(0, 0, canvas.width || 1, canvas.height || 1);
+        canvas.width = Math.round(window.innerWidth * scale);
+        canvas.height = Math.round(window.innerHeight * scale);
+        canvas.style.width = `${window.innerWidth}px`;
+        canvas.style.height = `${window.innerHeight}px`;
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        if (image.width > 1 && image.height > 1) {
+          ctx.putImageData(image, 0, 0);
+        }
+      }
+
+      function pointFrom(event) {
+        return {
+          x: event.clientX,
+          y: event.clientY,
+          pressure: event.pressure || 0.55,
+        };
+      }
+
+      function drawLine(from, to) {
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "#9b002a";
+        ctx.lineWidth = Math.max(2.4, 4.6 * to.pressure);
+        ctx.beginPath();
+        ctx.moveTo(from.x, from.y);
+        ctx.lineTo(to.x, to.y);
+        ctx.stroke();
+      }
+
+      function setInkMode(enabled) {
+        document.body.classList.toggle("ink-mode", enabled);
+        toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+        drawing = false;
+        lastPoint = null;
+      }
+
+      toggle.addEventListener("click", () => {
+        setInkMode(!document.body.classList.contains("ink-mode"));
+      });
+
+      clear.addEventListener("click", () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+
+      canvas.addEventListener("pointerdown", (event) => {
+        if (!document.body.classList.contains("ink-mode")) {
+          return;
+        }
+        event.preventDefault();
+        canvas.setPointerCapture(event.pointerId);
+        drawing = true;
+        lastPoint = pointFrom(event);
+      });
+
+      canvas.addEventListener("pointermove", (event) => {
+        if (!drawing || !lastPoint) {
+          return;
+        }
+        event.preventDefault();
+        const nextPoint = pointFrom(event);
+        drawLine(lastPoint, nextPoint);
+        lastPoint = nextPoint;
+      });
+
+      ["pointerup", "pointercancel", "pointerleave"].forEach((type) => {
+        canvas.addEventListener(type, () => {
+          drawing = false;
+          lastPoint = null;
+        });
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+    })();
+  </script>
+  <script src="components/lattice-torus-demo/lattice-torus-demo.js"></script>
+  <script src="components/circle-projective-demo/circle-projective-demo.js"></script>
+  <script src="components/mobius-line-bundle-demo/mobius-line-bundle-demo.js"></script>
+  <script src="components/complex-line-bundle-demo/complex-line-bundle-demo.js"></script>
+  <script src="components/theta-phase-demo/theta-phase-demo.js"></script>
+  <script src="components/very-ample-demo/very-ample-demo.js"></script>
+  <script src="components/theta-zero-sum-demo/theta-zero-sum-demo.js"></script>
+</body>
+</html>

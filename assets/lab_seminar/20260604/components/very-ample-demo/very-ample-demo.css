@@ -1,0 +1,86 @@
+.very-ample-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(22px, 3.2vw, 40px);
+  margin-top: clamp(22px, 3.4vh, 38px);
+  align-items: start;
+}
+
+.very-ample-panel {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.very-ample-panel h3 {
+  margin: 0;
+  color: var(--accent);
+  font-size: clamp(17px, 1.55vw, 23px);
+  line-height: 1.16;
+  font-weight: 800;
+}
+
+.very-ample-demo canvas {
+  display: block;
+  width: 100%;
+  height: min(46vh, 375px);
+  border: 2px solid var(--accent);
+  background: #fffdfb;
+  touch-action: none;
+}
+
+.very-ample-readout {
+  display: grid;
+  gap: 6px;
+  color: var(--accent);
+  font-family: var(--math-font);
+  font-size: clamp(15px, 1.3vw, 19px);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.very-ample-readout p {
+  margin: 0;
+}
+
+.projective-coordinate {
+  display: grid;
+  gap: 7px;
+  padding: clamp(12px, 1.7vh, 18px) clamp(14px, 2vw, 22px);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: clamp(16px, 1.45vw, 21px);
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.projective-coordinate p {
+  margin: 0;
+}
+
+.theta-basis-note {
+  display: grid;
+  gap: 6px;
+  padding: clamp(10px, 1.5vh, 15px) clamp(12px, 1.8vw, 18px);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: clamp(14px, 1.2vw, 17px);
+  font-weight: 800;
+  line-height: 1.24;
+  text-align: center;
+}
+
+.theta-basis-note p {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .very-ample-demo {
+    grid-template-columns: 1fr;
+  }
+
+  .very-ample-demo canvas {
+    height: 34vh;
+  }
+}

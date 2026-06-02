@@ -1,0 +1,97 @@
+.complex-line-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(24px, 3.4vw, 44px);
+  margin-top: clamp(26px, 4vh, 44px);
+  align-items: start;
+}
+
+.complex-line-visual {
+  display: grid;
+  gap: clamp(10px, 1.5vh, 14px);
+  min-width: 0;
+}
+
+.complex-line-demo canvas {
+  display: block;
+  width: 100%;
+  height: min(43vh, 360px);
+  border: 2px solid var(--accent);
+  background: #fffdfb;
+  touch-action: none;
+}
+
+.complex-line-info {
+  display: grid;
+  gap: clamp(14px, 2vh, 20px);
+  min-width: 0;
+  font-size: clamp(17px, 1.55vw, 23px);
+  line-height: 1.34;
+}
+
+.complex-line-info p {
+  margin: 0;
+}
+
+.phase-formula {
+  display: grid;
+  gap: 8px;
+  padding: clamp(10px, 1.35vh, 14px) clamp(14px, 2vw, 22px);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-weight: 800;
+  text-align: center;
+}
+
+.phase-formula .math-line {
+  font-size: clamp(17px, 1.75vw, 24px);
+}
+
+.phase-readout {
+  display: grid;
+  gap: 6px;
+  color: var(--accent);
+  font-family: var(--math-font);
+  font-size: clamp(18px, 1.65vw, 24px);
+  font-weight: 700;
+}
+
+.tau-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.tau-control {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 62px;
+  gap: 10px;
+  align-items: center;
+  font-size: clamp(15px, 1.3vw, 19px);
+  line-height: 1.2;
+}
+
+.tau-control label,
+.tau-control output {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.tau-control input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.phase-hint {
+  color: #4e555b;
+  font-size: clamp(14px, 1.2vw, 17px);
+}
+
+@media (max-width: 900px) {
+  .complex-line-demo {
+    grid-template-columns: 1fr;
+  }
+
+  .complex-line-demo canvas {
+    height: 36vh;
+  }
+}

@@ -1,0 +1,72 @@
+.circle-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(22px, 3vw, 38px);
+  margin-top: clamp(26px, 4vh, 44px);
+  align-items: start;
+}
+
+.circle-demo-panel {
+  min-width: 0;
+}
+
+.circle-demo-panel h3 {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: clamp(18px, 1.7vw, 25px);
+  line-height: 1.16;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.circle-demo canvas {
+  display: block;
+  width: 100%;
+  height: min(48vh, 390px);
+  border: 2px solid var(--accent);
+  background: #fffdfb;
+  touch-action: none;
+}
+
+.circle-readout {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: clamp(16px, 1.45vw, 20px);
+  line-height: 1.28;
+}
+
+.circle-readout p {
+  margin: 0;
+}
+
+.circle-value {
+  color: var(--accent);
+  font-family: var(--math-font);
+  font-size: clamp(19px, 1.85vw, 26px);
+  font-weight: 700;
+}
+
+.circle-projective-box {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: clamp(14px, 2vh, 20px) clamp(18px, 2.4vw, 28px);
+  border: 2px solid var(--accent);
+  font-size: clamp(18px, 1.75vw, 25px);
+  line-height: 1.32;
+}
+
+.circle-projective-box p {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .circle-demo {
+    grid-template-columns: 1fr;
+  }
+
+  .circle-demo canvas {
+    height: 32vh;
+  }
+}

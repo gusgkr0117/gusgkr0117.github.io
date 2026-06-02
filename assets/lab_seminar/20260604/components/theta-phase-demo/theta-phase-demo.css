@@ -1,0 +1,96 @@
+.theta-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: clamp(24px, 3.4vw, 44px);
+  margin-top: clamp(26px, 4vh, 44px);
+  align-items: start;
+}
+
+.theta-demo canvas {
+  display: block;
+  width: 100%;
+  height: min(52vh, 430px);
+  border: 2px solid var(--accent);
+  background: #fffdfb;
+}
+
+.theta-info {
+  display: grid;
+  gap: clamp(14px, 2vh, 20px);
+  min-width: 0;
+  font-size: clamp(17px, 1.55vw, 23px);
+  line-height: 1.34;
+}
+
+.theta-info p {
+  margin: 0;
+}
+
+.theta-formula {
+  display: grid;
+  gap: 8px;
+  padding: clamp(14px, 2vh, 20px) clamp(18px, 2.4vw, 28px);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-weight: 800;
+  text-align: center;
+}
+
+.theta-formula .theta-equation {
+  overflow: hidden;
+  font-family: "Computer Modern Web", var(--math-font);
+  font-size: clamp(18px, 1.72vw, 23px);
+  line-height: 1.2;
+  white-space: nowrap;
+  letter-spacing: 0;
+  word-spacing: 0;
+}
+
+.theta-readout {
+  display: grid;
+  gap: 6px;
+  color: var(--accent);
+  font-family: var(--math-font);
+  font-size: clamp(18px, 1.65vw, 24px);
+  font-weight: 700;
+}
+
+.theta-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.theta-control {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 62px;
+  gap: 10px;
+  align-items: center;
+  font-size: clamp(15px, 1.3vw, 19px);
+  line-height: 1.2;
+}
+
+.theta-control label,
+.theta-control output {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.theta-control input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.theta-hint {
+  color: #4e555b;
+  font-size: clamp(14px, 1.2vw, 17px);
+}
+
+@media (max-width: 900px) {
+  .theta-demo {
+    grid-template-columns: 1fr;
+  }
+
+  .theta-demo canvas {
+    height: 36vh;
+  }
+}
