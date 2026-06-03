@@ -13,7 +13,10 @@
     }
 
     const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+    let renderQuality = "full";
+    let pendingFrame = null;
+    let settleTimer = null;
 
     const state = {
       tau: {
@@ -30,9 +33,9 @@
       grid: "#d9d4d0",
     };
 
-    function setupCanvas() {
+    function setupCanvas(quality = "full") {
       const rect = canvas.getBoundingClientRect();
-      const dpr = renderDpr;
+      const dpr = quality === "fast" ? 1 : renderDpr;
       canvas.width = Math.max(1, Math.round(rect.width * dpr));
       canvas.height = Math.max(1, Math.round(rect.height * dpr));
       const ctx = canvas.getContext("2d");
@@ -51,7 +54,8 @@
       let re = 0;
       let im = 0;
       const tau = state.tau;
-      for (let n = -state.terms; n <= state.terms; n += 1) {
+      const terms = renderQuality === "fast" ? Math.min(state.terms, 5) : state.terms;
+      for (let n = -terms; n <= terms; n += 1) {
         const exponentRe = -Math.PI * n * n * tau.im - 2 * Math.PI * n * zIm;
         const exponentIm = Math.PI * n * n * tau.re + 2 * Math.PI * n * zRe;
         const magnitude = Math.exp(Math.max(-40, Math.min(40, exponentRe)));
@@ -148,8 +152,9 @@
       };
     }
 
-    function draw() {
-      const { ctx, width, height, dpr, pixelWidth, pixelHeight } = setupCanvas();
+    function draw(quality = "full") {
+      renderQuality = quality;
+      const { ctx, width, height, dpr, pixelWidth, pixelHeight } = setupCanvas(quality);
       const projection = planeProjection(width, height);
       const image = ctx.createImageData(pixelWidth, pixelHeight);
       const data = image.data;
@@ -181,6 +186,7 @@
       ctx.fillStyle = colors.ink;
       ctx.font = "700 17px Pretendard, sans-serif";
       ctx.fillText("complex plane colored by arg theta(z, tau)", width * 0.06, height * 0.08);
+      renderQuality = "full";
     }
 
     function hslToRgb(h, s, l) {
@@ -216,7 +222,7 @@
       };
     }
 
-    function render() {
+    function render(quality = "full") {
       if (tauReadout) {
         tauReadout.textContent = `τ = ${state.tau.re.toFixed(2)} + ${state.tau.im.toFixed(2)}i`;
       }
@@ -229,7 +235,25 @@
       if (tauImOutput) {
         tauImOutput.textContent = state.tau.im.toFixed(2);
       }
-      draw();
+      draw(quality);
+    }
+
+    function scheduleRender() {
+      if (pendingFrame === null) {
+        pendingFrame = requestAnimationFrame(() => {
+          pendingFrame = null;
+          render("fast");
+        });
+      }
+
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => {
+        if (pendingFrame !== null) {
+          cancelAnimationFrame(pendingFrame);
+          pendingFrame = null;
+        }
+        render("full");
+      }, 160);
     }
 
     function updateTauFromInputs() {
@@ -239,7 +263,7 @@
       if (tauImInput) {
         state.tau.im = Number(tauImInput.value);
       }
-      render();
+      scheduleRender();
     }
 
     if (tauReInput) {
@@ -251,7 +275,7 @@
       tauImInput.addEventListener("input", updateTauFromInputs);
     }
 
-    window.addEventListener("resize", render);
+    window.addEventListener("resize", () => render("full"));
     render();
   }
 

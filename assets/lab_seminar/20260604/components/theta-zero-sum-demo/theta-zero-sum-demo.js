@@ -10,7 +10,10 @@
     }
 
     const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+    let renderQuality = "full";
+    let pendingFrame = null;
+    let settleTimer = null;
 
     const state = {
       tau: {
@@ -35,9 +38,9 @@
       grid: "rgba(17, 17, 17, 0.18)",
     };
 
-    function setupCanvas(target) {
+    function setupCanvas(target, quality = "full") {
       const rect = target.getBoundingClientRect();
-      const dpr = renderDpr;
+      const dpr = quality === "fast" ? 1 : renderDpr;
       target.width = Math.max(1, Math.round(rect.width * dpr));
       target.height = Math.max(1, Math.round(rect.height * dpr));
       const ctx = target.getContext("2d");
@@ -122,8 +125,9 @@
       let re = 0;
       let im = 0;
       const shift = k / 3;
+      const terms = renderQuality === "fast" ? Math.min(state.terms, 6) : state.terms;
 
-      for (let n = -state.terms; n <= state.terms; n += 1) {
+      for (let n = -terms; n <= terms; n += 1) {
         const a = n + shift;
         const exponentRe = -Math.PI * 3 * a * a * state.tau.im - 2 * Math.PI * 3 * a * z.im;
         const exponentIm = Math.PI * 3 * a * a * state.tau.re + 2 * Math.PI * 3 * a * z.re;
@@ -222,7 +226,7 @@
     function refineZero(u, v) {
       let current = { u, v };
       const h = 0.00015;
-      const iterations = isCoarsePointer ? 14 : 24;
+      const iterations = renderQuality === "fast" ? 10 : (isCoarsePointer ? 14 : 20);
 
       for (let iter = 0; iter < iterations; iter += 1) {
         const f = sectionValue(current.u, current.v);
@@ -261,7 +265,7 @@
     }
 
     function findZeros() {
-      const grid = isCoarsePointer ? 44 : 72;
+      const grid = renderQuality === "fast" ? 40 : (isCoarsePointer ? 44 : 60);
       const step = 1 / grid;
       const candidates = [];
 
@@ -471,9 +475,10 @@
       });
     }
 
-    function draw() {
+    function draw(quality = "full") {
+      renderQuality = quality;
       findZeros();
-      const { ctx, width, height, dpr } = setupCanvas(canvas);
+      const { ctx, width, height, dpr } = setupCanvas(canvas, quality);
       const proj = projection(width, height);
       ctx.fillStyle = colors.panel;
       ctx.fillRect(0, 0, width, height);
@@ -488,6 +493,25 @@
       ctx.font = "600 13px Pretendard, sans-serif";
       ctx.fillText("red circles are zeros; blue diamond is their sum in C/Lambda", 18, 47);
       updateReadouts();
+      renderQuality = "full";
+    }
+
+    function scheduleDraw() {
+      if (pendingFrame === null) {
+        pendingFrame = requestAnimationFrame(() => {
+          pendingFrame = null;
+          draw("fast");
+        });
+      }
+
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => {
+        if (pendingFrame !== null) {
+          cancelAnimationFrame(pendingFrame);
+          pendingFrame = null;
+        }
+        draw("full");
+      }, 180);
     }
 
     controls.forEach((input) => {
@@ -496,13 +520,13 @@
         const index = Number(indexText);
         state.coeffs[index][kind] = Number(input.value);
         updateControlReadouts();
-        draw();
+        scheduleDraw();
       });
     });
 
     updateControlReadouts();
     draw();
-    window.addEventListener("resize", draw);
+    window.addEventListener("resize", () => draw("full"));
   }
 
   document.querySelectorAll("[data-theta-zero-sum-demo]").forEach(initThetaZeroSumDemo);

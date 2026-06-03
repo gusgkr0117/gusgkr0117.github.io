@@ -11,7 +11,11 @@
     }
 
     const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+    let renderQuality = "full";
+    let pendingFrame = null;
+    let settleTimer = null;
+    let sectionsCache = null;
 
     const state = {
       tau: {
@@ -31,9 +35,9 @@
       grid: "#d9d4d0",
     };
 
-    function setupCanvas(canvas) {
+    function setupCanvas(canvas, quality = "full") {
       const rect = canvas.getBoundingClientRect();
-      const dpr = renderDpr;
+      const dpr = quality === "fast" ? 1 : renderDpr;
       canvas.width = Math.max(1, Math.round(rect.width * dpr));
       canvas.height = Math.max(1, Math.round(rect.height * dpr));
       const ctx = canvas.getContext("2d");
@@ -74,7 +78,8 @@
       let im = 0;
       const tau = state.tau;
       const shift = k / 3;
-      for (let n = -state.terms; n <= state.terms; n += 1) {
+      const terms = renderQuality === "fast" ? Math.min(state.terms, 5) : state.terms;
+      for (let n = -terms; n <= terms; n += 1) {
         const a = n + shift;
         const exponentRe = -Math.PI * 3 * a * a * tau.im - 2 * Math.PI * 3 * a * zIm;
         const exponentIm = Math.PI * 3 * a * a * tau.re + 2 * Math.PI * 3 * a * zRe;
@@ -126,8 +131,8 @@
       return -Math.PI * 3 * tau.re - 2 * Math.PI * 3 * zRe;
     }
 
-    function drawBundleCanvas() {
-      const { ctx, width, height } = setupCanvas(bundleCanvas);
+    function drawBundleCanvas(quality = "full") {
+      const { ctx, width, height } = setupCanvas(bundleCanvas, quality);
       const projection = planeProjection(width, height);
       const tau = state.tau;
       const origin = planePoint(0, 0, projection);
@@ -185,8 +190,8 @@
       ctx.fillText("z", selected.x + 8, selected.y - 8);
     }
 
-    function drawThetaPanel(ctx, x0, y0, panelWidth, panelHeight, k) {
-      const dpr = renderDpr;
+    function drawThetaPanel(ctx, x0, y0, panelWidth, panelHeight, k, includeSelected = true, quality = "full") {
+      const dpr = quality === "fast" ? 1 : renderDpr;
       const pixelWidth = Math.max(1, Math.floor(panelWidth * dpr));
       const pixelHeight = Math.max(1, Math.floor(panelHeight * dpr));
       const offscreen = document.createElement("canvas");
@@ -225,7 +230,6 @@
       const one = planePoint(1, 0, projection);
       const tauPoint = planePoint(tau.re, tau.im, projection);
       const sum = planePoint(1 + tau.re, tau.im, projection);
-      const selected = planePoint(state.s + state.t * tau.re, state.t * tau.im, projection);
 
       ctx.strokeStyle = colors.ink;
       ctx.lineWidth = 1.8;
@@ -237,10 +241,9 @@
       ctx.closePath();
       ctx.stroke();
 
-      ctx.fillStyle = colors.accent;
-      ctx.beginPath();
-      ctx.arc(selected.x, selected.y, 5, 0, Math.PI * 2);
-      ctx.fill();
+      if (includeSelected) {
+        drawThetaPanelSelection(ctx, projection);
+      }
 
       ctx.fillStyle = colors.ink;
       ctx.font = "700 14px Pretendard, sans-serif";
@@ -252,17 +255,56 @@
       ctx.strokeRect(x0, y0, panelWidth, panelHeight);
     }
 
-    function drawSectionsCanvas() {
-      const { ctx, width, height } = setupCanvas(sectionsCanvas);
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = "#fffdfb";
-      ctx.fillRect(0, 0, width, height);
+    function drawThetaPanelSelection(ctx, projection) {
+      const tau = state.tau;
+      const selected = planePoint(state.s + state.t * tau.re, state.t * tau.im, projection);
+      ctx.fillStyle = colors.accent;
+      ctx.beginPath();
+      ctx.arc(selected.x, selected.y, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
+    function sectionsCacheKey(width, height, dpr, quality) {
+      return [
+        Math.round(width),
+        Math.round(height),
+        dpr,
+        quality,
+        state.tau.re.toFixed(3),
+        state.tau.im.toFixed(3),
+        state.terms,
+      ].join(":");
+    }
+
+    function drawSectionsCanvas(quality = "full") {
+      const { ctx, width, height } = setupCanvas(sectionsCanvas, quality);
+      ctx.clearRect(0, 0, width, height);
+      const dpr = quality === "fast" ? 1 : renderDpr;
+      const key = sectionsCacheKey(width, height, dpr, quality);
       const gap = 12;
       const panelWidth = (width - gap * 4) / 3;
       const panelHeight = height - 2 * gap;
+
+      if (!sectionsCache || sectionsCache.key !== key) {
+        const cacheCanvas = document.createElement("canvas");
+        cacheCanvas.width = Math.max(1, Math.round(width * dpr));
+        cacheCanvas.height = Math.max(1, Math.round(height * dpr));
+        const cacheCtx = cacheCanvas.getContext("2d");
+        cacheCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        cacheCtx.fillStyle = "#fffdfb";
+        cacheCtx.fillRect(0, 0, width, height);
+        for (let k = 0; k < 3; k += 1) {
+          drawThetaPanel(cacheCtx, gap + k * (panelWidth + gap), gap, panelWidth, panelHeight, k, false, quality);
+        }
+        sectionsCache = { key, canvas: cacheCanvas };
+      }
+
+      ctx.drawImage(sectionsCache.canvas, 0, 0, width, height);
       for (let k = 0; k < 3; k += 1) {
-        drawThetaPanel(ctx, gap + k * (panelWidth + gap), gap, panelWidth, panelHeight, k);
+        ctx.save();
+        ctx.translate(gap + k * (panelWidth + gap), gap);
+        drawThetaPanelSelection(ctx, planeProjection(panelWidth, panelHeight));
+        ctx.restore();
       }
     }
 
@@ -288,7 +330,8 @@
       return `${re}${sign}${im}i`;
     }
 
-    function render() {
+    function render(quality = "full") {
+      renderQuality = quality;
       const tau = state.tau;
       const zRe = state.s + state.t * tau.re;
       const zIm = state.t * tau.im;
@@ -297,8 +340,27 @@
       pointReadout.textContent = `z = ${zRe.toFixed(2)} + ${zIm.toFixed(2)}i`;
       valuesReadout.textContent = values.map((value, index) => `s${index}(z) = ${valueText(value)}`).join("    ");
       coordinateReadout.textContent = `[${values.map(valueText).join(" : ")}]`;
-      drawBundleCanvas();
-      drawSectionsCanvas();
+      drawBundleCanvas(quality);
+      drawSectionsCanvas(quality);
+      renderQuality = "full";
+    }
+
+    function scheduleRender() {
+      if (pendingFrame === null) {
+        pendingFrame = requestAnimationFrame(() => {
+          pendingFrame = null;
+          render("fast");
+        });
+      }
+
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => {
+        if (pendingFrame !== null) {
+          cancelAnimationFrame(pendingFrame);
+          pendingFrame = null;
+        }
+        render("full");
+      }, 160);
     }
 
     bundleCanvas.addEventListener("pointerdown", (event) => {
@@ -307,7 +369,7 @@
       const parameter = parameterFromBundleCanvas(event.clientX, event.clientY);
       state.s = parameter.s;
       state.t = parameter.t;
-      render();
+      scheduleRender();
     });
 
     bundleCanvas.addEventListener("pointermove", (event) => {
@@ -315,18 +377,23 @@
       const parameter = parameterFromBundleCanvas(event.clientX, event.clientY);
       state.s = parameter.s;
       state.t = parameter.t;
-      render();
+      scheduleRender();
     });
 
     bundleCanvas.addEventListener("pointerup", () => {
       state.dragging = false;
+      render("full");
     });
 
     bundleCanvas.addEventListener("pointercancel", () => {
       state.dragging = false;
+      render("full");
     });
 
-    window.addEventListener("resize", render);
+    window.addEventListener("resize", () => {
+      sectionsCache = null;
+      render("full");
+    });
     render();
   }
 
