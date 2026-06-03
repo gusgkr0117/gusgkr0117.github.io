@@ -12,12 +12,15 @@
       return;
     }
 
+    const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+
     const state = {
       tau: {
         re: Number(root.dataset.tauRe || 0.45),
         im: Number(root.dataset.tauIm || 1.25),
       },
-      terms: Number(root.dataset.terms || 8),
+      terms: isCoarsePointer ? Math.min(Number(root.dataset.terms || 8), 5) : Number(root.dataset.terms || 8),
     };
 
     const colors = {
@@ -29,7 +32,7 @@
 
     function setupCanvas() {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = renderDpr;
       canvas.width = Math.max(1, Math.round(rect.width * dpr));
       canvas.height = Math.max(1, Math.round(rect.height * dpr));
       const ctx = canvas.getContext("2d");

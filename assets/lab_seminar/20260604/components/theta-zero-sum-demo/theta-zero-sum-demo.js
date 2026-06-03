@@ -9,12 +9,15 @@
       return;
     }
 
+    const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+
     const state = {
       tau: {
         re: Number(root.dataset.tauRe || 0.45),
         im: Number(root.dataset.tauIm || 1.25),
       },
-      terms: 8,
+      terms: isCoarsePointer ? 5 : 8,
       coeffs: [
         { amp: 1, phase: 0 },
         { amp: 0.82, phase: 0.34 },
@@ -34,7 +37,7 @@
 
     function setupCanvas(target) {
       const rect = target.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = renderDpr;
       target.width = Math.max(1, Math.round(rect.width * dpr));
       target.height = Math.max(1, Math.round(rect.height * dpr));
       const ctx = target.getContext("2d");
@@ -219,8 +222,9 @@
     function refineZero(u, v) {
       let current = { u, v };
       const h = 0.00015;
+      const iterations = isCoarsePointer ? 14 : 24;
 
-      for (let iter = 0; iter < 24; iter += 1) {
+      for (let iter = 0; iter < iterations; iter += 1) {
         const f = sectionValue(current.u, current.v);
         const fu1 = sectionValue(current.u + h, current.v);
         const fu0 = sectionValue(current.u - h, current.v);
@@ -257,7 +261,7 @@
     }
 
     function findZeros() {
-      const grid = 72;
+      const grid = isCoarsePointer ? 44 : 72;
       const step = 1 / grid;
       const candidates = [];
 

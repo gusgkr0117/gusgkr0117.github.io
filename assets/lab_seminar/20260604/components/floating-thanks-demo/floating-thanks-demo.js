@@ -7,12 +7,15 @@
     const text = root.dataset.text || "Thank you";
     const letters = [];
     const pointer = { x: 0, y: 0, active: false };
+    const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
     let width = 0;
     let height = 0;
     let scale = 1;
     let lastTime = performance.now();
     let startTime = performance.now();
     let hasDropped = false;
+    let isVisible = false;
+    let frameId = null;
 
     function random(min, max) {
       return min + Math.random() * (max - min);
@@ -75,7 +78,7 @@
     }
 
     function resize() {
-      scale = window.devicePixelRatio || 1;
+      scale = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       const rect = root.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
@@ -145,7 +148,8 @@
         }
       }
 
-      for (let iteration = 0; iteration < 9; iteration += 1) {
+      const iterations = isCoarsePointer ? 5 : 9;
+      for (let iteration = 0; iteration < iterations; iteration += 1) {
         nodes[0].x = letter.anchorX;
         nodes[0].y = letter.anchorY;
         for (let i = 0; i < nodes.length - 1; i += 1) {
@@ -184,22 +188,34 @@
       ctx.font = `800 ${letter.size}px Pretendard, sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-      ctx.shadowBlur = 18;
-      ctx.shadowOffsetY = 8;
+      ctx.shadowColor = isCoarsePointer ? "transparent" : "rgba(0, 0, 0, 0.15)";
+      ctx.shadowBlur = isCoarsePointer ? 0 : 18;
+      ctx.shadowOffsetY = isCoarsePointer ? 0 : 8;
       ctx.fillStyle = "#9b002a";
       ctx.fillText(letter.char, 0, 0);
       ctx.restore();
     }
 
     function frame(now) {
+      if (!isVisible) {
+        frameId = null;
+        return;
+      }
       const dt = Math.min(0.033, (now - lastTime) / 1000 || 0.016);
       lastTime = now;
       const elapsed = now / 1000;
       drawBackground();
       letters.forEach((letter) => updateLetter(letter, dt, elapsed));
       letters.forEach(drawLetter);
-      requestAnimationFrame(frame);
+      frameId = requestAnimationFrame(frame);
+    }
+
+    function startAnimation() {
+      if (frameId !== null) {
+        return;
+      }
+      lastTime = performance.now();
+      frameId = requestAnimationFrame(frame);
     }
 
     root.addEventListener("pointermove", (event) => {
@@ -225,15 +241,17 @@
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
+        isVisible = entry.isIntersecting;
         if (entry.isIntersecting && entry.intersectionRatio >= 0.6 && !hasDropped) {
           hasDropped = true;
           startTime = performance.now();
         }
+        if (isVisible) {
+          startAnimation();
+        }
       });
     }, { threshold: [0, 0.6, 1] });
     observer.observe(root);
-
-    requestAnimationFrame(frame);
   }
 
   document.querySelectorAll("[data-floating-thanks-demo]").forEach(initFloatingThanks);

@@ -10,6 +10,9 @@
       return;
     }
 
+    const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    const renderDpr = isCoarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+
     const state = {
       tau: {
         re: Number(root.dataset.tauRe || 0.45),
@@ -17,7 +20,7 @@
       },
       s: 0.35,
       t: 0.42,
-      terms: 7,
+      terms: isCoarsePointer ? 5 : 7,
       dragging: false,
     };
 
@@ -30,7 +33,7 @@
 
     function setupCanvas(canvas) {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = renderDpr;
       canvas.width = Math.max(1, Math.round(rect.width * dpr));
       canvas.height = Math.max(1, Math.round(rect.height * dpr));
       const ctx = canvas.getContext("2d");
@@ -183,7 +186,7 @@
     }
 
     function drawThetaPanel(ctx, x0, y0, panelWidth, panelHeight, k) {
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = renderDpr;
       const pixelWidth = Math.max(1, Math.floor(panelWidth * dpr));
       const pixelHeight = Math.max(1, Math.floor(panelHeight * dpr));
       const offscreen = document.createElement("canvas");
