@@ -670,27 +670,35 @@
     @media (max-width: 1024px) {
       main {
         width: 100%;
-        scroll-snap-type: y proximity;
+        min-height: 0;
+        scroll-snap-type: none;
       }
 
       .slide {
+        display: block;
         width: 100%;
         height: auto;
-        min-height: 100svh;
-        padding: clamp(64px, 8svh, 88px) clamp(24px, 5vw, 48px) clamp(54px, 7svh, 76px);
+        min-height: 0;
+        padding: clamp(34px, 5vw, 56px) clamp(24px, 5vw, 48px) clamp(42px, 6vw, 60px);
         border-width: 3px;
+        scroll-snap-align: none;
       }
 
       .title-content {
-        justify-content: center;
+        display: block;
+        flex: initial;
       }
 
       .title-slide .name {
-        padding-top: clamp(52px, 9svh, 86px);
+        padding-top: clamp(34px, 7vw, 56px);
+      }
+
+      .title-slide .meta {
+        margin-top: clamp(34px, 7vw, 56px);
       }
 
       .title-slide .date {
-        margin-top: clamp(44px, 8svh, 76px);
+        margin-top: clamp(24px, 5vw, 40px);
       }
 
       .content-slide .content {
@@ -711,6 +719,25 @@
         grid-template-columns: 1fr;
       }
 
+      .interactive-lattice,
+      .circle-demo,
+      .complex-line-demo,
+      .theta-demo,
+      .very-ample-demo,
+      .theta-zero-demo {
+        grid-template-columns: 1fr !important;
+      }
+
+      .slide canvas:not([data-floating-thanks-canvas]) {
+        height: auto !important;
+        max-height: none !important;
+      }
+
+      .slide3-video-panel video {
+        height: auto !important;
+        aspect-ratio: 16 / 9;
+      }
+
       .formula-step[open] {
         max-height: none;
       }
@@ -722,7 +749,7 @@
 
     @media (max-width: 640px) {
       .slide {
-        padding: 60px 18px 52px;
+        padding: 28px 18px 36px;
         border-width: 2px;
       }
 
@@ -737,7 +764,15 @@
       }
 
       .title-slide .name {
-        padding-top: 48px;
+        padding-top: 28px;
+      }
+
+      .title-slide .meta {
+        margin-top: 28px;
+      }
+
+      .title-slide .date {
+        margin-top: 18px;
       }
 
       .content-slide h2::after {
@@ -792,6 +827,40 @@
       .question-list li {
         grid-template-columns: 1fr;
         gap: 4px;
+      }
+
+      .interactive-lattice,
+      .circle-demo,
+      .complex-line-demo,
+      .theta-demo,
+      .very-ample-demo,
+      .theta-zero-demo,
+      .line-bundle-slide,
+      .definitions,
+      .definition-slide,
+      .explain-slide,
+      .projective-example,
+      .liouville-slide,
+      .formula-pager,
+      .conclusion-grid {
+        margin-top: 22px;
+      }
+
+      .slide3-video-panel {
+        padding: 0 30px !important;
+      }
+
+      .theta-zero-control {
+        grid-template-columns: 36px 1fr 40px !important;
+      }
+
+      .floating-thanks-demo {
+        height: auto !important;
+        min-height: 260px;
+      }
+
+      .floating-thanks-demo canvas {
+        height: 260px !important;
       }
 
       .ink-toolbar {
