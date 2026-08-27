@@ -1,7 +1,7 @@
 ---
 title: Yoneda Lemma
 subtitle: Yoneda Lemma 이해하기
-tags: Mathematics, Category Theory
+tags: Mathematics Category_Theory
 use_math: true
 key: post_20260827
 ---
