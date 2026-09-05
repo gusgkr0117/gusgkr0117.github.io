@@ -14,7 +14,7 @@ key: post_20260906
 
 ## Complete variety의 정의
 어떤 variety $X$에 대해서 다른 모든 variety $Y$에 대해
-Projective map $\pi : X\times Y \to Y$가 항상 closed map 이라면,
+Projection map $\pi : X\times Y \to Y$가 항상 closed map 이라면,
 즉, $X\times Y$의 Zariski closed set $Z$에 대해, image $\pi(Z)$
 가 $Y$에서 closed set이라면, $X$를 **Complete** variety라고 한다.
 
@@ -29,4 +29,4 @@ Metric을 정의할 수 없는 Zariski topology의 경우에 완비성을 정의
 
 여기서 중요한 직관은 Category theory를 통해서 어떤 특성을 정의할 땐, universal한 정의가 항상 사용된다는 것이다. 이러한 universal한 특성은 Complete variety의 정의에서도 볼 수 있다.
 
-어떤 variety $X$의 구멍을 메운다는 것은 $X$에 존재하지 않는 어떤 새로운 공간 $Y$를 덧붙여서 원래는 존재하지 않았던 자명하지 않은 (V_X \times V_Y와 같은 형태가 아닌) subvariety가 생긴다는 뜻이다. 예를들면, $X = \mathbb{A}\_k^1$일 때, $Y = \mathbb{A}\_k^1$이라고 한다면, $X \times Y = \mathbb{A}\_{k}^2$이고 그 안에 닫힌 곡선 $xy - 1 = 0$을 생각하면, 이는 projection map에 의해서 닫힌 곡선으로 가지 않는다. 반대로 모든 $Y$에 대해서 항상 새로운 어떤 자명하지 않은 variety가 생성되지 않으면 $X$는 완비성을 갖는다고 말하는건 이제 자연스러워 보인다.
+어떤 variety $X$의 구멍을 메운다는 것은 $X$에 존재하지 않는 어떤 새로운 공간 $Y$를 덧붙여서 원래는 존재하지 않았던 자명하지 않은 ($V\_X \times V\_Y$와 같은 형태가 아닌) subvariety가 생긴다는 뜻이다. 예를들면, $X = \mathbb{A}\_k^1$일 때, $Y = \mathbb{A}\_k^1$이라고 한다면, $X \times Y = \mathbb{A}\_{k}^2$이고 그 안에 닫힌 곡선 $xy - 1 = 0$을 생각하면, 이는 projection map에 의해서 닫힌 곡선으로 가지 않는다. 반대로 모든 $Y$에 대해서 항상 새로운 어떤 자명하지 않은 variety가 생성되지 않으면 $X$는 완비성을 갖는다고 말하는건 이제 자연스러워 보인다.
